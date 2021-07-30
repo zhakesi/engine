@@ -4,6 +4,7 @@ import { EventTarget } from '../../../cocos/core/event/event-target';
 import { legacyCC } from '../../../cocos/core/global-exports';
 import { clamp, clamp01 } from '../../../cocos/core';
 import { enqueueOperation, OperationInfo, OperationQueueable } from '../operation-queue';
+import { AudioLip } from './audio-lip';
 
 // NOTE: fix CI
 const AudioContextClass = (window.AudioContext || window.webkitAudioContext || window.mozAudioContext);
@@ -153,6 +154,8 @@ export class AudioPlayerWeb implements OperationQueueable {
     private _startTime = 0;
     private _playTimeOffset = 0;
     private _state: AudioState = AudioState.INIT;
+
+    private _audioLip: AudioLip | null  = null;
 
     // NOTE: the implemented interface properties need to be public access
     public _eventTarget: EventTarget = new EventTarget();
@@ -365,4 +368,12 @@ export class AudioPlayerWeb implements OperationQueueable {
     offInterruptionEnd (cb?: () => void) { this._eventTarget.off(AudioEvent.INTERRUPTION_END, cb); }
     onEnded (cb: () => void) { this._eventTarget.on(AudioEvent.ENDED, cb); }
     offEnded (cb?: () => void) { this._eventTarget.off(AudioEvent.ENDED, cb); }
+
+    public getLipData (): Array<number> {
+        if (!this._audioLip) {
+            this._audioLip = new AudioLip();
+            this._audioLip.Init(this._audioBuffer);
+        }
+        return this._audioLip.ComputeShapeWeight(this.currentTime);
+    }
 }

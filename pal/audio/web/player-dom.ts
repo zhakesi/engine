@@ -245,4 +245,9 @@ export class AudioPlayerDOM implements OperationQueueable {
     offInterruptionEnd (cb?: () => void) { this._eventTarget.off(AudioEvent.INTERRUPTION_END, cb); }
     onEnded (cb: () => void) { this._eventTarget.on(AudioEvent.ENDED, cb); }
     offEnded (cb?: () => void) { this._eventTarget.off(AudioEvent.ENDED, cb); }
+
+    public getLipData (): Array<number> {
+        const dat = [1, 0, 0];
+        return dat;
+    }
 }

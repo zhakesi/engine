@@ -261,6 +261,14 @@ export class AudioPlayer implements OperationQueueable {
     offInterruptionEnd (cb?: () => void) { this._eventTarget.off(AudioEvent.INTERRUPTION_END, cb); }
     onEnded (cb: () => void) { this._eventTarget.on(AudioEvent.ENDED, cb); }
     offEnded (cb?: () => void) { this._eventTarget.off(AudioEvent.ENDED, cb); }
+
+    public getLipData (): Array<number> {
+        if (this._id === INVALID_AUDIO_ID) {
+            const dat = [0, 0, 0];
+            return dat;
+        }
+        return jsb.AudioEngine.getLipData(this._id);
+    }
 }
 
 // REMOVE_ME

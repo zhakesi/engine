@@ -101,4 +101,8 @@ export class AudioPlayer {
     offInterruptionEnd (cb?: () => void) { this._player.offInterruptionEnd(cb); }
     onEnded (cb: () => void) { this._player.onEnded(cb); }
     offEnded (cb?: () => void) { this._player.offEnded(cb); }
+
+    public getLipData (): Array<number> {
+        return this._player.getLipData();
+    }
 }

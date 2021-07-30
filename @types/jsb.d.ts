@@ -111,6 +111,8 @@ declare namespace jsb {
         export function uncacheAll ();
         export function setErrorCallback (id: number, cb: (err: any) => void);
         export function setFinishCallback (id: number, cb: () => void);
+
+        export function getLipData (id: number): Array<number>;
     }
 
     export namespace reflection{
@@ -534,7 +536,7 @@ declare namespace jsb {
          *  Purges full path caches.
          */
         export function purgeCachedEntries ():void;
-            /**
+        /**
          *  Gets full path from a file name and the path of the relative file.
          *  @param filename The file name.
          *  @param relativeFile The path of the relative file.

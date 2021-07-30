@@ -173,5 +173,7 @@ declare module 'pal/audio' {
          * @param cb The callback. If not specified, all callback would be unregistered.
          */
         offEnded (cb?: () => void): void;
+
+        getLipData (): Array<number>;
     }
 }

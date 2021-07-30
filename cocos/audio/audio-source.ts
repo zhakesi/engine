@@ -356,4 +356,8 @@ export class AudioSource extends Component {
     get playing () {
         return this.state === AudioSource.AudioState.PLAYING;
     }
+
+    getPlayer (): AudioPlayer | null {
+        return this._player;
+    }
 }
