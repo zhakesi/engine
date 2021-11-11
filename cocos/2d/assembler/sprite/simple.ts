@@ -70,22 +70,29 @@ export const simple: IAssembler = {
         //         sprite._activateMaterial();
         //     }
         // }
-        dynamicAtlasManager.packToDynamicAtlas(sprite, frame);
-        // @ts-expect-error hack
-        if (UI_GPU_DRIVEN && sprite._canDrawByFourVertex) {
-            sprite._updateUVWithTrim();
-            return;
+        // dynamicAtlasManager.packToDynamicAtlas(sprite, frame);
+        /// @ts-expect-error hack
+        // if (UI_GPU_DRIVEN && sprite._canDrawByFourVertex) {
+        //     sprite._updateUVWithTrim();
+        //     return;
+        // }
+
+        const renderData = sprite.renderData!;
+        if (renderData.vertDirty) {
+            this.updateVertexData(sprite);
+        }
+        if (renderData.uvDirty) {
+            this.updateUvs(sprite);
         }
 
-        const renderData = sprite.renderData;
-        if (renderData && frame) {
-            if (renderData.vertDirty) {
-                this.updateVertexData(sprite);
-            }
-            if (renderData.uvDirty) {
-                this.updateUvs(sprite);
-            }
-        }
+        // if (renderData && frame) {
+        //     if (renderData.vertDirty) {
+        //         this.updateVertexData(sprite);
+        //     }
+        //     if (renderData.uvDirty) {
+        //         this.updateUvs(sprite);
+        //     }
+        // }
     },
 
     updateWorldVerts (sprite: Sprite, vData: Float32Array) {

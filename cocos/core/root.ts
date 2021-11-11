@@ -423,6 +423,7 @@ export class Root {
         for (let i = 0; i < this._scenes.length; ++i) {
             this._scenes[i].removeBatches();
         }
+
         if (this._batcher) this._batcher.update();
 
         const windows = this._windows;

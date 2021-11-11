@@ -130,6 +130,15 @@ const reserveContentsForAllSyncablePrefabTag = Symbol('ReserveContentsForAllSync
  * * 持有各类组件
  * * 维护 3D 空间左边变换（坐标、旋转、缩放）信息
  */
+ const FLOW_MASK_LOCAL_TRANSFORM = 1 << 2;
+ const FLOW_MASK_WORLD_TRANSFORM = 1 << 3;
+ const FLOW_MASK_TRANSFORM = FLOW_MASK_LOCAL_TRANSFORM | FLOW_MASK_WORLD_TRANSFORM;
+ const FLOW_MASK_OPACITY =  1 << 5;
+ const FLOW_MASK_RENDER_DATA =  1 << 4;
+ const FLOW_MASK_RENDER = 1 << 7;
+ const FLOW_MASK_CHILDREN =  1 << 8;
+
+ 
 @ccclass('cc.Node')
 export class Node extends BaseNode implements CustomSerializable {
     /**
@@ -202,6 +211,8 @@ export class Node extends BaseNode implements CustomSerializable {
     // local rotation in euler angles, maintained here so that rotation angles could be greater than 360 degree.
     @serializable
     protected _euler = new Vec3();
+
+    public flowMask : number = FLOW_MASK_OPACITY | FLOW_MASK_CHILDREN | FLOW_MASK_RENDER;
 
     private _dirtyFlagsPri = TransformBit.NONE; // does the world transform need to update?
 
@@ -723,6 +734,7 @@ export class Node extends BaseNode implements CustomSerializable {
                     cur._nativeDirtyFlag[0] = flag;
                 }
 
+                cur.flowMask |= FLOW_MASK_TRANSFORM;
                 // NOTE: inflate attribute accessor
                 // ```
                 // cur.hasChangedFlags = hasChangedFlags | dirtyBit;
