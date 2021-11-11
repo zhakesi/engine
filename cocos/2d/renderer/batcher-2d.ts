@@ -49,6 +49,7 @@ import { TextureBase } from '../../core/assets/texture-base';
 import { sys } from '../../core/platform/sys';
 import { Mat4 } from '../../core/math';
 import { IBatcher } from './i-batcher';
+import { RenderFlow2D } from './render-flow2d';
 
 const _dsInfo = new DescriptorSetInfo(null!);
 const m4_1 = new Mat4();
@@ -165,6 +166,7 @@ export class Batcher2D implements IBatcher {
         this.device = _root.device;
         this._batches = new CachedArray(64);
         this._drawBatchPool = new Pool(() => new DrawBatch2D(), 128);
+        RenderFlow2D.init(this);
     }
 
     public initialize () {
@@ -253,6 +255,7 @@ export class Batcher2D implements IBatcher {
                 continue;
             }
             this._currOpacity = 1;
+            RenderFlow2D.visitRootNode(screen.node);
             this._recursiveScreenNode(screen.node);
         }
 
@@ -582,39 +585,56 @@ export class Batcher2D implements IBatcher {
     public walk (node: Node, level = 0) {
         const len = node.children.length;
 
-        this._preProcess(node);
-        if (len > 0 && !node._static) {
-            const children = node.children;
-            for (let i = 0; i < children.length; ++i) {
-                this._currOpacity = node._uiProps.opacity;
-                const child = children[i];
-                this.walk(child, level);
-            }
-        }
+        //this._preProcess(node);
+        // const render = node._uiProps.uiComp;
+        // xxx---xxxx 
+        // const localAlpha = node._uiProps.localOpacity;
+        // node._uiProps.opacity = this._currOpacity * localAlpha;
 
-        this._postProcess(node);
+        // if (!node._uiProps.uiTransformComp) {
+        //     return;
+        // }
+        // if (render && render.enabledInHierarchy) {
+        //     render.updateAssembler(this);
+        // }
 
-        level += 1;
+
+
+        // if (len > 0 && !node._static) {
+        //     const children = node.children;
+        //     for (let i = 0; i < children.length; ++i) {
+        //         this._currOpacity = node._uiProps.opacity;
+        //         const child = children[i];
+        //         this.walk(child, level);
+        //     }
+        // }
+
+        ///this._postProcess(node);
+
+        //level += 1;
     }
 
-    private _preProcess (node: Node) {
-        const render = node._uiProps.uiComp;
-        const localAlpha = node._uiProps.localOpacity;
-        node._uiProps.opacity = this._currOpacity * localAlpha;
-        if (!node._uiProps.uiTransformComp) {
-            return;
-        }
-        if (render && render.enabledInHierarchy) {
-            render.updateAssembler(this);
-        }
-    }
+    //private _preProcess (node: Node) {
+        // xxx---xxxx use flow._updateRenderData instead
+        //const render = node._uiProps.uiComp;
+         
+        // const localAlpha = node._uiProps.localOpacity;
+        // node._uiProps.opacity = this._currOpacity * localAlpha;
+        // if (!node._uiProps.uiTransformComp) {
+        //     return;
+        // }
+        // if (render && render.enabledInHierarchy) {
+        //     render.updateAssembler(this);
+        // }
+    //}
 
-    private _postProcess (node: Node) {
-        const render = node._uiProps.uiComp;
-        if (render && render.enabledInHierarchy) {
-            render.postUpdateAssembler(this);
-        }
-    }
+    // xxx---xxxx use flow._updateRenderData instead
+    // private _postProcess (node: Node) {
+    //     const render = node._uiProps.uiComp;
+    //     if (render && render.enabledInHierarchy) {
+    //         render.postUpdateAssembler(this);
+    //     }
+    // }
 
     private _recursiveScreenNode (screen: Node) {
         this.walk(screen);

@@ -297,7 +297,7 @@ export class Renderable2D extends RenderableComponent {
     @serializable
     protected _color: Color = Color.WHITE.clone();
 
-    protected _assembler: IAssembler | null = null;
+    public _assembler: IAssembler | null = null;
     protected _postAssembler: IAssembler | null = null;
     protected _renderData: RenderData | null = null;
     protected _renderDataFlag = true;
@@ -426,7 +426,7 @@ export class Renderable2D extends RenderableComponent {
      * 注意：不要手动调用该函数，除非你理解整个流程。
      */
     public updateAssembler (render: IBatcher) {
-        this._updateColor();
+        // this._updateColor();
         if (this._renderFlag) {
             this._checkAndUpdateRenderData();
             this._render(render);
@@ -468,21 +468,21 @@ export class Renderable2D extends RenderableComponent {
 
     protected _postCanRender () {}
 
-    protected _updateColor () {
-        if (UI_GPU_DRIVEN && this._canDrawByFourVertex) {
-            const opacityZero = this._cacheAlpha <= 0;
-            this._updateWorldAlpha();
-            if (this._colorDirty) {
-                if (opacityZero || this._cacheAlpha <= 0) {
-                    this._renderFlag = this._canRender();
-                }
-                this._colorDirty = false;
-            }
-            return;
-        }
+    public updateColor () {
+        // if (UI_GPU_DRIVEN && this._canDrawByFourVertex) {
+        //     const opacityZero = this._cacheAlpha <= 0;
+        //     this._updateWorldAlpha();
+        //     if (this._colorDirty) {
+        //         if (opacityZero || this._cacheAlpha <= 0) {
+        //             this._renderFlag = this._canRender();
+        //         }
+        //         this._colorDirty = false;
+        //     }
+        //     return;
+        // }
         // Need update rendFlag when opacity changes from 0 to !0
         const opacityZero = this._cacheAlpha <= 0;
-        this._updateWorldAlpha();
+        //this._updateWorldAlpha();
         if (this._colorDirty && this._assembler && this._assembler.updateColor) {
             this._assembler.updateColor(this);
             // Need update rendFlag when opacity changes from 0 to !0 or 0 to !0

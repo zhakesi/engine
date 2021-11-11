@@ -92,5 +92,7 @@ export class UIComponent extends Component {
     public markForUpdateRenderData (enable = true) {
     }
 
+    public updateColor(){}
+
     public stencilStage : Stage = Stage.DISABLED;
 }
