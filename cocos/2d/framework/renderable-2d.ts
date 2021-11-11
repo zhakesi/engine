@@ -301,7 +301,7 @@ export class Renderable2D extends RenderableComponent {
     protected _postAssembler: IAssembler | null = null;
     protected _renderData: RenderData | null = null;
     protected _renderDataFlag = true;
-    protected _renderFlag = true;
+    public _renderFlag = true;
     // 特殊渲染节点，给一些不在节点树上的组件做依赖渲染（例如 mask 组件内置两个 graphics 来渲染）
     protected _delegateSrc: Node | null = null;
     protected _instanceMaterialType = -1;
@@ -427,10 +427,10 @@ export class Renderable2D extends RenderableComponent {
      */
     public updateAssembler (render: IBatcher) {
         // this._updateColor();
-        if (this._renderFlag) {
-            this._checkAndUpdateRenderData();
-            this._render(render);
-        }
+        // if (this._renderFlag) {
+        //     this._checkAndUpdateRenderData();
+        //     this._render(render);
+        // }
     }
 
     /**

@@ -647,7 +647,7 @@ export class Sprite extends Renderable2D {
                 this._renderData!.material = this.getRenderMaterial(0);
                 this.markForUpdateRenderData();
                 this._colorDirty = true;
-                this._updateColor();
+                this.updateColor();
             }
         }
     }

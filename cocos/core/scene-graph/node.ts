@@ -135,6 +135,7 @@ const reserveContentsForAllSyncablePrefabTag = Symbol('ReserveContentsForAllSync
  const FLOW_MASK_TRANSFORM = FLOW_MASK_LOCAL_TRANSFORM | FLOW_MASK_WORLD_TRANSFORM;
  const FLOW_MASK_OPACITY =  1 << 5;
  const FLOW_MASK_RENDER_DATA =  1 << 4;
+ const FLOW_MASK_RENDER = 1 << 7;
  const FLOW_MASK_CHILDREN =  1 << 8;
 
  
@@ -211,7 +212,7 @@ export class Node extends BaseNode implements CustomSerializable {
     @serializable
     protected _euler = new Vec3();
 
-    public flowMask : number = FLOW_MASK_OPACITY | FLOW_MASK_RENDER_DATA | FLOW_MASK_CHILDREN;
+    public flowMask : number = FLOW_MASK_OPACITY | FLOW_MASK_CHILDREN | FLOW_MASK_RENDER;
 
     private _dirtyFlagsPri = TransformBit.NONE; // does the world transform need to update?
 

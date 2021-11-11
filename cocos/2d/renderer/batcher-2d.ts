@@ -168,6 +168,9 @@ export class Batcher2D implements IBatcher {
         this._drawBatchPool = new Pool(() => new DrawBatch2D(), 128);
         RenderFlow2D.init(this);
     }
+    walk(node: Node, level?: number) {
+        throw new Error('Method not implemented.');
+    }
 
     public initialize () {
         return true;
@@ -256,7 +259,8 @@ export class Batcher2D implements IBatcher {
             }
             this._currOpacity = 1;
             RenderFlow2D.visitRootNode(screen.node);
-            this._recursiveScreenNode(screen.node);
+            //this._recursiveScreenNode(screen.node);
+            this.autoMergeBatches(this._currComponent!);
         }
 
         let batchPriority = 0;
@@ -582,8 +586,8 @@ export class Batcher2D implements IBatcher {
         this._currMaterial = mat;
     }
 
-    public walk (node: Node, level = 0) {
-        const len = node.children.length;
+    // public walk (node: Node, level = 0) {
+    //     const len = node.children.length;
 
         //this._preProcess(node);
         // const render = node._uiProps.uiComp;
@@ -612,7 +616,7 @@ export class Batcher2D implements IBatcher {
         ///this._postProcess(node);
 
         //level += 1;
-    }
+    // }
 
     //private _preProcess (node: Node) {
         // xxx---xxxx use flow._updateRenderData instead
@@ -636,10 +640,10 @@ export class Batcher2D implements IBatcher {
     //     }
     // }
 
-    private _recursiveScreenNode (screen: Node) {
-        this.walk(screen);
-        this.autoMergeBatches(this._currComponent!);
-    }
+    // private _recursiveScreenNode (screen: Node) {
+    //     // this.walk(screen);
+    //     this.autoMergeBatches(this._currComponent!);
+    // }
 
     private _createMeshBuffer (attributes: Attribute[]): MeshBuffer {
         const batch = this._bufferBatchPool.add();

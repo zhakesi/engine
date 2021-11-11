@@ -45,7 +45,8 @@ const _matInsInfo: IMaterialInstanceInfo = {
     owner: null!,
     subModelIdx: 0,
 };
-
+const FLOW_MASK_RENDER_DATA =  1 << 4;
+const FLOW_MASK_RENDER = 1 << 7;
 @ccclass('cc.RenderableComponent')
 export class RenderableComponent extends Component {
     @type([Material])
@@ -150,6 +151,7 @@ export class RenderableComponent extends Component {
             this._materialInstances[index] = null;
         }
         this._onMaterialModified(index, this._materials[index]);
+        this.markForRender(true);
     }
 
     get material (): MaterialInstance | null {
@@ -244,6 +246,15 @@ export class RenderableComponent extends Component {
     }
 
     protected _onVisibilityChange (val) {
+    }
+
+    private markForRender (enable) {
+        let flag = FLOW_MASK_RENDER_DATA | FLOW_MASK_RENDER;
+        if (enable) {
+            this.node.flowMask |= flag;
+        } else {
+            this.node.flowMask &= ~flag;
+        }
     }
 }
 

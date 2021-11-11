@@ -103,20 +103,26 @@ export class RenderFlow2D {
     };
     
     public _updateRenderData (node : Node) {
-        if (node._uiProps.uiTransformComp && node._uiProps.uiComp) {
-            const render = node._uiProps.uiComp;
-            render!.updateAssembler(RenderFlow2D.bather!);
+        //if (node._uiProps.uiTransformComp && node._uiProps.uiComp) {
+        const render = node._uiProps.uiComp;
+        if (render && render!._renderFlag) {
+            render!._checkAndUpdateRenderData();
         }
-        // node.flowMask &= ~UPDATE_RENDER_DATA;
+        // render!.updateAssembler(RenderFlow2D.bather!);
+        //node.flowMask &= ~UPDATE_RENDER_DATA;
         this._next!._func(node);
     };
     
     public _render (node : Node) {
         //console.log('_render');
+        const render = node._uiProps.uiComp;
+        if (render && render!._renderFlag) {
+            render!._render(RenderFlow2D.bather!);
+        }
+        
         this._next!._func(node);
     };
-    
-    
+
     public _children (node : Node) {
         //console.log('_children');
         let children = node.children;

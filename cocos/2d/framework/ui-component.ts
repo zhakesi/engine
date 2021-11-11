@@ -78,6 +78,13 @@ export class UIComponent extends Component {
     public updateAssembler (render: IBatcher) {
     }
 
+    public _checkAndUpdateRenderData() {
+        
+    }
+
+    public _render() {
+    }
+
     /**
      * @en Post render data submission procedure, it's executed after assembler updated for all children.
      * It may assemble some extra render data to the geometry buffers, or it may only change some render states.
@@ -95,4 +102,6 @@ export class UIComponent extends Component {
     public updateColor(){}
 
     public stencilStage : Stage = Stage.DISABLED;
+
+    public _renderFlag : boolean = true;
 }
