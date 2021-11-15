@@ -1361,7 +1361,7 @@ export class Skeleton extends Renderable2D {
     }
 
     public _meshRenderDataArrayIdx = 0;
-    protected _render (ui: IBatcher) {
+    public _render (ui: IBatcher) {
         if (this._meshRenderDataArray) {
             for (let i = 0; i < this._meshRenderDataArray.length; i++) {
                 // HACK

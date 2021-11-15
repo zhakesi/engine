@@ -49,6 +49,7 @@ import { TextureBase } from '../../core/assets/texture-base';
 import { sys } from '../../core/platform/sys';
 import { Mat4 } from '../../core/math';
 import { IBatcher } from './i-batcher';
+import { RenderFlow2D } from './render-flow-2d';
 
 const _dsInfo = new DescriptorSetInfo(null!);
 const m4_1 = new Mat4();
@@ -166,6 +167,11 @@ export class Batcher2D implements IBatcher {
         this.device = _root.device;
         this._batches = new CachedArray(64);
         this._drawBatchPool = new Pool(() => new DrawBatch2D(), 128);
+
+        RenderFlow2D.init(this);
+    }
+    walk(node: Node, level?: number) {
+        throw new Error('Method not implemented.');
     }
 
     public initialize () {
@@ -254,7 +260,8 @@ export class Batcher2D implements IBatcher {
                 continue;
             }
             this._currOpacity = 1;
-            this._recursiveScreenNode(screen.node);
+            RenderFlow2D.visitRootNode(screen.node);
+            this.autoMergeBatches(this._currComponent!);
         }
 
         let batchPriority = 0;
@@ -597,47 +604,42 @@ export class Batcher2D implements IBatcher {
         this._currMaterial = mat;
     }
 
-    public walk (node: Node, level = 0) {
-        const len = node.children.length;
+    // public walk (node: Node, level = 0) {
+    //     const len = node.children.length;
 
-        this._preProcess(node);
-        if (len > 0 && !node._static) {
-            const children = node.children;
-            for (let i = 0; i < children.length; ++i) {
-                this._currOpacity = node._uiProps.opacity;
-                const child = children[i];
-                this.walk(child, level);
-            }
-        }
+    //     this._preProcess(node);
+    //     if (len > 0 && !node._static) {
+    //         const children = node.children;
+    //         for (let i = 0; i < children.length; ++i) {
+    //             this._currOpacity = node._uiProps.opacity;
+    //             const child = children[i];
+    //             this.walk(child, level);
+    //         }
+    //     }
 
-        this._postProcess(node);
+    //     this._postProcess(node);
 
-        level += 1;
-    }
+    //     level += 1;
+    // }
 
-    private _preProcess (node: Node) {
-        const render = node._uiProps.uiComp;
-        const localAlpha = node._uiProps.localOpacity;
-        node._uiProps.opacity = this._currOpacity * localAlpha;
-        if (!node._uiProps.uiTransformComp) {
-            return;
-        }
-        if (render && render.enabledInHierarchy) {
-            render.updateAssembler(this);
-        }
-    }
+    // private _preProcess (node: Node) {
+    //     const render = node._uiProps.uiComp;
+    //     const localAlpha = node._uiProps.localOpacity;
+    //     node._uiProps.opacity = this._currOpacity * localAlpha;
+    //     if (!node._uiProps.uiTransformComp) {
+    //         return;
+    //     }
+    //     if (render && render.enabledInHierarchy) {
+    //         render.updateAssembler(this);
+    //     }
+    // }
 
-    private _postProcess (node: Node) {
-        const render = node._uiProps.uiComp;
-        if (render && render.enabledInHierarchy) {
-            render.postUpdateAssembler(this);
-        }
-    }
-
-    private _recursiveScreenNode (screen: Node) {
-        this.walk(screen);
-        this.autoMergeBatches(this._currComponent!);
-    }
+    // private _postProcess (node: Node) {
+    //     const render = node._uiProps.uiComp;
+    //     if (render && render.enabledInHierarchy) {
+    //         render.postUpdateAssembler(this);
+    //     }
+    // }
 
     private _createMeshBuffer (attributes: Attribute[]): MeshBuffer {
         const batch = this._bufferBatchPool.add();

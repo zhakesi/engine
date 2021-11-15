@@ -32,6 +32,7 @@ import { UIComponent } from '../../2d/framework/ui-component';
 import { Renderable2D } from '../../2d/framework/renderable-2d';
 import { UITransform } from '../../2d/framework/ui-transform';
 import { warnID } from '../platform/debug';
+import { RenderFlow2D } from '../../2d/renderer/render-flow-2d';
 
 /**
  * @en Node's UI properties abstraction
@@ -74,8 +75,20 @@ export class NodeUIProperties {
      * @en The opacity of the UI node
      * @zh UI 透明度
      */
-    public opacity = 1;
-    public localOpacity = 1;
+    private _opacity = 1;
+    get opacity () { return this._opacity; }
+
+    private _localOpacity = 1;
+    get localOpacity () { return this._localOpacity; }
+    set localOpacity (val) {
+        this._localOpacity = val;
+        this._node.markFlow2DTree(RenderFlow2D.OPACITY_COLOR);
+    }
+
+    public ApplyEffectOpacity (effectOpacity) {
+        this._opacity = this._localOpacity * effectOpacity;
+    }
+
     protected _uiTransformComp: UITransform | null = null;
     private _node: any;
 

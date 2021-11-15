@@ -437,7 +437,7 @@ export class Mask extends Renderable2D {
         return result;
     }
 
-    protected _render (render: IBatcher) {
+    public _render (render: IBatcher) {
         render.commitComp(this, null, this._assembler!, null);
     }
 

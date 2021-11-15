@@ -1435,7 +1435,7 @@ export class TiledLayer extends Renderable2D {
 
     // 当前的 _meshRenderDataArray 的索引, 以便 fillBuffers 选取 RenderData
     public _meshRenderDataArrayIdx = 0;
-    protected _render (ui: IBatcher) {
+    public _render (ui: IBatcher) {
         if (this._meshRenderDataArray) {
             for (let i = 0; i < this._meshRenderDataArray.length; i++) {
                 this._meshRenderDataArrayIdx = i;

@@ -639,7 +639,7 @@ export class Graphics extends Renderable2D {
         this._isNeedUploadData = false;
     }
 
-    protected _render (render: IBatcher) {
+    public _render (render: IBatcher) {
         if (this._isNeedUploadData) {
             if (this.impl) {
                 const renderDataList = this.impl.getRenderDataList();

@@ -1167,7 +1167,7 @@ export class ParticleSystem2D extends Renderable2D {
         return super._canRender() && !this._stopped && this._renderSpriteFrame !== null;
     }
 
-    protected _render (render: IBatcher) {
+    public _render (render: IBatcher) {
         if (this._positionType === PositionType.RELATIVE) {
             render.commitComp(this, this._renderSpriteFrame, this._assembler!, this.node.parent);
         } else if (this.positionType === PositionType.GROUPED) {

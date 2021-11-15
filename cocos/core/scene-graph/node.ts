@@ -42,6 +42,7 @@ import { NodeSpace, TransformBit } from './node-enum';
 import { NativeNode } from '../renderer/scene/native-scene';
 import { NodeEventType } from './node-event';
 import { CustomSerializable, deserializeTag, editorExtrasTag, SerializationContext, SerializationInput, SerializationOutput, serializeTag } from '../data';
+import { RenderFlow2D } from '../../2d/renderer/render-flow-2d';
 
 const v3_a = new Vec3();
 const q_a = new Quat();
@@ -215,6 +216,8 @@ export class Node extends BaseNode implements CustomSerializable {
             this._nativeDirtyFlag[0] = flags;
         }
     }
+
+    public flowMask : number = RenderFlow2D.CHILDREN;
 
     protected _eulerDirty = false;
     protected _nodeHandle: NodeHandle = NULL_HANDLE;
@@ -1321,6 +1324,17 @@ export class Node extends BaseNode implements CustomSerializable {
             Node.ClearFrame = 0;
             dirtyNodes.length = 0;
             nativeDirtyNodes.length = 0;
+        }
+    }
+
+    /**
+     * markFlow2DTree
+     */
+    public markFlow2DTree (mask : number) {
+        this.flowMask |= mask;
+        for (let i = 0, l = this._children.length; i < l; i++) {
+            const c = this._children[i];
+            c.markFlow2DTree(mask);
         }
     }
 }

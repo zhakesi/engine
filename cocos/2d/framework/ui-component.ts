@@ -34,6 +34,7 @@ import { Component } from '../../core/components/component';
 import { UITransform } from './ui-transform';
 import { Node } from '../../core/scene-graph';
 import { Stage } from '../renderer/stencil-manager';
+import { Color } from '../../core';
 
 /**
  * @en Legacy 2D base class for rendering component, please use [[Renderable2D]] instead.
@@ -99,4 +100,11 @@ export class UIComponent extends Component {
 
     public setFrameDirty () {
     }
+
+    public _render (render: IBatcher) {}
+    public _postRender (render: IBatcher) {}
+
+    public _updateColor () { }
+    public _checkAndUpdateRenderData () { }
+    public color = new Color(255, 255, 255, 255);
 }

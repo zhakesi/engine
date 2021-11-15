@@ -615,7 +615,7 @@ export class Sprite extends Renderable2D {
         return mat;
     }
 
-    protected _render (render: IBatcher) {
+    public _render (render: IBatcher) {
         render.commitComp(this, this._spriteFrame, this._assembler!, null);
     }
 

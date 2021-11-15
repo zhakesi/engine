@@ -46,8 +46,9 @@ import { RenderableComponent } from '../../core/components/renderable-component'
 import { Stage } from '../renderer/stencil-manager';
 import { warnID } from '../../core/platform/debug';
 import { legacyCC } from '../../core/global-exports';
-import { director } from '../../core';
+import { director, RenderFlow } from '../../core';
 import { NodeEventType } from '../../core/scene-graph/node-event';
+import { RenderFlow2D } from '../renderer/render-flow-2d';
 
 // hack
 ccenum(BlendFactor);
@@ -120,6 +121,13 @@ export enum InstanceMaterialType {
 export class Renderable2D extends RenderableComponent {
     @override
     protected _materials: (Material | null)[] = [];
+
+    @override
+    public setMaterial (material: Material | null, index: number) {
+        super.setMaterial(material, index);
+        const flag = RenderFlow2D.RENDER | RenderFlow2D.UPDATE_RENDER_DATA | RenderFlow2D.POST_RENDER | RenderFlow2D.OPACITY_COLOR;
+        this.node.flowMask |= flag;
+    }
 
     @override
     @visible(false)
@@ -258,12 +266,17 @@ export class Renderable2D extends RenderableComponent {
         if (this._color.equals(value)) {
             return;
         }
-
+        const oldAlpha = this._color.a;
         this._color.set(value);
         this._colorDirty = true;
         if (EDITOR) {
             const clone = value.clone();
             this.node.emit(NodeEventType.COLOR_CHANGED, clone);
+        }
+        if (this.color.a !== oldAlpha) {
+            this.node.markFlow2DTree(RenderFlow2D.OPACITY_COLOR);
+        } else {
+            this.node.flowMask |= RenderFlow2D.COLOR;
         }
     }
 
@@ -397,8 +410,10 @@ export class Renderable2D extends RenderableComponent {
             }
 
             this._renderDataFlag = enable;
+            this.node.flowMask |= RenderFlow2D.UPDATE_RENDER_DATA;
         } else if (!enable) {
             this._renderDataFlag = enable;
+            this.node.flowMask &= ~RenderFlow2D.UPDATE_RENDER_DATA;
         }
     }
 
@@ -435,11 +450,11 @@ export class Renderable2D extends RenderableComponent {
      * 注意：不要手动调用该函数，除非你理解整个流程。
      */
     public updateAssembler (render: IBatcher) {
-        this._updateColor();
-        if (this._renderFlag) {
-            this._checkAndUpdateRenderData();
-            this._render(render);
-        }
+        // this._updateColor();
+        // if (this._renderFlag) {
+        //     this._checkAndUpdateRenderData();
+        //     this._render(render);
+        // }
     }
 
     /**
@@ -456,11 +471,11 @@ export class Renderable2D extends RenderableComponent {
         }
     }
 
-    protected _render (render: IBatcher) {}
+    public _render (render: IBatcher) {}
 
-    protected _postRender (render: IBatcher) {}
+    public _postRender (render: IBatcher) {}
 
-    protected _checkAndUpdateRenderData () {
+    public _checkAndUpdateRenderData () {
         if (this._renderDataFlag) {
             this._assembler!.updateRenderData!(this);
             this._renderDataFlag = false;
@@ -479,36 +494,28 @@ export class Renderable2D extends RenderableComponent {
 
     protected _updateColor () {
         if (UI_GPU_DRIVEN && this._canDrawByFourVertex) {
-            const opacityZero = this._cacheAlpha <= 0;
-            this._updateWorldAlpha();
             if (this._colorDirty) {
-                if (opacityZero || this._cacheAlpha <= 0) {
-                    this._renderFlag = this._canRender();
-                }
+                this._renderFlag = this._canRender();
                 this._colorDirty = false;
             }
             return;
         }
         // Need update rendFlag when opacity changes from 0 to !0
         const opacityZero = this._cacheAlpha <= 0;
-        this._updateWorldAlpha();
         if (this._colorDirty && this._assembler && this._assembler.updateColor) {
             this._assembler.updateColor(this);
-            // Need update rendFlag when opacity changes from 0 to !0 or 0 to !0
-            if (opacityZero || this._cacheAlpha <= 0) {
-                this._renderFlag = this._canRender();
-            }
+            this._renderFlag = this._canRender();
             this._colorDirty = false;
         }
     }
 
     protected _updateWorldAlpha () {
-        let localAlpha = this.color.a / 255;
-        if (localAlpha === 1) localAlpha = this.node._uiProps.localOpacity; // Hack for Mask use ui-opacity
-        const alpha = this.node._uiProps.opacity * localAlpha;
-        this.node._uiProps.opacity = alpha;
-        this._colorDirty = this._colorDirty || alpha !== this._cacheAlpha;
-        this._cacheAlpha = alpha;
+    //     let localAlpha = this.color.a / 255;
+    //     if (localAlpha === 1) localAlpha = this.node._uiProps.localOpacity; // Hack for Mask use ui-opacity
+    //     const alpha = this.node._uiProps.opacity * localAlpha;
+    //     this.node._uiProps.opacity = alpha;
+    //     this._colorDirty = this._colorDirty || alpha !== this._cacheAlpha;
+    //     this._cacheAlpha = alpha;
     }
 
     public _updateBlendFunc () {
