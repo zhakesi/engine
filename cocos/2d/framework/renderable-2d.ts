@@ -518,6 +518,10 @@ export class Renderable2D extends RenderableComponent {
     //     this._cacheAlpha = alpha;
     }
 
+    public markUpdateAlpha () {
+        this._colorDirty = this._colorDirty || (this.node.flowMask & RenderFlow2D.OPACITY) !== 0;
+    }
+
     public _updateBlendFunc () {
         // todo: Not only Pass[0].target[0]
         let target = this._blendState.targets[0];

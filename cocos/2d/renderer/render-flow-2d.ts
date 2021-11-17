@@ -79,9 +79,10 @@ export class RenderFlow2D {
         let effectOpacity = 1.0;
         if (node.parent) {
             effectOpacity *= node.parent._uiProps.opacity;
-            const render = node._uiProps.uiComp;
+            const render = node._uiProps.uiComp as Renderable2D;
             if (render) {
                 effectOpacity *= (render.color.a / 255);
+                render.markUpdateAlpha();
             }
         }
         node._uiProps.ApplyEffectOpacity(effectOpacity);
