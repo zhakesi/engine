@@ -62,11 +62,6 @@
     "dependencies": ["WebGL Renderer"]
   },
   {
-    "name": "Spine Skeleton",
-    "entries": ["./engine/jsb-spine-skeleton.js"],
-    "dependencies": ["WebGL Renderer"]
-  },
-  {
     "name": "DragonBones",
     "entries": ["./engine/jsb-dragonbones.js"],
     "dependencies": ["WebGL Renderer"]
