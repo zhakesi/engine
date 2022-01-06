@@ -580,6 +580,14 @@ const cacheManager = require('./jsb-cache-manager');
         if (this._nativeSkeleton) return this._nativeSkeleton.findSlot(slotName);
         return null;
     };
+    skeleton.updateRegion = function (slotName, spTex) {
+        if (this._nativeSkeleton) {
+            this._nativeSkeleton.updateRegion(slotName, spTex);
+        }
+        // 该接口在c++新增的
+        //sp.spine.updateRegion(attachment, spTex);
+    };
+
 
     skeleton.setSkin = function (skinName) {
         if (this._nativeSkeleton) return this._nativeSkeleton.setSkin(skinName);
