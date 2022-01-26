@@ -22,6 +22,7 @@ import { js } from '../core/utils/js';
 import { BlendFactor, BlendOp } from '../core/gfx';
 import { legacyCC } from '../core/global-exports';
 import { SkeletonSystem } from './skeleton-system';
+import { SkeletonTexture } from './skeleton-texture';
 
 export const timeScale = 1.0;
 
@@ -1664,6 +1665,80 @@ export class Skeleton extends Renderable2D {
             this._materialCache[val].destroy();
         }
         this._materialCache = {};
+    }
+
+    /**
+     * 局部换装
+     */
+    public changeSlotSkin (slotName: string, tex2d: Texture2D) {
+        const slot = this.findSlot(slotName);
+        if (!slot) return;
+        const attachment = slot.getAttachment();
+        if (!attachment) return;
+        const isMesh = attachment instanceof spine.MeshAttachment;
+        const isRegion = attachment instanceof spine.RegionAttachment;
+        if (!isMesh && !isRegion) return;
+
+        const tex2dW = tex2d.width;
+        const tex2dH = tex2d.height;
+        const skelTex = new SkeletonTexture({ width: tex2dW, height: tex2dH } as ImageBitmap);
+        skelTex.setRealTexture(tex2d);
+
+        const region = new spine.TextureAtlasRegion();
+        region.width = tex2dW;
+        region.height = tex2dH;
+        region.originalWidth = tex2dW;
+        region.originalHeight = tex2dH;
+        region.rotate = false;
+        region.u = 0;
+        region.v = 0;
+        region.u2 = 1;
+        region.v2 = 1;
+        region.texture = skelTex;
+        region.renderObject = region;
+
+        attachment.region = region;
+        attachment.width = tex2dW;
+        attachment.height = tex2dH;
+        if (isMesh) {
+            attachment.updateUVs();
+        } else if (isRegion) {
+            attachment.setRegion(region);
+            attachment.updateOffset();
+        }
+    }
+
+    /**
+     * 清除局部皮肤
+     */
+    public clearSlotSkin (slotName: string) {
+        const slot = this.findSlot(slotName);
+        if (!slot) return;
+        const attachment = slot.getAttachment();
+        if (!attachment) return;
+        const isMesh = attachment instanceof spine.MeshAttachment;
+        const isRegion = attachment instanceof spine.RegionAttachment;
+        if (!isMesh && !isRegion) return;
+        const region = attachment.region;
+        region.u = 0;
+        region.v = 0;
+        region.u2 = 0;
+        region.v2 = 0;
+        region.width = 0;
+        region.height = 0;
+        attachment.width = 0;
+        attachment.height = 0;
+        const isTextureRegion = region instanceof spine.TextureAtlasRegion;
+        if (isTextureRegion && region.texture && region.texture._texture) {
+            region.texture._texture.decRef();
+            region.texture._texture = null;
+            if (isMesh) {
+                attachment.updateUVs();
+            } else if (isRegion) {
+                attachment.setRegion(region);
+                attachment.updateOffset();
+            }
+        }
     }
 }
 
