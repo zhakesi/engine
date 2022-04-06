@@ -3282,7 +3282,7 @@ var spine = (() => {
 
   // spine-core/src/TextureAtlas.ts
   var TextureAtlas = class {
-    constructor(atlasText) {
+    constructor(atlasText, textureLoader) {
       this.pages = new Array();
       this.regions = new Array();
       let reader = new TextureAtlasReader(atlasText);
@@ -3369,6 +3369,8 @@ var spine = (() => {
         } else if (!page) {
           page = new TextureAtlasPage();
           page.name = line.trim();
+          let texture = textureLoader(line);
+          page.setTexture(texture);
           while (true) {
             if (reader.readEntry(entry, line = reader.readLine()) == 0)
               break;
@@ -3380,6 +3382,7 @@ var spine = (() => {
         } else {
           region = new TextureAtlasRegion();
           region.page = page;
+          region.texture = page.texture;
           region.name = line;
           while (true) {
             let count = reader.readEntry(entry, line = reader.readLine());
@@ -4252,6 +4255,7 @@ var spine = (() => {
       }
     }
     loadTextureAtlas(path, success = null, error = null) {
+      console.log('spine4 loadTextureAtlas ' + path);
       let index = path.lastIndexOf("/");
       let parent = index >= 0 ? path.substring(0, index + 1) : "";
       path = this.start(path);
@@ -6246,6 +6250,7 @@ var spine = (() => {
       this.attachmentLoader = attachmentLoader;
     }
     readSkeletonData(binary) {
+      console.log('spine4.0 readSkeletonData binary');
       let scale = this.scale;
       let skeletonData = new SkeletonData();
       skeletonData.name = "";
@@ -7923,6 +7928,7 @@ var spine = (() => {
       this.attachmentLoader = attachmentLoader;
     }
     readSkeletonData(json) {
+      console.log('spine4.0 readSkeletonData binary');
       let scale = this.scale;
       let skeletonData = new SkeletonData();
       let root = typeof json === "string" ? JSON.parse(json) : json;
