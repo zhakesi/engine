@@ -7928,7 +7928,7 @@ var spine = (() => {
       this.attachmentLoader = attachmentLoader;
     }
     readSkeletonData(json) {
-      console.log('spine4.0 readSkeletonData binary');
+      console.log('spine4.0 readSkeletonData json');
       let scale = this.scale;
       let skeletonData = new SkeletonData();
       let root = typeof json === "string" ? JSON.parse(json) : json;
@@ -8019,12 +8019,12 @@ var spine = (() => {
           data.offsetScaleX = getValue(constraintMap, "scaleX", 0);
           data.offsetScaleY = getValue(constraintMap, "scaleY", 0);
           data.offsetShearY = getValue(constraintMap, "shearY", 0);
-          data.mixRotate = getValue(constraintMap, "mixRotate", 1);
-          data.mixX = getValue(constraintMap, "mixX", 1);
-          data.mixY = getValue(constraintMap, "mixY", data.mixX);
-          data.mixScaleX = getValue(constraintMap, "mixScaleX", 1);
-          data.mixScaleY = getValue(constraintMap, "mixScaleY", data.mixScaleX);
-          data.mixShearY = getValue(constraintMap, "mixShearY", 1);
+          data.mixRotate = getValue(constraintMap, "rotateMix", 1);
+          data.mixX = getValue(constraintMap, "translateMix", 1);
+          data.mixY = data.mixX;
+          data.mixScaleX = getValue(constraintMap, "scaleMix", 1);
+          data.mixScaleY = data.mixScaleX;
+          data.mixShearY = getValue(constraintMap, "shearMix", 1);
           skeletonData.transformConstraints.push(data);
         }
       }
@@ -8048,9 +8048,9 @@ var spine = (() => {
           data.spacing = getValue(constraintMap, "spacing", 0);
           if (data.spacingMode == SpacingMode.Length || data.spacingMode == SpacingMode.Fixed)
             data.spacing *= scale;
-          data.mixRotate = getValue(constraintMap, "mixRotate", 1);
-          data.mixX = getValue(constraintMap, "mixX", 1);
-          data.mixY = getValue(constraintMap, "mixY", data.mixX);
+          data.mixRotate = getValue(constraintMap, "rotateMix", 1);
+          data.mixX = getValue(constraintMap, "translateMix", 1);
+          data.mixY = data.mixX;
           skeletonData.pathConstraints.push(data);
         }
       }
@@ -8749,9 +8749,9 @@ var spine = (() => {
     return bezier + 1;
   }
   function getValue(map, property, defaultValue) {
-    //return map[property] !== void 0 ? map[property] : defaultValue;
-    if (map[property]) return map[property];
-    return defaultValue;
+    return map[property] !== void 0 ? map[property] : defaultValue;
+    // if (map[property] !== null || map[property] !== undefined) return map[property];
+    // return defaultValue;
   }
 
   // spine-core/src/polyfills.ts
