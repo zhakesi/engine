@@ -8479,12 +8479,12 @@ var spine = (() => {
           let constraintIndex = skeletonData.transformConstraints.indexOf(constraint);
           let timeline = new TransformConstraintTimeline(timelineMap.length, timelineMap.length * 6, constraintIndex);
           let time = getValue(keyMap, "time", 0);
-          let mixRotate = getValue(keyMap, "mixRotate", 1);
-          let mixX = getValue(keyMap, "mixX", 1);
-          let mixY = getValue(keyMap, "mixY", mixX);
-          let mixScaleX = getValue(keyMap, "mixScaleX", 1);
-          let mixScaleY = getValue(keyMap, "mixScaleY", mixScaleX);
-          let mixShearY = getValue(keyMap, "mixShearY", 1);
+          let mixRotate = getValue(keyMap, "rotateMix", 1);
+          let mixX = getValue(keyMap, "translateMix", 1);
+          let mixY = mixX;
+          let mixScaleX = getValue(keyMap, "scaleMix", 1);
+          let mixScaleY = mixScaleX;
+          let mixShearY = getValue(keyMap, "shearMix", 1);
           for (let frame = 0, bezier = 0; ; frame++) {
             timeline.setFrame(frame, time, mixRotate, mixX, mixY, mixScaleX, mixScaleY, mixShearY);
             let nextMap = timelineMap[frame + 1];
@@ -8493,12 +8493,12 @@ var spine = (() => {
               break;
             }
             let time2 = getValue(nextMap, "time", 0);
-            let mixRotate2 = getValue(nextMap, "mixRotate", 1);
-            let mixX2 = getValue(nextMap, "mixX", 1);
-            let mixY2 = getValue(nextMap, "mixY", mixX2);
-            let mixScaleX2 = getValue(nextMap, "mixScaleX", 1);
-            let mixScaleY2 = getValue(nextMap, "mixScaleY", mixScaleX2);
-            let mixShearY2 = getValue(nextMap, "mixShearY", 1);
+            let mixRotate2 = getValue(nextMap, "rotateMix", 1);
+            let mixX2 = getValue(nextMap, "translateMix", 1);
+            let mixY2 = mixX2;
+            let mixScaleX2 = getValue(nextMap, "scaleMix", 1);
+            let mixScaleY2 = mixScaleX2;
+            let mixShearY2 = getValue(nextMap, "shearMix", 1);
             let curve = keyMap.curve;
             if (curve) {
               bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mixRotate, mixRotate2, 1);
@@ -8540,9 +8540,9 @@ var spine = (() => {
             } else if (timelineName === "mix") {
               let timeline = new PathConstraintMixTimeline(frames, frames * 3, constraintIndex);
               let time = getValue(keyMap, "time", 0);
-              let mixRotate = getValue(keyMap, "mixRotate", 1);
-              let mixX = getValue(keyMap, "mixX", 1);
-              let mixY = getValue(keyMap, "mixY", mixX);
+              let mixRotate = getValue(keyMap, "rotateMix", 1);
+              let mixX = getValue(keyMap, "translateMix", 1);
+              let mixY = mixX;
               for (let frame = 0, bezier = 0; ; frame++) {
                 timeline.setFrame(frame, time, mixRotate, mixX, mixY);
                 let nextMap = timelineMap[frame + 1];
@@ -8551,9 +8551,9 @@ var spine = (() => {
                   break;
                 }
                 let time2 = getValue(nextMap, "time", 0);
-                let mixRotate2 = getValue(nextMap, "mixRotate", 1);
-                let mixX2 = getValue(nextMap, "mixX", 1);
-                let mixY2 = getValue(nextMap, "mixY", mixX2);
+                let mixRotate2 = getValue(nextMap, "rotateMix", 1);
+                let mixX2 = getValue(nextMap, "translateMix", 1);
+                let mixY2 = mixX2;
                 let curve = keyMap.curve;
                 if (curve) {
                   bezier = readCurve(curve, timeline, bezier, frame, 0, time, time2, mixRotate, mixRotate2, 1);
