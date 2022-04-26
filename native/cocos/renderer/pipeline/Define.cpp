@@ -33,8 +33,8 @@ namespace pipeline {
 static uint32_t globalUBOCount     = static_cast<uint32_t>(PipelineGlobalBindings::SAMPLER_SHADOWMAP);
 static uint32_t globalSamplerCount = static_cast<uint32_t>(PipelineGlobalBindings::COUNT) - globalUBOCount;
 
-static uint32_t localUBOCount          = static_cast<uint32_t>(ModelLocalBindings::SAMPLER_JOINTS);
-static uint32_t localSamplerCount      = static_cast<uint32_t>(ModelLocalBindings::STORAGE_REFLECTION) - localUBOCount;
+static uint32_t localUBOCount          = static_cast<uint32_t>(ModelLocalBindings::UBO_END) - static_cast<uint32_t>(ModelLocalBindings::UBO_START) + 1;
+static uint32_t localSamplerCount      = static_cast<uint32_t>(ModelLocalBindings::SAMPLER_END) - static_cast<uint32_t>(ModelLocalBindings::SAMPLER_START) + 1;
 static uint32_t localStorageImageCount = static_cast<uint32_t>(ModelLocalBindings::COUNT) - localUBOCount - localSamplerCount;
 
 uint globalSet   = static_cast<uint>(SetIndex::GLOBAL);
@@ -384,6 +384,22 @@ const gfx::UniformSamplerTexture JOINTTEXTURE::LAYOUT = {
     localSet,
     JOINTTEXTURE::BINDING,
     JOINTTEXTURE::NAME,
+    gfx::Type::SAMPLER2D,
+    1,
+};
+
+const String REALTIMEJOINTTEXTURE::NAME       = "cc_realTimeJoint";
+const gfx::DescriptorSetLayoutBinding REALTIMEJOINTTEXTURE::DESCRIPTOR = {
+    REALTIMEJOINTTEXTURE::BINDING,
+    gfx::DescriptorType::SAMPLER_TEXTURE,
+    1,
+    gfx::ShaderStageFlagBit::VERTEX,
+    {},
+};
+const gfx::UniformSamplerTexture REALTIMEJOINTTEXTURE::LAYOUT = {
+    localSet,
+    REALTIMEJOINTTEXTURE::BINDING,
+    REALTIMEJOINTTEXTURE::NAME,
     gfx::Type::SAMPLER2D,
     1,
 };

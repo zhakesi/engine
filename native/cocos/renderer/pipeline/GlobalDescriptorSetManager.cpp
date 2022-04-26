@@ -200,6 +200,8 @@ void GlobalDSManager::setDescriptorSetLayout() {
     localDescriptorSetLayout.bindings[UBOUILocal::BINDING]           = UBOUILocal::DESCRIPTOR;
     localDescriptorSetLayout.samplers[JOINTTEXTURE::NAME]            = JOINTTEXTURE::LAYOUT;
     localDescriptorSetLayout.bindings[JOINTTEXTURE::BINDING]         = JOINTTEXTURE::DESCRIPTOR;
+        localDescriptorSetLayout.samplers[REALTIMEJOINTTEXTURE::NAME]= REALTIMEJOINTTEXTURE::LAYOUT;
+    localDescriptorSetLayout.bindings[REALTIMEJOINTTEXTURE::BINDING] = REALTIMEJOINTTEXTURE::DESCRIPTOR;
     localDescriptorSetLayout.samplers[POSITIONMORPH::NAME]           = POSITIONMORPH::LAYOUT;
     localDescriptorSetLayout.bindings[POSITIONMORPH::BINDING]        = POSITIONMORPH::DESCRIPTOR;
     localDescriptorSetLayout.samplers[NORMALMORPH::NAME]             = NORMALMORPH::LAYOUT;

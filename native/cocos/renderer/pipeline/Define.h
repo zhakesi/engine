@@ -223,22 +223,26 @@ enum class CC_DLL PipelineGlobalBindings {
 CC_ENUM_CONVERSION_OPERATOR(PipelineGlobalBindings)
 
 enum class CC_DLL ModelLocalBindings {
-    UBO_LOCAL,
+    UBO_START,
+    UBO_LOCAL = UBO_START,
     UBO_FORWARD_LIGHTS,
     UBO_SKINNING_ANIMATION,
     UBO_SKINNING_TEXTURE,
     UBO_MORPH,
     UBO_UI_LOCAL,
+    UBO_END = UBO_UI_LOCAL,
 
-    SAMPLER_JOINTS,
+    SAMPLER_START,
+    SAMPLER_JOINTS = SAMPLER_START,
     SAMPLER_MORPH_POSITION,
     SAMPLER_MORPH_NORMAL,
     SAMPLER_MORPH_TANGENT,
     SAMPLER_LIGHTMAP,
     SAMPLER_SPRITE,
     SAMPLER_REFLECTION,
-
     STORAGE_REFLECTION,
+    SAMPLER_REALTIME_JOINTS,
+    SAMPLER_END = SAMPLER_REALTIME_JOINTS,
 
     COUNT,
 };
@@ -335,6 +339,7 @@ struct CC_DLL UBOSkinning {
     static constexpr uint                        COUNT         = UBOSkinning::JOINTS_OFFSET + JOINT_UNIFORM_CAPACITY * 12;
     static constexpr uint                        SIZE          = UBOSkinning::COUNT * 4;
     static constexpr uint                        BINDING       = static_cast<uint>(ModelLocalBindings::UBO_SKINNING_TEXTURE);
+    static constexpr uint                        REALTIME_JOINTS    = static_cast<uint>(ModelLocalBindings::SAMPLER_REALTIME_JOINTS);
     static const gfx::DescriptorSetLayoutBinding DESCRIPTOR;
     static const gfx::UniformBlock               LAYOUT;
     static const String                          NAME;
@@ -528,6 +533,12 @@ struct CC_DLL JOINTTEXTURE : public Object {
     static const String                          NAME;
 };
 
+struct CC_DLL REALTIMEJOINTTEXTURE : public Object {
+    static constexpr uint                        BINDING = static_cast<uint>(ModelLocalBindings::SAMPLER_REALTIME_JOINTS);
+    static const gfx::DescriptorSetLayoutBinding DESCRIPTOR;
+    static const gfx::UniformSamplerTexture      LAYOUT;
+    static const String                          NAME;
+};
 struct CC_DLL POSITIONMORPH : public Object {
     static constexpr uint                        BINDING = static_cast<uint>(ModelLocalBindings::SAMPLER_MORPH_POSITION);
     static const gfx::DescriptorSetLayoutBinding DESCRIPTOR;
