@@ -33,6 +33,7 @@
 #include "renderer/pipeline/Define.h"
 #include "scene/Model.h"
 #include "../renderer/gfx-validator/DeviceValidator.h"
+#include "renderer/gfx-base/GFXDevice.h"
 namespace cc {
 namespace scene {
 
@@ -105,8 +106,8 @@ public:
                 gfx::Address::CLAMP,
                 gfx::Address::CLAMP,
             };
-            auto devValidator = cc::gfx::DeviceValidator::getInstance();
-            auto sampler = devValidator->getSampler(info);
+            auto device = cc::gfx::Device::getInstance();
+            auto sampler = device->getSampler(info);
             descriptorset->bindTexture(pipeline::UBOSkinning::REALTIME_JOINTS, texture);
             descriptorset->bindSampler(pipeline::UBOSkinning::REALTIME_JOINTS, sampler);
         }
@@ -129,7 +130,7 @@ private:
     std::vector<uint32_t>                                          _bufferIndices;
     std::vector<gfx::Buffer *>                                     _buffers;
     std::vector<JointInfo>                                         _joints;
-    std::vector<float *>                                           _dataArray;
+    std::vector<std::array<float, pipeline::UBOSkinning::COUNT> *> _dataArray;
     static std::vector<JointTransform *>                           transStacks;
     bool                                                           _realTimeTextureMode = false;
     RealTimeJointTexture                                           *_realTimeJointTexture;
