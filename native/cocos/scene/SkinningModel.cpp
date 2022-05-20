@@ -186,14 +186,14 @@ void SkinningModel::updateRealTimeJointTextureBuffer()
         cc::gfx::Offset texOffset;
         cc::gfx::Extent extent = {TEXTURE_WIDTH, TEXTURE_HEIGHT, 1};
         cc::gfx::BufferTextureCopy region = {
-           4 * TEXTURE_WIDTH * sizeof(float),
+           TEXTURE_WIDTH,
            TEXTURE_HEIGHT,
            texOffset,
            extent,
            layer
         };
-        auto devValidator = cc::gfx::DeviceValidator::getInstance();
-        devValidator->copyBuffersToTexture((const uint8_t *const *)&buffer, texture, &region, 1);
+        auto device = cc::gfx::Device::getInstance();
+        device->copyBuffersToTexture((const uint8_t *const *)&buffer, texture, &region, 1);
         bIdx++;
     }
 }

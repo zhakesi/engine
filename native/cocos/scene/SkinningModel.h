@@ -105,8 +105,8 @@ public:
                 gfx::Address::CLAMP,
                 gfx::Address::CLAMP,
             };
-            auto devValidator = cc::gfx::DeviceValidator::getInstance();
-            auto sampler = devValidator->getSampler(info);
+            auto device = cc::gfx::Device::getInstance();
+            auto sampler = device->getSampler(info);
             descriptorset->bindTexture(pipeline::UBOSkinning::REALTIME_JOINTS, texture);
             descriptorset->bindSampler(pipeline::UBOSkinning::REALTIME_JOINTS, sampler);
         }
