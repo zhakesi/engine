@@ -35,12 +35,15 @@ import { displayName, displayOrder, editable, override, serializable, tooltip, t
 import { SkeletonData } from './skeleton-data';
 import { VertexEffectDelegate } from './vertex-effect-delegate';
 import { Graphics } from '../2d/components/graphics';
-import { MaterialInstance } from '../core/renderer';
+import { MaterialInstance, scene } from '../core/renderer';
 import { js } from '../core/utils/js';
-import { BlendFactor, BlendOp } from '../core/gfx';
+import { BlendFactor, BlendOp, PrimitiveMode, Attribute, BufferUsageBit, BufferInfo, MemoryUsageBit } from '../core/gfx';
 import { legacyCC } from '../core/global-exports';
 import { SkeletonSystem } from './skeleton-system';
 import { Batcher2D } from '../2d/renderer/batcher-2d';
+import { director } from '../core/director';
+import { vfmtPosUvColor, getAttributeStride } from '../2d/renderer/vertex-format';
+import { RenderingSubMesh } from '../core/assets';
 
 export const timeScale = 1.0;
 
@@ -237,6 +240,9 @@ export class Skeleton extends UIRenderer {
         }
     }
 
+    public _testTexture : Texture2D | null = null;
+    public _model: scene.Model | null = null;
+    public _testMaterial: Material | null = null;
     /**
      * @internal
      */
@@ -1325,33 +1331,14 @@ export class Skeleton extends UIRenderer {
     }
 
     public getMaterialForBlendAndTint (src: BlendFactor, dst: BlendFactor, type: SpineMaterialType): MaterialInstance {
-        const key = `${type}/${src}/${dst}`;
-        let inst = this._materialCache[key];
-        if (inst) {
-            return inst;
-        }
-
-        let material = this.customMaterial;
-        if (material === null) {
-            material = builtinResMgr.get<Material>('default-spine-material');
-        }
-
-        let useTwoColor = false;
-        switch (type) {
-        case SpineMaterialType.TWO_COLORED:
-            useTwoColor = true;
-            break;
-        case SpineMaterialType.COLORED_TEXTURED:
-        default:
-            break;
-        }
+        const material = this.customMaterial!;
+        const useTwoColor = false;
         const matInfo = {
             parent: material,
             subModelIdx: 0,
             owner: this,
         };
-        inst = new MaterialInstance(matInfo);
-        this._materialCache[key] = inst;
+        const inst = new MaterialInstance(matInfo);
         inst.overridePipelineStates({
             blendState: {
                 blendColor: Color.WHITE,
@@ -1416,28 +1403,12 @@ export class Skeleton extends UIRenderer {
     }
 
     protected _render (batcher: Batcher2D) {
-        if (this._renderData && this._drawList) {
-            const rd = this._renderData;
-            const chunk = rd.chunk;
-            const accessor = chunk.vertexAccessor;
-            const meshBuffer = rd.getMeshBuffer()!;
-            const origin = meshBuffer.indexOffset;
-            // Fill index buffer
-            accessor.appendIndices(chunk.bufferId, rd.indices!);
-            for (let i = 0; i < this._drawList.length; i++) {
-                this._drawIdx = i;
-                const dc = this._drawList.data[i];
-                if (dc.texture) {
-                    // Construct IA
-                    const ia = meshBuffer.requireFreeIA(batcher.device);
-                    ia.firstIndex = origin + dc.indexOffset;
-                    ia.indexCount = dc.indexCount;
-                    // Commit IA
-                    batcher.commitIA(this, ia, dc.texture, dc.material!, this.node);
-                }
-            }
-            // this.node._static = true;
+        if (!this._model) {
+            this._testPrepareData();
         }
+        this._testUploadData();
+        this._updateDS();
+        batcher.commitModel2(this, this._model, this._testMaterial, this._testTexture!);
     }
 
     // RENDERER
@@ -1725,6 +1696,104 @@ export class Skeleton extends UIRenderer {
             this._materialCache[val].destroy();
         }
         this._materialCache = {};
+    }
+
+    private _testPrepareData () {
+        this._model = director.root!.createModel(scene.Model);
+        this._model.node = this._model.transform = this.node;
+
+        const stride = getAttributeStride(vfmtPosUvColor);
+
+        const gfxDevice = legacyCC.director.root.device;
+        const vertexBuffer = gfxDevice.createBuffer(new BufferInfo(
+            BufferUsageBit.VERTEX | BufferUsageBit.TRANSFER_DST,
+            MemoryUsageBit.DEVICE,
+            4 * stride,
+            stride,
+        ));
+        const indexBuffer = gfxDevice.createBuffer(new BufferInfo(
+            BufferUsageBit.INDEX | BufferUsageBit.TRANSFER_DST,
+            MemoryUsageBit.DEVICE,
+            6 * Uint16Array.BYTES_PER_ELEMENT,
+            Uint16Array.BYTES_PER_ELEMENT,
+        ));
+
+        const renderMesh = new RenderingSubMesh([vertexBuffer], vfmtPosUvColor, PrimitiveMode.TRIANGLE_LIST, indexBuffer);
+        renderMesh.subMeshIdx = 0;
+
+        this._model.initSubModel(0, renderMesh, this._testMaterial!);
+        //this._model.setSubModelMaterial(0, this._testMaterial!);
+    }
+
+    private _testUploadData () {
+        const subModelList = this._model!.subModels;
+        const ia = subModelList[0].inputAssembler;
+
+        const vb = new Float32Array(36);
+        this._testUpdateVB(vb);
+        ia.vertexBuffers[0].update(vb);
+        ia.vertexCount = 9;
+
+        const ib = new Uint16Array(6);
+        this._testUpdateIB(ib);
+        ia.indexBuffer!.update(ib);
+        ia.indexCount = 6;
+    }
+
+    private _testUpdateVB (vb:Float32Array) {
+        const width = 480;
+        const height = 360;
+        //xyz
+        vb[0] = -0.5 * width + Math.random() * 50;
+        vb[1] = 0.5 * height + Math.random() * 50;
+
+        vb[9] = -0.5 * width;
+        vb[10] = -0.5 * height;
+
+        vb[18] = 0.5 * width;
+        vb[19] = 0.5 * height;
+
+        vb[27] = 0.5 * width;
+        vb[28] = -0.5 * height;
+
+        // uv
+        vb[3] = 0;
+        vb[4] = 1;
+        vb[12] = 0;
+        vb[13] = 0;
+        vb[21] = 1;
+        vb[22] = 1;
+        vb[30] = 1;
+        vb[31] = 0;
+
+        // color
+        let colorOffset = 5;
+        for (let i = 0; i < 4; i++, colorOffset += 9) {
+            vb[colorOffset] = 1;
+            vb[colorOffset + 1] = 1;
+            vb[colorOffset + 2] = 1;
+            vb[colorOffset + 3] = 1;
+        }
+    }
+
+    private _testUpdateIB (ib: Uint16Array) {
+        let indexOffset = 0;
+        const vid = 0;
+        ib[indexOffset++] = vid;
+        ib[indexOffset++] = vid + 1;
+        ib[indexOffset++] = vid + 2;
+        ib[indexOffset++] = vid + 2;
+        ib[indexOffset++] = vid + 1;
+        ib[indexOffset++] = vid + 3;
+    }
+
+    private _updateDS () {
+        const binding = 11;
+        const descriptorSet = this._model!.subModels[0].descriptorSet;
+        const texture = this._testTexture!.getGFXTexture();
+        const sampler = this._testTexture!.getGFXSampler();
+        descriptorSet.bindTexture(binding, texture!);
+        descriptorSet.bindSampler(binding, sampler);
     }
 }
 

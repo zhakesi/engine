@@ -105,7 +105,7 @@ let _renderData: RenderData | null;
 let _ibuf: Uint16Array;
 let _vbuf: Float32Array;
 let _needColor: boolean;
-let _vertexEffect: spine.VertexEffect | null = null;
+const _vertexEffect: spine.VertexEffect | null = null;
 let _currentMaterial: MaterialInstance | null = null;
 let _currentTexture: Texture2D | null = null;
 
@@ -202,36 +202,40 @@ export const simple: IAssembler = {
     },
 
     createData (comp: Skeleton) {
-        let rd = comp.renderData;
-        if (!rd) {
-            const useTint = comp.useTint || comp.isAnimationCached();
-            const accessor = this.ensureAccessor(useTint) as StaticVBAccessor;
-            const skins = comp._skeleton!.data.skins;
-            let vCount = 0;
-            let iCount = 0;
-            for (let i = 0; i < skins.length; ++i) {
-                const attachments = skins[i].attachments;
-                for (let j = 0; j < attachments.length; j++) {
-                    const entry = attachments[j];
-                    for (const key in entry) {
-                        const skin = entry[key];
-                        if (skin instanceof spine.RegionAttachment) {
-                            vCount += 4;
-                            iCount += 6;
-                        } else if (skin instanceof spine.MeshAttachment) {
-                            vCount += skin.worldVerticesLength >> 1;
-                            iCount += skin.triangles.length;
-                        }
-                    }
-                }
-            }
-            rd = RenderData.add(useTint ? vfmtPosUvTwoColor : vfmtPosUvColor, accessor);
-            rd.resize(vCount, iCount);
-            if (!rd.indices || iCount !== rd.indices.length) {
-                rd.indices = new Uint16Array(iCount);
-            }
-            comp.maxVertexCount = vCount;
-            comp.maxIndexCount = iCount;
+        const rd = comp.requestRenderData();
+        rd.resize(4, 6);
+        const vb = rd.chunk.vb;
+        const ib = rd.indices;
+        //xyz
+        vb[0] = -1;
+        vb[1] = 1;
+
+        vb[9] = -1;
+        vb[10] = -1;
+
+        vb[18] = 1;
+        vb[19] = 1;
+
+        vb[27] = 1;
+        vb[28] = -1;
+
+        // uv
+        vb[3] = 0;
+        vb[4] = 1;
+        vb[12] = 0;
+        vb[13] = 0;
+        vb[21] = 1;
+        vb[22] = 1;
+        vb[30] = 1;
+        vb[31] = 0;
+
+        // color
+        let colorOffset = 5;
+        for (let i = 0; i < 4; i++, colorOffset += rd.floatStride) {
+            vb[colorOffset] = 1;
+            vb[colorOffset + 1] = 1;
+            vb[colorOffset + 2] = 1;
+            vb[colorOffset + 3] = 1;
         }
         return rd;
     },
@@ -255,59 +259,34 @@ export const simple: IAssembler = {
 
     fillBuffers (comp: Skeleton, renderer: Batcher2D) {
         // Fill indices
+        // const rd = comp.renderData;
+        // const chunk = rd!.chunk;
+        // const bid = chunk.bufferId;
+        // const vid = chunk.vertexOffset;
+        // const meshBuffer = chunk.meshBuffer;
+        // const ib = chunk.meshBuffer.iData;
+        // let indexOffset = meshBuffer.indexOffset;
+        // ib[indexOffset++] = vid;
+        // ib[indexOffset++] = vid + 1;
+        // ib[indexOffset++] = vid + 2;
+        // ib[indexOffset++] = vid + 2;
+        // ib[indexOffset++] = vid + 1;
+        // ib[indexOffset++] = vid + 3;
+        // meshBuffer.indexOffset += 6;
     },
 };
 
 function updateComponentRenderData (comp: Skeleton, batcher: Batcher2D) {
-    if (!comp._skeleton) return;
+    const locSkeleton = _comp!._skeleton!;
+    let material: MaterialInstance | null = null;
 
-    const nodeColor = comp.color;
-    _nodeR = nodeColor.r / 255;
-    _nodeG = nodeColor.g / 255;
-    _nodeB = nodeColor.b / 255;
-    _nodeA = comp.node._uiProps.opacity;
-
-    _useTint = comp.useTint || comp.isAnimationCached();
-    // x y u v color1 color2 or x y u v color
-    _perVertexSize = _vfmtFloatSize(_useTint);
-
-    // Reuse draw list
-    comp.drawList.reset();
-    _comp = comp;
-    _node = comp.node;
-    _renderData = comp.renderData!;
-
-    _currentMaterial = null;
-
-    _mustFlush = true;
-    _premultipliedAlpha = comp.premultipliedAlpha;
-    _multiplier = 1.0;
-    _needColor = false;
-    _vertexEffect = comp._effectDelegate && comp._effectDelegate._vertexEffect as any;
-
-    if (nodeColor._val !== 0xffffffff ||  _premultipliedAlpha) {
-        _needColor = true;
-    }
-
-    if (comp.isAnimationCached()) {
-        // Traverse input assembler.
-        cacheTraverse();
-    } else {
-        if (_vertexEffect) _vertexEffect.begin(comp._skeleton);
-        realTimeTraverse(batcher);
-        if (_vertexEffect) _vertexEffect.end();
-    }
-    // Ensure mesh buffer update
-    const accessor = _useTint ? _tintAccessor : _accessor;
-    accessor.getMeshBuffer(_renderData.chunk.bufferId).setDirty();
-
-    // sync attached node matrix
-    comp.attachUtil._syncAttachedNode();
-
-    // Clear temp var.
-    _node = undefined;
-    _comp = undefined;
-    _vertexEffect = null;
+    const slot = locSkeleton.drawOrder[4];
+    const attachment = slot.getAttachment();
+    const texture = ((attachment as any).region.texture as SkeletonTexture).getRealTexture();
+    _useTint = false;
+    material = _getSlotMaterial(slot.data.blendMode);
+    comp._testMaterial = material;
+    comp._testTexture = texture;
 }
 
 function updateChunkForClip (clippedVertices: number[], clippedTriangles: number[]) {

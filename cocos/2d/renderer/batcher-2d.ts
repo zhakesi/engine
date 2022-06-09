@@ -471,6 +471,64 @@ export class Batcher2D implements IBatcher {
         }
     }
 
+    /**
+     * @en
+     * Render component data submission process of UI.
+     * The submitted vertex data is the UI for local coordinates.
+     * For example: The UI components of Graphics and UIModel.
+     *
+     * @zh
+     * UI 渲染组件数据提交流程（针对例如： Graphics 和 UIModel 等数据量较为庞大的 ui 组件）。
+     *
+     * @param comp - The committed renderable component
+     * @param model - The committed model
+     * @param mat - The material used, could be null
+     */
+    public commitModel2 (comp: UIMeshRenderer | UIRenderer, model: Model | null, mat: Material | null, tex: TextureBase) {
+        // if the last comp is spriteComp, previous comps should be batched.
+        if (this._currMaterial !== this._emptyMaterial) {
+            this.autoMergeBatches(this._currComponent!);
+            this.resetRenderStates();
+        }
+
+        let depthStencil;
+        let dssHash = 0;
+        if (mat) {
+            // Notice: A little hack, if not this two stage, not need update here, while control by stencilManger
+            if (comp.stencilStage === Stage.ENABLED || comp.stencilStage === Stage.DISABLED) {
+                comp.stencilStage = StencilManager.sharedManager!.stage;
+            }
+            depthStencil = StencilManager.sharedManager!.getStencilStage(comp.stencilStage, mat);
+            dssHash = StencilManager.sharedManager!.getStencilHash(comp.stencilStage);
+        }
+
+        const stamp = legacyCC.director.getTotalFrames();
+        if (model) {
+            model.updateTransform(stamp);
+            model.updateUBOs(stamp);
+        }
+
+        for (let i = 0; i < model!.subModels.length; i++) {
+            const curDrawBatch = this._drawBatchPool.alloc();
+            const subModel = model!.subModels[i];
+            curDrawBatch.visFlags = comp.node.layer;
+            curDrawBatch.model = model;
+            // if (tex) {
+            //     curDrawBatch.texture = tex.getGFXTexture();
+            //     curDrawBatch.sampler = tex.getGFXSampler();
+            //     curDrawBatch.textureHash = tex.getHash();
+            //     curDrawBatch.samplerHash = curDrawBatch.sampler.hash;
+            // }
+            curDrawBatch.useLocalData = null;
+            if (!depthStencil) { depthStencil = null; }
+            curDrawBatch.fillPasses(mat, depthStencil, dssHash, null, 0, subModel.patches, this);
+            curDrawBatch.inputAssembler = subModel.inputAssembler;
+            curDrawBatch.model!.visFlags = curDrawBatch.visFlags;
+            curDrawBatch.descriptorSet = subModel.descriptorSet;
+            this._batches.push(curDrawBatch);
+        }
+    }
+
     public setupStaticBatch (staticComp: UIStaticBatch, bufferAccessor: StaticVBAccessor) {
         this.finishMergeBatches();
         this._staticVBBuffer = bufferAccessor;
