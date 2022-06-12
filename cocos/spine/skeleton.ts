@@ -35,12 +35,13 @@ import { displayName, displayOrder, editable, override, serializable, tooltip, t
 import { SkeletonData } from './skeleton-data';
 import { VertexEffectDelegate } from './vertex-effect-delegate';
 import { Graphics } from '../2d/components/graphics';
-import { MaterialInstance } from '../core/renderer';
+import { MaterialInstance, scene } from '../core/renderer';
 import { js } from '../core/utils/js';
 import { BlendFactor, BlendOp } from '../core/gfx';
 import { legacyCC } from '../core/global-exports';
 import { SkeletonSystem } from './skeleton-system';
 import { Batcher2D } from '../2d/renderer/batcher-2d';
+import { director } from '../core/director';
 
 export const timeScale = 1.0;
 
@@ -616,6 +617,9 @@ export class Skeleton extends UIRenderer {
     protected _socketNodes: Map<number, Node> = new Map();
     protected _cachedSockets: Map<string, number> = new Map<string, number>();
 
+    private _model: scene.Model | null = null;
+    get model () { return this._model; }
+
     // CONSTRUCTOR
     constructor () {
         super();
@@ -735,6 +739,11 @@ export class Skeleton extends UIRenderer {
         this._updateSocketBindings();
 
         if (EDITOR) { this._refreshInspector(); }
+    }
+
+    public onLoad () {
+        this._model = director.root!.createModel(scene.Model);
+        this._model.node = this._model.transform = this.node;
     }
 
     /**
@@ -1365,7 +1374,7 @@ export class Skeleton extends UIRenderer {
                 }],
             },
         });
-        inst.recompileShaders({ TWO_COLORED: useTwoColor, USE_LOCAL: true });
+        inst.recompileShaders({ TWO_COLORED: false, USE_LOCAL: true });
         return inst;
     }
 
@@ -1416,28 +1425,7 @@ export class Skeleton extends UIRenderer {
     }
 
     protected _render (batcher: Batcher2D) {
-        if (this._renderData && this._drawList) {
-            const rd = this._renderData;
-            const chunk = rd.chunk;
-            const accessor = chunk.vertexAccessor;
-            const meshBuffer = rd.getMeshBuffer()!;
-            const origin = meshBuffer.indexOffset;
-            // Fill index buffer
-            accessor.appendIndices(chunk.bufferId, rd.indices!);
-            for (let i = 0; i < this._drawList.length; i++) {
-                this._drawIdx = i;
-                const dc = this._drawList.data[i];
-                if (dc.texture) {
-                    // Construct IA
-                    const ia = meshBuffer.requireFreeIA(batcher.device);
-                    ia.firstIndex = origin + dc.indexOffset;
-                    ia.indexCount = dc.indexCount;
-                    // Commit IA
-                    batcher.commitIA(this, ia, dc.texture, dc.material!, this.node);
-                }
-            }
-            // this.node._static = true;
-        }
+        batcher.commitModel(this, this._model, this.material);
     }
 
     // RENDERER
@@ -1553,7 +1541,6 @@ export class Skeleton extends UIRenderer {
         this._cleanMaterialCache();
         this.destroyRenderData();
         if (this._assembler && this._skeleton) {
-            this._renderData = this._assembler.createData(this);
             this.markForUpdateRenderData();
         }
     }
@@ -1671,7 +1658,6 @@ export class Skeleton extends UIRenderer {
             this._assembler = assembler;
         }
         if (this._skeleton && this._assembler) {
-            this._renderData = this._assembler.createData(this);
             this.markForUpdateRenderData();
             this._updateColor();
         }
