@@ -876,8 +876,9 @@ const cacheManager = require('./jsb-cache-manager');
             _tempIndicesCount = renderInfo[renderInfoOffset + materialIdx++];
 
             const renderData = middleware.RenderInfoLookup[_tempVfmt][_tempBufferIndex];
+            renderData.vertDirty = true;
             ui.commitComp(this, renderData, realTexture, this._assembler, this.node);
-            renderData.updateRange(renderData.vertexStart, renderData.vertexCount, _tempIndicesOffset, _tempIndicesCount);
+            renderData.chunk.meshBuffer.indexOffset += _tempIndicesCount;
             this.material = mat;
         }
     };
