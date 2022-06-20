@@ -452,69 +452,69 @@ const cacheManager = require('./jsb-cache-manager');
             nativeSkeleton.setAttachEnabled(true);
         }
 
-        if (!this.isAnimationCached() && (this.debugBones || this.debugSlots || this.debugMesh) && this._debugRenderer) {
-            const graphics = this._debugRenderer;
-            graphics.clear();
-            graphics.lineWidth = 5;
+        // if (!this.isAnimationCached() && (this.debugBones || this.debugSlots || this.debugMesh) && this._debugRenderer) {
+        //     const graphics = this._debugRenderer;
+        //     graphics.clear();
+        //     graphics.lineWidth = 5;
 
-            const debugData = this._debugData || nativeSkeleton.getDebugData();
-            if (!debugData) return;
-            let debugIdx = 0; let debugType = 0; let debugLen = 0;
+        //     const debugData = this._debugData || nativeSkeleton.getDebugData();
+        //     if (!debugData) return;
+        //     let debugIdx = 0; let debugType = 0; let debugLen = 0;
 
-            debugType = debugData[debugIdx++];
-            while (debugType !== 0) {
-                debugLen = debugData[debugIdx++];
+        //     debugType = debugData[debugIdx++];
+        //     while (debugType !== 0) {
+        //         debugLen = debugData[debugIdx++];
 
-                switch (debugType) {
-                    case 1: // slots
-                        graphics.strokeColor = _slotColor;
-                        for (let i = 0; i < debugLen; i += 8) {
-                            graphics.moveTo(debugData[debugIdx++], debugData[debugIdx++]);
-                            graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
-                            graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
-                            graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
-                            graphics.close();
-                            graphics.stroke();
-                        }
-                    break;
-                    case 2: // mesh
-                        graphics.strokeColor = _meshColor;
-                        for (let i = 0; i < debugLen; i += 6) {
-                            graphics.moveTo(debugData[debugIdx++], debugData[debugIdx++]);
-                            graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
-                            graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
-                            graphics.close();
-                            graphics.stroke();
-                        }
-                    break;
-                    case 3: // bones
-                        graphics.strokeColor = _boneColor;
-                        graphics.fillColor = _slotColor; // Root bone color is same as slot color.
-                        for (let i = 0; i < debugLen; i += 4) {
-                            const bx = debugData[debugIdx++];
-                            const by = debugData[debugIdx++];
-                            const x = debugData[debugIdx++];
-                            const y = debugData[debugIdx++];
+        //         switch (debugType) {
+        //             case 1: // slots
+        //                 graphics.strokeColor = _slotColor;
+        //                 for (let i = 0; i < debugLen; i += 8) {
+        //                     graphics.moveTo(debugData[debugIdx++], debugData[debugIdx++]);
+        //                     graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
+        //                     graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
+        //                     graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
+        //                     graphics.close();
+        //                     graphics.stroke();
+        //                 }
+        //             break;
+        //             case 2: // mesh
+        //                 graphics.strokeColor = _meshColor;
+        //                 for (let i = 0; i < debugLen; i += 6) {
+        //                     graphics.moveTo(debugData[debugIdx++], debugData[debugIdx++]);
+        //                     graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
+        //                     graphics.lineTo(debugData[debugIdx++], debugData[debugIdx++]);
+        //                     graphics.close();
+        //                     graphics.stroke();
+        //                 }
+        //             break;
+        //             case 3: // bones
+        //                 graphics.strokeColor = _boneColor;
+        //                 graphics.fillColor = _slotColor; // Root bone color is same as slot color.
+        //                 for (let i = 0; i < debugLen; i += 4) {
+        //                     const bx = debugData[debugIdx++];
+        //                     const by = debugData[debugIdx++];
+        //                     const x = debugData[debugIdx++];
+        //                     const y = debugData[debugIdx++];
 
-                            // Bone lengths.
-                            graphics.moveTo(bx, by);
-                            graphics.lineTo(x, y);
-                            graphics.stroke();
+        //                     // Bone lengths.
+        //                     graphics.moveTo(bx, by);
+        //                     graphics.lineTo(x, y);
+        //                     graphics.stroke();
 
-                            // Bone origins.
-                            graphics.circle(bx, by, Math.PI * 1.5);
-                            graphics.fill();
-                            if (i === 0) {
-                                graphics.fillColor = _originColor;
-                            }
-                        }
-                    break;
-                    default:
-                    return;
-                }
-                debugType = debugData[debugIdx++];
-            }
-        }
+        //                     // Bone origins.
+        //                     graphics.circle(bx, by, Math.PI * 1.5);
+        //                     graphics.fill();
+        //                     if (i === 0) {
+        //                         graphics.fillColor = _originColor;
+        //                     }
+        //                 }
+        //             break;
+        //             default:
+        //             return;
+        //         }
+        //         debugType = debugData[debugIdx++];
+        //     }
+        // }
     };
 
     skeleton.updateWorldTransform = function () {
@@ -797,7 +797,7 @@ const cacheManager = require('./jsb-cache-manager');
     const _tempAttachMat4 = cc.mat4();
     let _tempVfmt; let _tempBufferIndex; let _tempIndicesOffset; let _tempIndicesCount;
 
-    skeleton._render = function (ui) {
+    skeleton._render = function () {
         const nativeSkeleton = this._nativeSkeleton;
         if (!nativeSkeleton) return;
 
@@ -811,33 +811,33 @@ const cacheManager = require('./jsb-cache-manager');
         // reset render info offset
         sharedBufferOffset[0] = 0;
 
-        const socketNodes = this.socketNodes;
-        if (socketNodes.size > 0) {
-            const attachInfoMgr = middleware.attachInfoMgr;
-            const attachInfo = attachInfoMgr.attachInfo;
+        // const socketNodes = this.socketNodes;
+        // if (socketNodes.size > 0) {
+        //     const attachInfoMgr = middleware.attachInfoMgr;
+        //     const attachInfo = attachInfoMgr.attachInfo;
 
-            const attachInfoOffset = sharedBufferOffset[1];
-            // reset attach info offset
-            sharedBufferOffset[1] = 0;
-            for (const boneIdx of socketNodes.keys()) {
-                const boneNode = socketNodes.get(boneIdx);
-                // Node has been destroy
-                if (!boneNode || !boneNode.isValid) {
-                    socketNodes.delete(boneIdx);
-                    continue;
-                }
+        //     const attachInfoOffset = sharedBufferOffset[1];
+        //     // reset attach info offset
+        //     sharedBufferOffset[1] = 0;
+        //     for (const boneIdx of socketNodes.keys()) {
+        //         const boneNode = socketNodes.get(boneIdx);
+        //         // Node has been destroy
+        //         if (!boneNode || !boneNode.isValid) {
+        //             socketNodes.delete(boneIdx);
+        //             continue;
+        //         }
 
-                const tm = _tempAttachMat4;
-                const matOffset = attachInfoOffset + boneIdx * 16;
-                tm.m00 = attachInfo[matOffset];
-                tm.m01 = attachInfo[matOffset + 1];
-                tm.m04 = attachInfo[matOffset + 4];
-                tm.m05 = attachInfo[matOffset + 5];
-                tm.m12 = attachInfo[matOffset + 12];
-                tm.m13 = attachInfo[matOffset + 13];
-                boneNode.matrix = tm;
-            }
-        }
+        //         const tm = _tempAttachMat4;
+        //         const matOffset = attachInfoOffset + boneIdx * 16;
+        //         tm.m00 = attachInfo[matOffset];
+        //         tm.m01 = attachInfo[matOffset + 1];
+        //         tm.m04 = attachInfo[matOffset + 4];
+        //         tm.m05 = attachInfo[matOffset + 5];
+        //         tm.m12 = attachInfo[matOffset + 12];
+        //         tm.m13 = attachInfo[matOffset + 13];
+        //         boneNode.matrix = tm;
+        //     }
+        // }
 
         const renderInfoMgr = middleware.renderInfoMgr;
         const renderInfo = renderInfoMgr.renderInfo;
@@ -863,7 +863,7 @@ const cacheManager = require('./jsb-cache-manager');
             // SpineMaterialType.TWO_COLORED 1
             // SpineMaterialType.COLORED_TEXTURED 0
             //HACK
-            const mat = this.material;
+            //const mat = this.material;
             // cache material
             this.material = this.getMaterialForBlendAndTint(
                 renderInfo[renderInfoOffset + materialIdx++],
@@ -877,9 +877,13 @@ const cacheManager = require('./jsb-cache-manager');
 
             const renderData = middleware.RenderInfoLookup[_tempVfmt][_tempBufferIndex];
             renderData.vertDirty = true;
-            ui.commitComp(this, renderData, realTexture, this._assembler, this.node);
-            renderData.chunk.meshBuffer.indexOffset += _tempIndicesCount;
-            this.material = mat;
+            renderData.assignExtraEntityAttrs(this);
+            this._renderData = renderData;
+            renderData._useData = false;
+            renderData.syncRender2dBuffer();
+            renderData.updateRenderData(this, realTexture);
+            //ui.commitComp(this, renderData, realTexture, this._assembler, this.node);
+            //renderData.chunk.meshBuffer.indexOffset += _tempIndicesCount;
         }
     };
 
@@ -891,7 +895,8 @@ const cacheManager = require('./jsb-cache-manager');
     assembler.createData = function (comp) {
     };
 
-    assembler.updateRenderData = function () {
+    assembler.updateRenderData = function (comp) {
+        comp._render();
     };
 
     // eslint-disable-next-line no-unused-vars

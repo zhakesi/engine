@@ -84,7 +84,7 @@ private:
         uint16_t* indexb = entity->getIbBuffer();
         index_t indexCount = entity->getIbCount();
 
-        memcpy(&ib[indexOffset], indexb, indexCount * sizeof(uint16_t));
+        //memcpy(&ib[indexOffset], indexb, indexCount * sizeof(uint16_t));
         indexOffset += indexCount;
 
         buffer->setIndexOffset(indexOffset);
@@ -106,7 +106,7 @@ private:
             offset = i;
             vbBuffer[offset++] = temp.x;
             vbBuffer[offset++] = temp.y;
-            vbBuffer[offset++] = temp.z;
+            vbBuffer[offset++] = 0;
         }
     }
 

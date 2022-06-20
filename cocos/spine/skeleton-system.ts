@@ -80,4 +80,13 @@ export class SkeletonSystem extends System {
             skeleton.updateAnimation(dt);
         });
     }
+
+    public prepareRenderData () {
+        if (!this._skeletons) {
+            return;
+        }
+        this._skeletons.forEach((skeleton) => {
+            skeleton.markForUpdateRenderData();
+        });
+    }
 }

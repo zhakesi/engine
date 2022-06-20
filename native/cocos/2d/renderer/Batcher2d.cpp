@@ -95,11 +95,12 @@ void Batcher2d::walk(Node* node) {
                     _currSamplerHash = _currSampler->getHash();
                 }
             }
-
-            if (curNode->getChangedFlags()) {
-                fillVertexBuffers(entity);
-            }
+            //fillVertexBuffers(entity);
             fillIndexBuffers(entity);
+            if (curNode->getChangedFlags()) {
+                //fillVertexBuffers(entity);
+            }
+            //fillIndexBuffers(entity);
         }
 
         auto& children = curNode->getChildren();
@@ -205,7 +206,7 @@ void Batcher2d::update() {
 void Batcher2d::updateVertDirtyRenderer() {
     size_t size = _vertDirtyRenderers.size();
     for (uint32_t i = 0; i < size; i++) {
-        fillVertexBuffers(_vertDirtyRenderers[i]);
+        //fillVertexBuffers(_vertDirtyRenderers[i]);
     }
     _vertDirtyRenderers.clear();
 }

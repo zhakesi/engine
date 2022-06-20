@@ -116,7 +116,7 @@
 
         const batcher2D = director.root.batcher2D;
         CopyNativeBufferToJS(batcher2D, nativeXYZUVC, vfmtPosUvColor);
-        CopyNativeBufferToJS(batcher2D, nativeXYZUVCC, vfmtPosUvTwoColor);
+        //CopyNativeBufferToJS(batcher2D, nativeXYZUVCC, vfmtPosUvTwoColor);
     });
 
     const renderInfoMgr = middlewareMgr.getRenderInfoMgr();

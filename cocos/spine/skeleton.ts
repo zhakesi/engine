@@ -1365,7 +1365,7 @@ export class Skeleton extends UIRenderer {
                 }],
             },
         });
-        inst.recompileShaders({ TWO_COLORED: useTwoColor, USE_LOCAL: true });
+        inst.recompileShaders({ TWO_COLORED: useTwoColor, USE_LOCAL: false });
         return inst;
     }
 

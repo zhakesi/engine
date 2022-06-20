@@ -280,6 +280,7 @@ export class RenderData extends BaseRenderData {
 
     public vertexRow = 1;
     public vertexCol = 1;
+    public _useData = true;
 
     public constructor (vertexFormat = vfmtPosUvColor, accessor?: StaticVBAccessor) {
         super(vertexFormat);
@@ -333,12 +334,12 @@ export class RenderData extends BaseRenderData {
     }
 
     // Initial advance render data for native
-    protected syncRender2dBuffer () {
+    public syncRender2dBuffer () {
         if (JSB) {
             if (!this._renderEntity) {
                 return;
             }
-            this.renderEntity.initRender2dBuffer(this.dataLength, this.floatStride);
+            this.renderEntity.initRender2dBuffer(this._vc, this.floatStride);
             this.renderEntity.setRender2dBufferToNative();
         }
     }
@@ -424,7 +425,9 @@ export class RenderData extends BaseRenderData {
             // for sync vData and iData address to native
             this.setRenderEntityAttributes();
             // sync shared buffer to native
-            this.copyRenderDataToSharedBuffer();
+            if (this._useData) {
+                this.copyRenderDataToSharedBuffer();
+            }
         }
     }
 
@@ -432,6 +435,7 @@ export class RenderData extends BaseRenderData {
         if (JSB) {
             const entity = this._renderEntity;
             const sharedBuffer = entity.render2dBuffer;
+            if (!sharedBuffer) return;
 
             if (sharedBuffer.length < this.floatStride * this._data.length) {
                 console.error('Vertex count doesn\'t match.');

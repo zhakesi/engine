@@ -27,7 +27,7 @@
 
 /* spell-checker:words COORD, Quesada, INITED, Renerer */
 
-import { DEBUG, EDITOR, BUILD, TEST } from 'internal:constants';
+import { DEBUG, EDITOR, BUILD, TEST, JSB } from 'internal:constants';
 import { SceneAsset } from './assets';
 import System from './components/system';
 import { CCObject } from './data/object';
@@ -45,6 +45,7 @@ import { legacyCC } from './global-exports';
 import { errorID, error, assertID, warnID } from './platform/debug';
 import { containerManager } from './memop/container-manager';
 import { uiRendererManager } from '../2d/framework/ui-renderer-manager';
+import { SkeletonSystem } from '../spine/skeleton-system';
 
 // ----------------------------------------------------------------------------------------------------------------------
 
@@ -711,10 +712,13 @@ export class Director extends EventTarget {
                     this._systems[i].postUpdate(dt);
                 }
             }
-
-            uiRendererManager.updateAllDirtyRenderers();
-
             this.emit(Director.EVENT_BEFORE_DRAW);
+            if (JSB) {
+                const sks = SkeletonSystem.getInstance();
+                sks.prepareRenderData();
+            }
+            console.log('uiRendererManager.updateAllDirtyRenderers');
+            uiRendererManager.updateAllDirtyRenderers();
             this._root!.frameMove(dt);
             this.emit(Director.EVENT_AFTER_DRAW);
 

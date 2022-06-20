@@ -58,7 +58,7 @@ export class RenderEntity {
     protected declare _sharedBuffer: Int32Array;
 
     protected _vertexCount = 0;
-    protected _stride = 0;
+    protected _stride = 9;
 
     constructor (batcher:Batcher2D) {
         if (JSB) {

@@ -74,7 +74,7 @@ gfx::InputAssembler* UIMeshBuffer::requireFreeIA(gfx::Device* device) {
 void UIMeshBuffer::uploadBuffers() {
     index_t byteOffset = getByteOffset();
     bool dirty = getDirty();
-    if (_meshBufferLayout == nullptr || byteOffset == 0 || !dirty || this->_iaPool.size() == 0) {
+    if (_meshBufferLayout == nullptr || !dirty || this->_iaPool.size() == 0) {
         return;
     }
 
@@ -83,18 +83,22 @@ void UIMeshBuffer::uploadBuffers() {
     //const submitCount = iOS14 ? this._nextFreeIAHandle : 1;
 
     index_t indexCount = this->getIndexOffset();
-    index_t byteCount = this->getByteOffset();
-    index_t dataCount = byteCount >> 2;
+    //index_t byteCount = this->getByteOffset();
+    //index_t dataCount = byteCount >> 2;
+    index_t dataCount = 274;
+    index_t byteCount = 274 * 9 * 14; 
+
 
     gfx::InputAssembler* ia = this->_iaPool[0];
     gfx::BufferList vBuffers = ia->getVertexBuffers();
     if (vBuffers.size() > 0) {
-        gfx::Buffer* vBuffer = vBuffers[0];
-        if (byteCount > vBuffer->getSize()) {
-            vBuffer->resize(byteCount);
-        }
-        vBuffer->update(_vData);
+       gfx::Buffer* vBuffer = vBuffers[0];
+       if (byteCount > vBuffer->getSize()) {
+           vBuffer->resize(byteCount);
+       }
+       vBuffer->update(_vData);
     }
+    //vBuffers[0]->update(_vData);
     gfx::Buffer* iBuffer = ia->getIndexBuffer();
     if (indexCount * 2 > iBuffer->getSize()) {
         iBuffer->resize(indexCount * 2);
