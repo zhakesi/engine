@@ -90,7 +90,7 @@
             let buffer = renderInfoLookup[nativeFormat][i];
             if (!buffer)  {
                 if (!_accessors[jsFormat]) {
-                    _accessors[jsFormat] = cc.UI.RenderData.createStaticVBAccessor(jsFormat);
+                    _accessors[jsFormat] = cc.UI.RenderData.createStaticVBAccessor(jsFormat, 65535);
                 }
                 buffer = cc.UI.RenderData.add(jsFormat, _accessors[jsFormat]);
                 buffer.multiOwner = true;
