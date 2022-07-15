@@ -251,6 +251,10 @@ export class Batcher2D implements IBatcher {
     public uploadBuffers () {
         if (JSB) {
             this._nativeObj.uploadBuffers();
+            // Reset buffer accessors
+            this._bufferAccessors.forEach((accessor: StaticVBAccessor) => {
+                accessor.reset();
+            });
         } else if (this._batches.length > 0) {
             this._meshDataArray.forEach((rd) => {
                 rd.uploadBuffers();
@@ -278,10 +282,6 @@ export class Batcher2D implements IBatcher {
                 batch.clear();
                 this._drawBatchPool.free(batch);
             }
-            // Reset buffer accessors
-            this._bufferAccessors.forEach((accessor: StaticVBAccessor) => {
-                accessor.reset();
-            });
             this._meshDataArray.forEach((rd) => {
                 rd.freeIAPool();
             });

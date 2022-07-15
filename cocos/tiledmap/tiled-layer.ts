@@ -64,7 +64,7 @@ export class TiledUserNodeData extends Component {
 }
 
 export interface TiledRenderData {
-    renderData: RenderData;
+    renderData: RenderData | null;
     texture: Texture2D | null;
 }
 
@@ -1380,23 +1380,9 @@ export class TiledLayer extends UIRenderer {
     }
 
     public requestTiledRenderData () {
-        const arr = this._tiledDataArray as any[];
-        while (arr.length > 0 && arr[arr.length - 1].subNodes && arr[arr.length - 1].subNodes.length === 0) {
-            arr.pop();
-        }
-        if (arr.length > 0) {
-            const last = arr[arr.length - 1];
-            if (last.renderData && last.renderData.vertexCount === 0) {
-                return last as TiledRenderData;
-            }
-        }
-
-        const renderData = RenderData.add();
-        renderData.drawInfoType = RenderDrawInfoType.IA;
-        const comb = { renderData, texture: null };
-        renderData.material = this.getRenderMaterial(0);
+        const comb = { renderData: null, texture: null };
         this._tiledDataArray.push(comb);
-        return comb;
+        return (comb as TiledRenderData);
     }
 
     public requestSubNodesData () {
@@ -1426,13 +1412,11 @@ export class TiledLayer extends UIRenderer {
         const assembler = TiledLayer.Assembler.getAssembler(this);
         if (this._assembler !== assembler) {
             this._assembler = assembler;
+            this._assembler.createData(this);
         }
         if (this._tiledDataArray.length === 0) {
-            if (this._assembler && this._assembler.createData) {
-                this._assembler.createData(this);
-                this.markForUpdateRenderData();
-                this._updateColor();
-            }
+            this.markForUpdateRenderData();
+            this._updateColor();
         }
     }
 
@@ -1468,35 +1452,28 @@ export class TiledLayer extends UIRenderer {
         return new RenderEntity(RenderEntityType.DYNAMIC);
     }
 
-    private fillIndicesBuffer () {
-        if (this._tiledDataArray.length === 0) return;
+    private fillIndicesBuffer (renderData: RenderData, drawInfo: RenderDrawInfo) {
+        const iBuf = renderData.chunk.meshBuffer.iData;
 
-        const dataArray = this._tiledDataArray;
-
-        for (let i = 0; i < dataArray.length; i++) {
-            const m = dataArray[i];
-            if ((m as TiledSubNodeData).subNodes) continue;
-            const renderData = (m as TiledRenderData).renderData;
-            const iBuf = renderData.chunk.meshBuffer.iData;
-
-            let indexOffset = renderData.chunk.meshBuffer.indexOffset;
-            let vertexId = renderData.chunk.vertexOffset;
-            const quadCount = renderData.vertexCount / 4;
-            for (let i = 0; i < quadCount; i += 1) {
-                iBuf[indexOffset] = vertexId;
-                iBuf[indexOffset + 1] = vertexId + 1;
-                iBuf[indexOffset + 2] = vertexId + 2;
-                iBuf[indexOffset + 3] = vertexId + 2;
-                iBuf[indexOffset + 4] = vertexId + 1;
-                iBuf[indexOffset + 5] = vertexId + 3;
-                indexOffset += 6;
-                vertexId += 4;
-            }
+        let indexOffset = renderData.chunk.meshBuffer.indexOffset;
+        drawInfo.setIndexOffset(indexOffset);
+        let vertexId = renderData.chunk.vertexOffset;
+        const quadCount = renderData.vertexCount / 4;
+        for (let i = 0; i < quadCount; i += 1) {
+            iBuf[indexOffset] = vertexId;
+            iBuf[indexOffset + 1] = vertexId + 1;
+            iBuf[indexOffset + 2] = vertexId + 2;
+            iBuf[indexOffset + 3] = vertexId + 2;
+            iBuf[indexOffset + 4] = vertexId + 1;
+            iBuf[indexOffset + 5] = vertexId + 3;
+            indexOffset += 6;
+            vertexId += 4;
         }
+        renderData.chunk.meshBuffer.indexOffset = indexOffset;
+        drawInfo.setIBCount(quadCount * 6);
     }
 
     public prepareDrawData (ui: IBatcher) {
-        this.fillIndicesBuffer();
         const entity = this.renderEntity;
         entity.clearDynamicRenderDrawInfos();
         for (let i = 0; i < this._tiledDataArray.length; i++) {
@@ -1511,12 +1488,13 @@ export class TiledLayer extends UIRenderer {
                 const td = m as TiledRenderData;
                 if (td.texture) {
                     const drawInfo = this.requestDrawInfo(i);
+                    td.renderData!.fillDrawInfoAttributes(drawInfo);
                     drawInfo.setTexture(td.texture.getGFXTexture());
                     drawInfo.setTextureHash(td.texture.getHash());
                     drawInfo.setSampler(td.texture.getGFXSampler());
                     drawInfo.setBlendHash(this.blendHash);
                     drawInfo.setMaterial(this.getRenderMaterial(0)!);
-                    td.renderData.fillDrawInfoAttributes(drawInfo);
+                    this.fillIndicesBuffer(td.renderData!, drawInfo);
                     entity.setDynamicRenderDrawInfo(drawInfo, i);
                 }
             }

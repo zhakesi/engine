@@ -29,7 +29,11 @@ import { IAssembler } from '../../2d/renderer/base';
 import { IBatcher } from '../../2d/renderer/i-batcher';
 import { TiledLayer, TiledRenderData, TiledTile } from '..';
 import { GID, MixedGID, RenderOrder, TiledGrid, TileFlag } from '../tiled-types';
-import { Texture2D, Node } from '../../core';
+import { Texture2D, Node, director } from '../../core';
+import { StaticVBAccessor } from '../../2d/renderer/static-vb-accessor';
+import { vfmtPosUvColor } from '../../2d/renderer/vertex-format';
+import { RenderData } from '../../2d/renderer/render-data';
+import { RenderDrawInfoType } from '../../2d/renderer/render-draw-info';
 
 const MaxGridsLimit = Math.ceil(65535 / 6);
 
@@ -57,15 +61,24 @@ let _curLayer: TiledLayer;
 
 let flipTexture: (grid: TiledGrid, gid: MixedGID) => void;
 
+let _accessor: StaticVBAccessor = null!;
 /**
  * simple 组装器
  * 可通过 `UI.simple` 获取该组装器。
  */
 export const simple: IAssembler = {
+    ensureAccessor () {
+        if (!_accessor) {
+            const device = director.root!.device;
+            const batcher = director.root!.batcher2D;
+            _accessor = new StaticVBAccessor(device, vfmtPosUvColor, this.vCount);
+            batcher.registerBufferAccessor(Number.parseInt('TILED-MAP', 36), _accessor);
+        }
+    },
+
     createData (layer: TiledLayer) {
-        const maxGrids = layer.rightTop.col * layer.rightTop.row;
-        if (maxGrids * 4 > 65535) {
-            console.error('Vertex count exceeds 65535');
+        if (JSB) {
+            this.ensureAccessor();
         }
     },
 
@@ -76,7 +89,7 @@ export const simple: IAssembler = {
 
         // 当前渲染的数据
         const data = dataArray[layer._tiledDataArrayIdx] as TiledRenderData;
-        const renderData = data.renderData;
+        const renderData = data.renderData!;
         const iBuf = renderData.chunk.meshBuffer.iData;
 
         let indexOffset = renderData.chunk.meshBuffer.indexOffset;
@@ -290,6 +303,12 @@ function packRenderData () {
     const vbCount = 4 * _fillCount;
     const ibCount = 6 * _fillCount;
     const tiledData = _curLayer.requestTiledRenderData();
+    if (JSB) {
+        tiledData.renderData = RenderData.add(vfmtPosUvColor, _accessor);
+        tiledData.renderData.drawInfoType = RenderDrawInfoType.IA;
+    } else {
+        tiledData.renderData = RenderData.add(vfmtPosUvColor);
+    }
     tiledData.texture = _curTexture;
     const rd = tiledData.renderData;
     rd.resize(vbCount, ibCount);
