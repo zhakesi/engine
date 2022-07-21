@@ -798,6 +798,7 @@ const cacheManager = require('./jsb-cache-manager');
             this._nativeSkeleton = null;
         }
         this._stateData = null;
+        this._drawInfoList.length = 0;
     };
 
     const _tempAttachMat4 = cc.mat4();
@@ -884,8 +885,6 @@ const cacheManager = require('./jsb-cache-manager');
             _tempIndicesCount = renderInfo[renderInfoOffset + materialIdx++];
 
             const renderData = middleware.RenderInfoLookup[_tempVfmt][_tempBufferIndex];
-            const meshBuffer = renderData.chunk.meshBuffer;
-            meshBuffer.setDirty();
             const drawInfo = this.requestDrawInfo(index);
             drawInfo.setTexture(realTexture.getGFXTexture());
             drawInfo.setTextureHash(realTexture.getHash());

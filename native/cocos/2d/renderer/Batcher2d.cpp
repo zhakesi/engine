@@ -79,19 +79,8 @@ gfx::Device* Batcher2d::getDevice() {
     }
     return _device;
 }
-cc::Float32Array& mat4ToFloat32Array(const cc::Mat4& mat, cc::Float32Array& out, index_t ofs = 0) {
-    memcpy(reinterpret_cast<float*>(const_cast<uint8_t*>(out.buffer()->getData())) + ofs, mat.m, 16 * sizeof(float));
-    return out;
-}
+
 void Batcher2d::updateDescriptorSet() {
-    for (auto& item : uboMap) {
-        auto lds = item.second;
-        Float32Array localData;
-        localData.reset(pipeline::UBOLocal::COUNT);
-        const auto& worldMatrix = lds.node->getWorldMatrix();
-        mat4ToFloat32Array(worldMatrix, localData, pipeline::UBOLocal::MAT_WORLD_OFFSET);
-        lds.ubo->update(localData.buffer()->getData());
-    }
 }
 
 void Batcher2d::syncRootNodesToNative(ccstd::vector<Node*>&& rootNodes) {
@@ -316,8 +305,9 @@ CC_FORCE_INLINE void Batcher2d::handleDrawInfo(RenderEntity* entity, RenderDrawI
         curdrawBatch->setUseLocalFlag(node); // todo usLocal
         curdrawBatch->fillPass(_currMaterial, depthStencil, dssHash);
         const auto& pass = curdrawBatch->getPasses().at(0);
-
-        curdrawBatch->setDescriptorSet(getDescriptorSet(_currTexture, _currSampler, node, pass->getLocalSetLayout()));
+        drawInfo->updateLocalDescriptorSet(node, pass->getLocalSetLayout());
+        curdrawBatch->setDescriptorSet(drawInfo->getLocalDes());
+        //curdrawBatch->setDescriptorSet(getDescriptorSet(_currTexture, _currSampler, node, pass->getLocalSetLayout()));
         _batches.push_back(curdrawBatch);
     }
 }

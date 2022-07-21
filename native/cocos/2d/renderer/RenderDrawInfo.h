@@ -51,6 +51,11 @@ enum class RenderDrawInfoType: uint8_t {
     IA
 };
 
+struct LocalDSBF {
+    gfx::DescriptorSet* ds;
+    gfx::Buffer* uboBuf;
+};
+
 class Batcher2d;
 class RenderDrawInfo final {
 public:
@@ -115,6 +120,9 @@ public:
     void uploadBuffers();
     void resetMeshIA();
 
+    inline gfx::DescriptorSet* getLocalDes() { return _localDSBF->ds; }
+    void updateLocalDescriptorSet(Node* transform, gfx::DescriptorSetLayout* dsLayout);
+
 private:
     CC_DISALLOW_COPY_MOVE_ASSIGN(RenderDrawInfo);
     void destroy();
@@ -167,6 +175,8 @@ private:
     gfx::Buffer* _vbGFXBuffer{nullptr};
     // weak reference
     gfx::Buffer* _ibGFXBuffer{nullptr};
+
+    LocalDSBF* _localDSBF{nullptr};
 
     gfx::InputAssemblerInfo* _iaInfo{nullptr};
     //TODO(): it is not a good way to cache IA here.

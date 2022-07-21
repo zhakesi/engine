@@ -31,6 +31,12 @@
 
 namespace cc {
 
+static gfx::DescriptorSetInfo gDsInfo;
+cc::Float32Array& mat4ToFloat32Array(const cc::Mat4& mat, cc::Float32Array& out, index_t ofs = 0) {
+    memcpy(reinterpret_cast<float*>(const_cast<uint8_t*>(out.buffer()->getData())) + ofs, mat.m, 16 * sizeof(float));
+    return out;
+}
+
 RenderDrawInfo::RenderDrawInfo(index_t bufferId, uint32_t vertexOffset, uint32_t indexOffset) { // NOLINT(bugprone-easily-swappable-parameters)
     _bufferId = bufferId;
     _vertexOffset = vertexOffset;
@@ -121,7 +127,7 @@ void RenderDrawInfo::setDrawInfoType(uint32_t type) {
     _drawInfoType = static_cast<RenderDrawInfoType>(type);
 }
 
-void RenderDrawInfo::setSubNode(Node *node) {
+void RenderDrawInfo::setSubNode(Node* node) {
     _subNode = node;
 }
 
@@ -143,7 +149,7 @@ gfx::InputAssembler* RenderDrawInfo::requestIA(gfx::Device* device) {
 
 void RenderDrawInfo::uploadBuffers() {
     if (_vbCount == 0 || _ibCount == 0) return;
-    uint32_t size = _vbCount * 9 * sizeof(float);// magic Number
+    uint32_t size = _vbCount * 9 * sizeof(float); // magic Number
     gfx::Buffer* vBuffer = _vbGFXBuffer;
     vBuffer->resize(size);
     vBuffer->update(_vDataBuffer);
@@ -155,6 +161,32 @@ void RenderDrawInfo::uploadBuffers() {
 
 void RenderDrawInfo::resetMeshIA() {
     _nextFreeIAHandle = 0;
+}
+
+void RenderDrawInfo::updateLocalDescriptorSet(Node* transform, gfx::DescriptorSetLayout* dsLayout) {
+    if (_localDSBF == nullptr) {
+        _localDSBF = new LocalDSBF();
+        auto device = Root::getInstance()->getDevice();
+        gDsInfo.layout = dsLayout;
+        _localDSBF->ds = device->createDescriptorSet(gDsInfo);
+        _localDSBF->uboBuf = device->createBuffer({
+            gfx::BufferUsageBit::UNIFORM | gfx::BufferUsageBit::TRANSFER_DST,
+            gfx::MemoryUsageBit::HOST | gfx::MemoryUsageBit::DEVICE,
+            pipeline::UBOLocal::SIZE,
+            pipeline::UBOLocal::SIZE,
+        });
+    }
+    if (_texture != nullptr && _sampler != nullptr) {
+        _localDSBF->ds->bindTexture(static_cast<uint32_t>(pipeline::ModelLocalBindings::SAMPLER_SPRITE), _texture);
+        _localDSBF->ds->bindSampler(static_cast<uint32_t>(pipeline::ModelLocalBindings::SAMPLER_SPRITE), _sampler);
+    }
+    _localDSBF->ds->bindBuffer(pipeline::UBOLocal::BINDING, _localDSBF->uboBuf);
+    _localDSBF->ds->update();
+    static Float32Array matrixData;
+    matrixData.reset(pipeline::UBOLocal::COUNT);
+    const auto& worldMatrix = transform->getWorldMatrix();
+    mat4ToFloat32Array(worldMatrix, matrixData, pipeline::UBOLocal::MAT_WORLD_OFFSET);
+    _localDSBF->uboBuf->update(matrixData.buffer()->getData());
 }
 
 void RenderDrawInfo::destroy() {
@@ -179,6 +211,12 @@ void RenderDrawInfo::destroy() {
         CC_SAFE_DELETE(ia);
     }
     _iaPool.clear();
+
+    if (_localDSBF) {
+        _localDSBF->ds->destroy();
+        _localDSBF->uboBuf->destroy();
+        CC_SAFE_DELETE(_localDSBF);
+    }
 }
 
 gfx::InputAssembler* RenderDrawInfo::initIAInfo(gfx::Device* device) {
