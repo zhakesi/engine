@@ -55,7 +55,7 @@ public:
     void reset();
 
     void syncRootNodesToNative(ccstd::vector<Node*>&& rootNodes);
-    void releaseDescriptorSetCache(gfx::Texture* texture, gfx::Sampler* sampler);
+    void releaseDescriptorSetCache(gfx::Texture* texture, gfx::Sampler* sampler, Node* node = nullptr);
 
     UIMeshBuffer* getMeshBuffer(uint32_t accId, uint32_t bufferId);
     gfx::Device* getDevice();
@@ -131,7 +131,7 @@ private:
         }
     }
 
-    gfx::DescriptorSet* getDescriptorSet(gfx::Texture* texture, gfx::Sampler* sampler, gfx::DescriptorSetLayout* dsLayout);
+    gfx::DescriptorSet* getDescriptorSet(gfx::Texture* texture, gfx::Sampler* sampler, Node* node, gfx::DescriptorSetLayout* dsLayout);
 
     StencilManager* _stencilManager{nullptr};
 

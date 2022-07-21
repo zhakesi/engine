@@ -31,6 +31,13 @@
 #include "scene/Pass.h"
 
 namespace cc {
+struct LocalDS {
+    gfx::DescriptorSet* ds;
+    gfx::Buffer* ubo;
+    Node* node;
+};
+std::map<size_t, LocalDS> uboMap;
+
 Batcher2d::Batcher2d() : Batcher2d(nullptr) {
 }
 
@@ -72,8 +79,19 @@ gfx::Device* Batcher2d::getDevice() {
     }
     return _device;
 }
-
+cc::Float32Array& mat4ToFloat32Array(const cc::Mat4& mat, cc::Float32Array& out, index_t ofs = 0) {
+    memcpy(reinterpret_cast<float*>(const_cast<uint8_t*>(out.buffer()->getData())) + ofs, mat.m, 16 * sizeof(float));
+    return out;
+}
 void Batcher2d::updateDescriptorSet() {
+    for (auto& item : uboMap) {
+        auto lds = item.second;
+        Float32Array localData;
+        localData.reset(pipeline::UBOLocal::COUNT);
+        const auto& worldMatrix = lds.node->getWorldMatrix();
+        mat4ToFloat32Array(worldMatrix, localData, pipeline::UBOLocal::MAT_WORLD_OFFSET);
+        lds.ubo->update(localData.buffer()->getData());
+    }
 }
 
 void Batcher2d::syncRootNodesToNative(ccstd::vector<Node*>&& rootNodes) {
@@ -295,11 +313,11 @@ CC_FORCE_INLINE void Batcher2d::handleDrawInfo(RenderEntity* entity, RenderDrawI
         auto* curdrawBatch = _drawBatchPool.alloc();
         curdrawBatch->setVisFlags(_currLayer);
         curdrawBatch->setInputAssembler(ia);
-        curdrawBatch->setUseLocalFlag(nullptr); // todo usLocal
+        curdrawBatch->setUseLocalFlag(node); // todo usLocal
         curdrawBatch->fillPass(_currMaterial, depthStencil, dssHash);
         const auto& pass = curdrawBatch->getPasses().at(0);
 
-        curdrawBatch->setDescriptorSet(getDescriptorSet(_currTexture, _currSampler, pass->getLocalSetLayout()));
+        curdrawBatch->setDescriptorSet(getDescriptorSet(_currTexture, _currSampler, node, pass->getLocalSetLayout()));
         _batches.push_back(curdrawBatch);
     }
 }
@@ -356,7 +374,7 @@ void Batcher2d::generateBatch(RenderEntity* entity, RenderDrawInfo* drawInfo) {
     curdrawBatch->fillPass(_currMaterial, depthStencil, dssHash);
     const auto& pass = curdrawBatch->getPasses().at(0);
 
-    curdrawBatch->setDescriptorSet(getDescriptorSet(_currTexture, _currSampler, pass->getLocalSetLayout()));
+    curdrawBatch->setDescriptorSet(getDescriptorSet(_currTexture, _currSampler, nullptr, pass->getLocalSetLayout()));
     _batches.push_back(curdrawBatch);
 }
 
@@ -371,15 +389,20 @@ void Batcher2d::resetRenderStates() {
     _currDrawInfo = nullptr;
 }
 
-gfx::DescriptorSet* Batcher2d::getDescriptorSet(gfx::Texture* texture, gfx::Sampler* sampler, gfx::DescriptorSetLayout* dsLayout) {
-    ccstd::hash_t hash = 2;
+gfx::DescriptorSet* Batcher2d::getDescriptorSet(gfx::Texture* texture, gfx::Sampler* sampler, Node* node, gfx::DescriptorSetLayout* dsLayout) {
+    ccstd::hash_t hash = 3;
     size_t textureHash;
+    size_t localHash;
     if (texture != nullptr) {
         textureHash = boost::hash_value(texture);
         ccstd::hash_combine(hash, textureHash);
     }
     if (sampler != nullptr) {
         ccstd::hash_combine(hash, sampler->getHash());
+    }
+    if (node != nullptr) {
+        localHash = boost::hash_value(node);
+        ccstd::hash_combine(hash, localHash);
     }
     auto iter = _descriptorSetCache.find(hash);
     if (iter != _descriptorSetCache.end()) {
@@ -387,31 +410,54 @@ gfx::DescriptorSet* Batcher2d::getDescriptorSet(gfx::Texture* texture, gfx::Samp
             iter->second->bindTexture(static_cast<uint32_t>(pipeline::ModelLocalBindings::SAMPLER_SPRITE), texture);
             iter->second->bindSampler(static_cast<uint32_t>(pipeline::ModelLocalBindings::SAMPLER_SPRITE), sampler);
         }
+        if (node != nullptr) {
+            auto lds = uboMap[localHash];
+            iter->second->bindBuffer(pipeline::UBOLocal::BINDING, lds.ubo);
+        }
         iter->second->forceUpdate();
         return iter->second;
     }
     _dsInfo.layout = dsLayout;
     auto* ds = getDevice()->createDescriptorSet(_dsInfo);
-
-    if (texture != nullptr && sampler != nullptr) {
-        ds->bindTexture(static_cast<uint32_t>(pipeline::ModelLocalBindings::SAMPLER_SPRITE), texture);
-        ds->bindSampler(static_cast<uint32_t>(pipeline::ModelLocalBindings::SAMPLER_SPRITE), sampler);
+    if (node == nullptr) {
+        if (texture != nullptr && sampler != nullptr) {
+            ds->bindTexture(static_cast<uint32_t>(pipeline::ModelLocalBindings::SAMPLER_SPRITE), texture);
+            ds->bindSampler(static_cast<uint32_t>(pipeline::ModelLocalBindings::SAMPLER_SPRITE), sampler);
+        }
+        ds->update();
+        _descriptorSetCache.emplace(hash, ds);
+    } else {
+        auto* ubo = getDevice()->createBuffer({
+            gfx::BufferUsageBit::UNIFORM | gfx::BufferUsageBit::TRANSFER_DST,
+            gfx::MemoryUsageBit::HOST | gfx::MemoryUsageBit::DEVICE,
+            pipeline::UBOLocal::SIZE,
+            pipeline::UBOLocal::SIZE,
+        });
+        if (texture != nullptr && sampler != nullptr) {
+            ds->bindTexture(static_cast<uint32_t>(pipeline::ModelLocalBindings::SAMPLER_SPRITE), texture);
+            ds->bindSampler(static_cast<uint32_t>(pipeline::ModelLocalBindings::SAMPLER_SPRITE), sampler);
+        }
+        ds->bindBuffer(pipeline::UBOLocal::BINDING, ubo);
+        ds->update();
+        _descriptorSetCache.emplace(hash, ds);
     }
-    ds->update();
-    _descriptorSetCache.emplace(hash, ds);
-
     return ds;
 }
 
-void Batcher2d::releaseDescriptorSetCache(gfx::Texture* texture, gfx::Sampler* sampler) {
-    ccstd::hash_t hash = 2;
+void Batcher2d::releaseDescriptorSetCache(gfx::Texture* texture, gfx::Sampler* sampler, Node* node) {
+    ccstd::hash_t hash = 3;
     size_t textureHash;
+    size_t nodeHash;
     if (texture != nullptr) {
         textureHash = boost::hash_value(texture);
         ccstd::hash_combine(hash, textureHash);
     }
     if (sampler != nullptr) {
         ccstd::hash_combine(hash, sampler->getHash());
+    }
+    if (node != nullptr) {
+        nodeHash = boost::hash_value(node);
+        ccstd::hash_combine(hash, nodeHash);
     }
     auto iter = _descriptorSetCache.find(hash);
     if (iter != _descriptorSetCache.end()) {
