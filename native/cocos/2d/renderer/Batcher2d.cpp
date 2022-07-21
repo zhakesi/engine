@@ -440,6 +440,11 @@ gfx::DescriptorSet* Batcher2d::getDescriptorSet(gfx::Texture* texture, gfx::Samp
         ds->bindBuffer(pipeline::UBOLocal::BINDING, ubo);
         ds->update();
         _descriptorSetCache.emplace(hash, ds);
+        LocalDS lds;
+        lds.ds = ds;
+        lds.node = node;
+        lds.ubo = ubo;
+        uboMap[localHash] = lds;
     }
     return ds;
 }
