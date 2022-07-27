@@ -88,7 +88,7 @@
             const vbBytesLength = middlewareMgr.getVBTypedArrayLength(nativeFormat, i);
             const srcIndicesCount = ibBytesLength / 2; // USHORT
             const srcVertexCount = vbBytesLength  / nativeFormat / 4;
-            const srcVertexFloatCount = srcVertexCount * nativeFormat;
+            // const srcVertexFloatCount = srcVertexCount * nativeFormat;
 
             let buffer = renderInfoLookup[nativeFormat][i];
             if (!buffer)  {
@@ -100,14 +100,14 @@
                 buffer.drawInfoType = RenderDrawInfoType_IA;
             }
 
-            const srcVBuf = middlewareMgr.getVBTypedArray(nativeFormat, i);
-            const srcIBuf = middlewareMgr.getIBTypedArray(nativeFormat, i);
+            // const srcVBuf = middlewareMgr.getVBTypedArray(nativeFormat, i);
+            // const srcIBuf = middlewareMgr.getIBTypedArray(nativeFormat, i);
 
             buffer.resize(srcVertexCount, srcIndicesCount);
-            const vData = buffer.chunk.vb;
-            const iData = buffer.chunk.meshBuffer.iData;
-            vData.set(srcVBuf.subarray(0, srcVertexFloatCount), 0);
-            iData.set(srcIBuf.subarray(0, srcIndicesCount), 0);
+            // const vData = buffer.chunk.vb;
+            // const iData = buffer.chunk.meshBuffer.iData;
+            // vData.set(srcVBuf.subarray(0, srcVertexFloatCount), 0);
+            // iData.set(srcIBuf.subarray(0, srcIndicesCount), 0);
 
             renderInfoLookup[nativeFormat][i] = buffer;
         }

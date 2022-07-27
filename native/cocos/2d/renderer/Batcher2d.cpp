@@ -29,8 +29,10 @@
 #include "core/Root.h"
 #include "renderer/pipeline/Define.h"
 #include "scene/Pass.h"
+#include "editor-support/MiddlewareManager.h"
 
 namespace cc {
+static bool _isCopy = false;
 Batcher2d::Batcher2d() : Batcher2d(nullptr) {
 }
 
@@ -100,7 +102,6 @@ void Batcher2d::walk(Node* node, float parentOpacity) { // NOLINT(misc-no-recurs
             entity->setOpacity(parentOpacity * localOpacity * localColorAlpha);
         }
         if (entity->isEnabled()) {
-            
             uint32_t size = entity->getRenderDrawInfosSize();
             for (uint32_t i = 0; i < size; i++) {
                 auto* drawInfo = entity->getRenderDrawInfoAt(i);
@@ -292,6 +293,26 @@ CC_FORCE_INLINE void Batcher2d::handleDrawInfo(RenderEntity* entity, RenderDrawI
             curdrawBatch->setDescriptorSet(getDescriptorSet(_currTexture, _currSampler, pass->getLocalSetLayout()));
         }
         _batches.push_back(curdrawBatch);
+
+        if (!_isCopy) {
+            _isCopy = true;
+            int nativeFormat = 13;
+            auto* middleWare = middleware::MiddlewareManager::getInstance();
+            auto ibBytesLength = middleWare->getIBTypedArrayLength(nativeFormat, 0);
+            auto vbBytesLength = middleWare->getVBTypedArrayLength(nativeFormat, 0);
+            //auto srcIndicesCount = ibBytesLength / 2;
+            //auto srcVertexCount = vbBytesLength / nativeFormat / 4;
+            //auto* srcVBuf = middleWare->getVBTypedArray(nativeFormat, 0);
+            //auto* srcIBuf = middleWare->getIBTypedArray(nativeFormat, 0);
+            auto buffer = middleWare->getMeshBuffer(nativeFormat);
+            auto* srcIBuf = buffer->getIB().getBuffer();
+            auto* srcVBuf = buffer->getVB().getBuffer();
+
+            auto* dstVBuf = currMeshBuffer->getVData();
+            auto* dstIBuf = currMeshBuffer->getIData();
+            memcpy(dstVBuf, srcVBuf, vbBytesLength);
+            memcpy(dstIBuf, srcIBuf, ibBytesLength);
+        }
     } else {
         if (drawInfo->getSubNode()) {
             walk(drawInfo->getSubNode(), entity->getOpacity());
@@ -436,6 +457,7 @@ void Batcher2d::uploadBuffers() {
     }
 
     updateDescriptorSet();
+    _isCopy = false;
 }
 
 void Batcher2d::reset() {
