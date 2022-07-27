@@ -182,20 +182,22 @@ void UIMeshBuffer::setFloatsPerVertex(uint32_t floatsPerVertex) {
     _meshBufferLayout->floatsPerVertex = floatsPerVertex;
 }
 
-void UIMeshBuffer::copyFromMiddleWare() {
+void UIMeshBuffer::linkWithMiddleWareBuffer(size_t &i, size_t &ii) {
     int nativeFormat = 9;
-    if (_attributes.size() == 4) nativeFormat = 13;
-    
+    int index = i;
+    if (_attributes.size() == 3) {
+        i++;
+    } else {
+        nativeFormat = 13;
+        index = ii;
+        ii++;
+    }
     auto* middleWare = middleware::MiddlewareManager::getInstance();
-    auto ibBytesLength = middleWare->getIBTypedArrayLength(nativeFormat, 0);
-    auto vbBytesLength = middleWare->getVBTypedArrayLength(nativeFormat, 0);
-
     auto buffer = middleWare->getMeshBuffer(nativeFormat);
-    auto* srcIBuf = buffer->getIB().getBuffer();
-    auto* srcVBuf = buffer->getVB().getBuffer();
-
-    memcpy(_vData, srcVBuf, vbBytesLength);
-    memcpy(_iData, srcIBuf, ibBytesLength);
+    auto* srcIBuf = buffer->getIBFromBufferArray(index);
+    auto* srcVBuf = buffer->getVBFromBufferArray(index);
+    _vData = reinterpret_cast<float *>(srcVBuf);
+    _iData = reinterpret_cast<uint16_t*>(srcIBuf);
 }
 
 } // namespace cc

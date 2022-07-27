@@ -72,10 +72,10 @@ public:
     void setDirty(bool dirty) const;
     inline uint32_t getFloatsPerVertex() const { return _meshBufferLayout->floatsPerVertex; }
     void setFloatsPerVertex(uint32_t floatsPerVertex);
-    inline bool getIsMiddlWareBuf() { return _isMiddlWareBuf; }
-    inline void setIsMiddlWareBuf(bool val) { _isMiddlWareBuf = val; }
+    inline bool getNeedLinkMiddleWare() { return _needLinkMiddleWare; }
+    inline void setNeedLinkMiddleWare(bool val) { _needLinkMiddleWare = val; }
 
-    void copyFromMiddleWare();
+    void linkWithMiddleWareBuffer(size_t &i, size_t &ii);
 
 protected:
     CC_DISALLOW_COPY_MOVE_ASSIGN(UIMeshBuffer);
@@ -100,6 +100,6 @@ private:
     gfx::InputAssemblerInfo _iaInfo;
     uint32_t _nextFreeIAHandle{0};
     bool _needDeleteVData{false};
-    bool _isMiddlWareBuf{false};
+    bool _needLinkMiddleWare{false};
 };
 } // namespace cc
