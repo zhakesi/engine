@@ -25,6 +25,7 @@
 
 #include "2d/renderer/UIMeshBuffer.h"
 #include "renderer/gfx-base/GFXDevice.h"
+#include "editor-support/MiddlewareManager.h"
 
 namespace cc {
 
@@ -180,4 +181,21 @@ void UIMeshBuffer::setDirty(bool dirty) const {
 void UIMeshBuffer::setFloatsPerVertex(uint32_t floatsPerVertex) {
     _meshBufferLayout->floatsPerVertex = floatsPerVertex;
 }
+
+void UIMeshBuffer::copyFromMiddleWare() {
+    int nativeFormat = 9;
+    if (_attributes.size() == 4) nativeFormat = 13;
+    
+    auto* middleWare = middleware::MiddlewareManager::getInstance();
+    auto ibBytesLength = middleWare->getIBTypedArrayLength(nativeFormat, 0);
+    auto vbBytesLength = middleWare->getVBTypedArrayLength(nativeFormat, 0);
+
+    auto buffer = middleWare->getMeshBuffer(nativeFormat);
+    auto* srcIBuf = buffer->getIB().getBuffer();
+    auto* srcVBuf = buffer->getVB().getBuffer();
+
+    memcpy(_vData, srcVBuf, vbBytesLength);
+    memcpy(_iData, srcIBuf, ibBytesLength);
+}
+
 } // namespace cc
