@@ -101,7 +101,7 @@
         }
     }
 
-    director.on(cc.Director.EVENT_BEFORE_UPDATE, () => {
+    director.on(cc.Director.EVENT_AFTER_UPDATE, () => {
         if (reference === 0) return;
         middlewareMgr.update(game.deltaTime);
     });
