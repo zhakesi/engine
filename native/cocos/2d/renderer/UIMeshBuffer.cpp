@@ -204,4 +204,8 @@ void UIMeshBuffer::setDirty(bool dirty) const {
     _meshBufferLayout->dirtyMark = dirty ? 1 : 0;
 }
 
+void UIMeshBuffer::createLayout() {
+    _meshBufferLayout = new MeshBufferLayout();
+}
+
 } // namespace cc

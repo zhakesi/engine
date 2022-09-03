@@ -26,33 +26,32 @@
 // @ts-expect-error jsb polyfills
 (function () {
     if (!window.middleware) return;
-    const RenderDrawInfoType_IA = 2;
     const middleware = window.middleware;
     const middlewareMgr = middleware.MiddlewareManager.getInstance();
     let reference = 0;
     const director = cc.director;
     const game = cc.game;
-    const _accessors = [];
+    // const _accessors = [];
 
-    const nativeXYZUVC = middleware.vfmtPosUvColor = 6;
-    const nativeXYZUVCC = middleware.vfmtPosUvTwoColor = 7;
+    // const nativeXYZUVC = middleware.vfmtPosUvColor = 6;
+    // const nativeXYZUVCC = middleware.vfmtPosUvTwoColor = 7;
 
-    const vfmtPosUvColor4B = cc.internal.vfmtPosUvColor4B;
-    const vfmtPosUvTwoColor4B = cc.internal.vfmtPosUvTwoColor4B;
+    // const vfmtPosUvColor4B = cc.internal.vfmtPosUvColor4B;
+    // const vfmtPosUvTwoColor4B = cc.internal.vfmtPosUvTwoColor4B;
 
-    const renderInfoLookup = middleware.RenderInfoLookup = {};
-    renderInfoLookup[nativeXYZUVC] = [];
-    renderInfoLookup[nativeXYZUVCC] = [];
+    // const renderInfoLookup = middleware.RenderInfoLookup = {};
+    // renderInfoLookup[nativeXYZUVC] = [];
+    // renderInfoLookup[nativeXYZUVCC] = [];
 
-    middleware.reset = function () {
-        middleware.preRenderComponent = null;
-        middleware.preRenderBufferIndex = 0;
-        middleware.preRenderBufferType = nativeXYZUVC;
-        middleware.renderOrder = 0;
-        middleware.indicesStart = 0;
-        middleware.resetIndicesStart = false;
-    };
-    middleware.reset();
+    // middleware.reset = function () {
+    //     middleware.preRenderComponent = null;
+    //     middleware.preRenderBufferIndex = 0;
+    //     //middleware.preRenderBufferType = nativeXYZUVC;
+    //     middleware.renderOrder = 0;
+    //     middleware.indicesStart = 0;
+    //     middleware.resetIndicesStart = false;
+    // };
+    // middleware.reset();
     middleware.retain = function () {
         reference++;
     };
@@ -62,44 +61,44 @@
             return;
         }
         reference--;
-        if (reference === 0) {
-            const uvcBuffers = renderInfoLookup[nativeXYZUVC];
-            for (let i = 0; i < uvcBuffers.length; i++) {
-                cc.UI.RenderData.remove(uvcBuffers[i]);
-            }
-            uvcBuffers.length = 0;
-            const uvccBuffers = renderInfoLookup[nativeXYZUVCC];
-            for (let i = 0; i < uvccBuffers.length; i++) {
-                cc.UI.RenderData.remove(uvccBuffers[i]);
-            }
-            uvccBuffers.length = 0;
-            _accessors.forEach((accessor) => {
-                accessor.destroy();
-            });
-        }
+        // if (reference === 0) {
+        //     const uvcBuffers = renderInfoLookup[nativeXYZUVC];
+        //     for (let i = 0; i < uvcBuffers.length; i++) {
+        //         cc.UI.RenderData.remove(uvcBuffers[i]);
+        //     }
+        //     uvcBuffers.length = 0;
+        //     const uvccBuffers = renderInfoLookup[nativeXYZUVCC];
+        //     for (let i = 0; i < uvccBuffers.length; i++) {
+        //         cc.UI.RenderData.remove(uvccBuffers[i]);
+        //     }
+        //     uvccBuffers.length = 0;
+        //     _accessors.forEach((accessor) => {
+        //         accessor.destroy();
+        //     });
+        // }
     };
 
-    function CopyNativeBufferToJS (renderer, nativeFormat, jsFormat) {
-        if (!renderer) return;
+    // function CopyNativeBufferToJS (renderer, nativeFormat, jsFormat) {
+    //     if (!renderer) return;
 
-        const bufferCount = middlewareMgr.getBufferCount(nativeFormat);
-        for (let i = 0; i < bufferCount; i++) {
-            let buffer = renderInfoLookup[nativeFormat][i];
-            if (!buffer)  {
-                if (!_accessors[jsFormat]) {
-                    _accessors[jsFormat] = cc.UI.RenderData.createStaticVBAccessor(jsFormat, 65535, 524280);
-                }
-                buffer = cc.UI.RenderData.add(jsFormat, _accessors[jsFormat]);
-                buffer.multiOwner = true;
-                buffer.drawInfoType = RenderDrawInfoType_IA;
-                // vertex count 65535, indices count 8 * 65535
-                buffer.resize(65535, 524280);
-                const meshBuffer = buffer.getMeshBuffer();
-                meshBuffer.useLinkedData = true;
-                renderInfoLookup[nativeFormat][i] = buffer;
-            }
-        }
-    }
+    //     const bufferCount = middlewareMgr.getBufferCount(nativeFormat);
+    //     for (let i = 0; i < bufferCount; i++) {
+    //         let buffer = renderInfoLookup[nativeFormat][i];
+    //         if (!buffer)  {
+    //             if (!_accessors[jsFormat]) {
+    //                 _accessors[jsFormat] = cc.UI.RenderData.createStaticVBAccessor(jsFormat, 65535, 524280);
+    //             }
+    //             buffer = cc.UI.RenderData.add(jsFormat, _accessors[jsFormat]);
+    //             buffer.multiOwner = true;
+    //             buffer.drawInfoType = RenderDrawInfoType_IA;
+    //             // vertex count 65535, indices count 8 * 65535
+    //             buffer.resize(65535, 524280);
+    //             const meshBuffer = buffer.getMeshBuffer();
+    //             meshBuffer.useLinkedData = true;
+    //             renderInfoLookup[nativeFormat][i] = buffer;
+    //         }
+    //     }
+    // }
 
     director.on(cc.Director.EVENT_BEFORE_UPDATE, () => {
         if (reference === 0) return;
@@ -110,37 +109,37 @@
         if (reference === 0) return;
         middlewareMgr.render(game.deltaTime);
 
-        // reset render order
-        middleware.reset();
+        // // reset render order
+        // middleware.reset();
 
-        const batcher2D = director.root.batcher2D;
-        CopyNativeBufferToJS(batcher2D, nativeXYZUVC, vfmtPosUvColor4B);
-        CopyNativeBufferToJS(batcher2D, nativeXYZUVCC, vfmtPosUvTwoColor4B);
-        if (window.dragonBones) {
-            const armaSystem = cc.internal.ArmatureSystem.getInstance();
-            armaSystem.prepareRenderData();
-        }
-        if (window.spine) {
-            const skeletonSystem = cc.internal.SpineSkeletonSystem.getInstance();
-            skeletonSystem.prepareRenderData();
-        }
+        // const batcher2D = director.root.batcher2D;
+        // CopyNativeBufferToJS(batcher2D, nativeXYZUVC, vfmtPosUvColor4B);
+        // CopyNativeBufferToJS(batcher2D, nativeXYZUVCC, vfmtPosUvTwoColor4B);
+        // if (window.dragonBones) {
+        //     const armaSystem = cc.internal.ArmatureSystem.getInstance();
+        //     armaSystem.prepareRenderData();
+        // }
+        // if (window.spine) {
+        //     const skeletonSystem = cc.internal.SpineSkeletonSystem.getInstance();
+        //     skeletonSystem.prepareRenderData();
+        // }
     });
 
-    const renderInfoMgr = middlewareMgr.getRenderInfoMgr();
-    renderInfoMgr.renderInfo = renderInfoMgr.getSharedBuffer();
-    renderInfoMgr.setResizeCallback(function () {
-        this.attachInfo = this.getSharedBuffer();
-    });
-    renderInfoMgr.__middleware__ = middleware;
+    // const renderInfoMgr = middlewareMgr.getRenderInfoMgr();
+    // renderInfoMgr.renderInfo = renderInfoMgr.getSharedBuffer();
+    // renderInfoMgr.setResizeCallback(function () {
+    //     this.attachInfo = this.getSharedBuffer();
+    // });
+    // renderInfoMgr.__middleware__ = middleware;
 
-    const attachInfoMgr = middlewareMgr.getAttachInfoMgr();
-    attachInfoMgr.attachInfo = attachInfoMgr.getSharedBuffer();
-    attachInfoMgr.setResizeCallback(function () {
-        this.attachInfo = this.getSharedBuffer();
-    });
+    // const attachInfoMgr = middlewareMgr.getAttachInfoMgr();
+    // attachInfoMgr.attachInfo = attachInfoMgr.getSharedBuffer();
+    // attachInfoMgr.setResizeCallback(function () {
+    //     this.attachInfo = this.getSharedBuffer();
+    // });
 
-    middleware.renderInfoMgr = renderInfoMgr;
-    middleware.attachInfoMgr = attachInfoMgr;
+    // middleware.renderInfoMgr = renderInfoMgr;
+    // middleware.attachInfoMgr = attachInfoMgr;
 
     // generate get set function
     middleware.generateGetSet = function (moduleObj) {

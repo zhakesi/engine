@@ -278,7 +278,27 @@ CC_FORCE_INLINE void Batcher2d::handleIADraw(RenderEntity* entity, RenderDrawInf
     setIndexRange(drawInfo);
 
     UIMeshBuffer* currMeshBuffer = drawInfo->getMeshBuffer();
+    if (currMeshBuffer != _currMeshBuffer) {
+        uint16_t accID = currMeshBuffer->getAttributes().size() == 3 ? 65534 : 65535;
+        ccstd::vector<UIMeshBuffer*> buffers;
+        if (_meshBuffersMap.find(accID) != _meshBuffersMap.end()) {
+            buffers = _meshBuffersMap[accID];
+            bool find = false;
+            for (auto& item : buffers) {
+                if (item == currMeshBuffer) {
+                    find = true;
+                    break;
+                }
+            }
+            if (!find) {
+                _meshBuffersMap[accID].push_back(currMeshBuffer);
+            }
+        } else {
+            _meshBuffersMap[accID].push_back(currMeshBuffer);
+        }
+    }
     currMeshBuffer->setDirty(true);
+    _currMeshBuffer = currMeshBuffer;
     gfx::InputAssembler* ia = currMeshBuffer->requireFreeIA(getDevice());
     ia->setFirstIndex(drawInfo->getIndexOffset());
     ia->setIndexCount(drawInfo->getIbCount());
@@ -295,12 +315,13 @@ CC_FORCE_INLINE void Batcher2d::handleIADraw(RenderEntity* entity, RenderDrawInf
     curdrawBatch->setInputAssembler(ia);
     curdrawBatch->fillPass(_currMaterial, depthStencil, dssHash);
     const auto& pass = curdrawBatch->getPasses().at(0);
-    if (entity->getUseLocal()) {
-        drawInfo->updateLocalDescriptorSet(node, pass->getLocalSetLayout());
-        curdrawBatch->setDescriptorSet(drawInfo->getLocalDes());
-    } else {
-        curdrawBatch->setDescriptorSet(getDescriptorSet(_currTexture, _currSampler, pass->getLocalSetLayout()));
-    }
+    //  if (entity->getUseLocal()) {
+    //      drawInfo->updateLocalDescriptorSet(node, pass->getLocalSetLayout());
+    //      curdrawBatch->setDescriptorSet(drawInfo->getLocalDes());
+    //  } else {
+    //      curdrawBatch->setDescriptorSet(getDescriptorSet(_currTexture, _currSampler, pass->getLocalSetLayout()));
+    //  }
+    curdrawBatch->setDescriptorSet(getDescriptorSet(_currTexture, _currSampler, pass->getLocalSetLayout()));
     _batches.push_back(curdrawBatch);
 }
 
@@ -466,30 +487,8 @@ void Batcher2d::uploadBuffers() {
         meshRenderData->uploadBuffers();
     }
 
-    size_t i = 0;
-    size_t ii = 0;
     for (auto& map : _meshBuffersMap) {
         for (auto& buffer : map.second) {
-#if CC_USE_MIDDLEWARE
-            // set vData and iData With Middleware buffer.
-            if (buffer->getUseLinkData()) {
-                int nativeFormat = 6;
-                size_t index = i;
-                if (buffer->getAttributes().size() == 3) {
-                    i++;
-                } else {
-                    nativeFormat = 7;
-                    index = ii;
-                    ii++;
-                }
-                auto* middleWare = middleware::MiddlewareManager::getInstance();
-                auto* middleBuffer = middleWare->getMeshBuffer(nativeFormat);
-                auto* srcIBuf = middleBuffer->getIBFromBufferArray(index);
-                auto* srcVBuf = middleBuffer->getVBFromBufferArray(index);
-                buffer->setVData(reinterpret_cast<float*>(srcVBuf));
-                buffer->setIData(reinterpret_cast<uint16_t*>(srcIBuf));
-            }
-#endif
             buffer->uploadBuffers();
             buffer->reset();
         }

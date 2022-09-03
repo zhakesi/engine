@@ -69,6 +69,10 @@ public:
         _drawInfoAttrs._drawInfoType = static_cast<RenderDrawInfoType>(type);
     }
 
+    inline void setMeshBuffer(UIMeshBuffer* meshBuffer) {
+        _meshBuffer = meshBuffer;
+    }
+
     inline uint16_t getAccId() const { return _drawInfoAttrs._accId; }
     inline void setAccId(uint16_t id) {
         _drawInfoAttrs._accId = id;

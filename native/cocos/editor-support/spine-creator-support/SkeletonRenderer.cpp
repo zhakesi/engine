@@ -40,6 +40,9 @@
 #include "math/Vec3.h"
 #include "spine-creator-support/AttachmentVertices.h"
 #include "spine-creator-support/spine-cocos2dx.h"
+#include "2d/renderer/RenderDrawInfo.h"
+#include "2d/renderer/RenderEntity.h"
+#include "renderer/core/MaterialInstance.h"
 
 USING_NS_MW;             // NOLINT(google-build-using-namespace)
 using namespace spine;   // NOLINT(google-build-using-namespace)
@@ -263,39 +266,18 @@ void SkeletonRenderer::initWithBinaryFile(const std::string &skeletonDataFile, c
 void SkeletonRenderer::render(float /*deltaTime*/) {
     if (!_skeleton) return;
 
-    _sharedBufferOffset->reset();
-    _sharedBufferOffset->clear();
+    RenderEntity *entity = (RenderEntity *)_entity;
+    entity->clearDynamicRenderDrawInfos();
 
     // avoid other place call update.
     auto *mgr = MiddlewareManager::getInstance();
     if (!mgr->isRendering) return;
 
-    auto *renderMgr = mgr->getRenderInfoMgr();
-    auto *renderInfo = renderMgr->getBuffer();
-    if (!renderInfo) return;
-
-    auto *attachMgr = mgr->getAttachInfoMgr();
-    auto *attachInfo = attachMgr->getBuffer();
-    if (!attachInfo) return;
-
-    //  store render info offset
-    _sharedBufferOffset->writeUint32(static_cast<uint32_t>(renderInfo->getCurPos()) / sizeof(uint32_t));
-    // store attach info offset
-    _sharedBufferOffset->writeUint32(static_cast<uint32_t>(attachInfo->getCurPos()) / sizeof(uint32_t));
-
-    // check enough space
-    renderInfo->checkSpace(sizeof(uint32_t) * 2, true);
-    // write border
-    renderInfo->writeUint32(0xffffffff);
-
-    std::size_t materialLenOffset = renderInfo->getCurPos();
-    //reserved space to save material len
-    renderInfo->writeUint32(0);
-
     // If opacity is 0,then return.
     if (_skeleton->getColor().a == 0) {
         return;
     }
+    cc::Mat4 nodeWorldMat = entity->getNode()->getWorldMatrix();
 
     // color range is [0.0, 1.0]
     cc::middleware::Color4F color;
@@ -315,15 +297,7 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
     unsigned int vbs2 = sizeof(V3F_T2F_C4B_C4B);
     // verex size in floats with two color
     unsigned int vs2 = vbs2 / sizeof(float);
-
-    auto vbs = vbs1;
-    if (_useTint) {
-        vbs = vbs2;
-    }
-
-    auto *paramsBuffer = _paramsBuffer->getBuffer();
-    // data store in buffer which 0 to 3 is render order, left data is node world matrix
-    const cc::Mat4 &nodeWorldMat = *reinterpret_cast<cc::Mat4 *>(&paramsBuffer[4]);
+    auto vbs = _useTint ? vbs2 : vbs1;
 
     unsigned int vbSize = 0;
     unsigned int ibSize = 0;
@@ -332,10 +306,9 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
     int curBlendDst = -1;
     int curBlendMode = -1;
     int preBlendMode = -1;
-    int preTextureIndex = -1;
-    int curTextureIndex = -1;
-
-    int preISegWritePos = -1;
+    cc::Texture2D* preTexture = nullptr;
+    cc::Texture2D* curTexture = nullptr;
+    RenderDrawInfo* curDrawInfo = nullptr;
     uint32_t curISegLen = 0;
 
     int materialLen = 0;
@@ -352,9 +325,11 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
 
     auto flush = [&]() {
         // fill pre segment indices count field
-        if (preISegWritePos != -1) {
-            renderInfo->writeUint32(preISegWritePos, curISegLen);
+        if (curDrawInfo) {
+            curDrawInfo->setIbCount(curISegLen);
         }
+        curDrawInfo = (RenderDrawInfo *)requestDrawInfo(materialLen);
+        entity->addDynamicRenderDrawInfo(curDrawInfo);
         // prepare to fill new segment field
         curBlendMode = slot->getData().getBlendMode();
         switch (curBlendMode) {
@@ -374,30 +349,21 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
                 curBlendSrc = static_cast<int>(_premultipliedAlpha ? BlendFactor::ONE : BlendFactor::SRC_ALPHA);
                 curBlendDst = static_cast<int>(BlendFactor::ONE_MINUS_SRC_ALPHA);
         }
+        Material *material = (Material *)requestMaterial(curBlendSrc, curBlendDst);
+        curDrawInfo->setMaterial(material);
+        gfx::Texture *texture = curTexture->getGFXTexture();
+        gfx::Sampler *sampler = curTexture->getGFXSampler();
+        curDrawInfo->setTexture(texture);
+        curDrawInfo->setSampler(sampler);
 
-        // check enough space
-        renderInfo->checkSpace(sizeof(uint32_t) * 6, true);
-
-        // fill new texture index
-        renderInfo->writeUint32(curTextureIndex);
-        // fill new blend src and dst
-        renderInfo->writeUint32(curBlendSrc);
-        renderInfo->writeUint32(curBlendDst);
-        // fill new index and vertex buffer id
-        auto bufferIndex = mb->getBufferPos();
-        renderInfo->writeUint32(bufferIndex);
-
-        // fill new index offset
-        renderInfo->writeUint32(static_cast<uint32_t>(ib.getCurPos()) / sizeof(uint16_t));
-        // save new segment indices count pos field
-        preISegWritePos = static_cast<int>(renderInfo->getCurPos());
-        // reserve indice segamentation count
-        renderInfo->writeUint32(0);
+        UIMeshBuffer* uiMeshBuffer = (UIMeshBuffer*)mb->getUIMeshBuffer();
+        curDrawInfo->setMeshBuffer(uiMeshBuffer);
+        curDrawInfo->setIndexOffset(static_cast<uint32_t>(ib.getCurPos()) / sizeof(uint16_t));
 
         // reset pre blend mode to current
         preBlendMode = static_cast<int>(slot->getData().getBlendMode());
         // reset pre texture index to current
-        preTextureIndex = curTextureIndex;
+        preTexture = curTexture;
         // reset index segmentation count
         curISegLen = 0;
         // material length increased
@@ -747,12 +713,18 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
             }
         }
 
-        curTextureIndex = attachmentVertices->_texture->getRealTextureIndex();
+        curTexture = (cc::Texture2D*)attachmentVertices->_texture->getRealTexture();
         // If texture or blendMode change,will change material.
-        if (preTextureIndex != curTextureIndex || preBlendMode != slot->getData().getBlendMode() || isFull) {
+        if (preTexture != curTexture || preBlendMode != slot->getData().getBlendMode() || isFull) {
             flush();
         }
 
+        uint8_t *vbBuffer = vb.getCurBuffer();
+        cc::Vec3 *point = nullptr;
+        for (unsigned int ii = 0, nn = vbSize; ii < nn; ii += vbs) {
+            point = reinterpret_cast<cc::Vec3 *>(vbBuffer + ii);
+            point->transformMat4(*point, nodeWorldMat);
+        }
         auto vertexOffset = vb.getCurPos() / vbs;
         if (vbSize > 0 && ibSize > 0) {
             if (vertexOffset > 0) {
@@ -775,44 +747,43 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
 
     if (effect) effect->end();
 
-    renderInfo->writeUint32(materialLenOffset, materialLen);
-    if (preISegWritePos != -1) {
-        renderInfo->writeUint32(preISegWritePos, curISegLen);
+    if (curDrawInfo) {
+        curDrawInfo->setIbCount(curISegLen);
     }
 
     if (_useAttach || _debugBones) {
-        auto &bones = _skeleton->getBones();
-        size_t bonesCount = bones.size();
+        // auto &bones = _skeleton->getBones();
+        // size_t bonesCount = bones.size();
 
-        cc::Mat4 boneMat = cc::Mat4::IDENTITY;
+        // cc::Mat4 boneMat = cc::Mat4::IDENTITY;
 
-        if (_debugBones) {
-            _debugBuffer->writeFloat32(DebugType::BONES);
-            _debugBuffer->writeFloat32(static_cast<float>(bonesCount * 4));
-        }
+        // if (_debugBones) {
+        //     _debugBuffer->writeFloat32(DebugType::BONES);
+        //     _debugBuffer->writeFloat32(static_cast<float>(bonesCount * 4));
+        // }
 
-        for (size_t i = 0, n = bonesCount; i < n; i++) {
-            Bone *bone = bones[i];
+        // for (size_t i = 0, n = bonesCount; i < n; i++) {
+        //     Bone *bone = bones[i];
 
-            boneMat.m[0] = bone->getA();
-            boneMat.m[1] = bone->getC();
-            boneMat.m[4] = bone->getB();
-            boneMat.m[5] = bone->getD();
-            boneMat.m[12] = bone->getWorldX();
-            boneMat.m[13] = bone->getWorldY();
-            attachInfo->checkSpace(sizeof(boneMat), true);
-            attachInfo->writeBytes(reinterpret_cast<const char *>(&boneMat), sizeof(boneMat));
+        //     boneMat.m[0] = bone->getA();
+        //     boneMat.m[1] = bone->getC();
+        //     boneMat.m[4] = bone->getB();
+        //     boneMat.m[5] = bone->getD();
+        //     boneMat.m[12] = bone->getWorldX();
+        //     boneMat.m[13] = bone->getWorldY();
+        //     attachInfo->checkSpace(sizeof(boneMat), true);
+        //     attachInfo->writeBytes(reinterpret_cast<const char *>(&boneMat), sizeof(boneMat));
 
-            if (_debugBones) {
-                float boneLength = bone->getData().getLength();
-                float x = boneLength * bone->getA() + bone->getWorldX();
-                float y = boneLength * bone->getC() + bone->getWorldY();
-                _debugBuffer->writeFloat32(bone->getWorldX());
-                _debugBuffer->writeFloat32(bone->getWorldY());
-                _debugBuffer->writeFloat32(x);
-                _debugBuffer->writeFloat32(y);
-            }
-        }
+        //     if (_debugBones) {
+        //         float boneLength = bone->getData().getLength();
+        //         float x = boneLength * bone->getA() + bone->getWorldX();
+        //         float y = boneLength * bone->getC() + bone->getWorldY();
+        //         _debugBuffer->writeFloat32(bone->getWorldX());
+        //         _debugBuffer->writeFloat32(bone->getWorldY());
+        //         _debugBuffer->writeFloat32(x);
+        //         _debugBuffer->writeFloat32(y);
+        //     }
+        // }
     }
 
     // debug end
@@ -1035,4 +1006,41 @@ uint32_t SkeletonRenderer::getRenderOrder() const {
         return static_cast<uint32_t>(buffer[0]);
     }
     return 0;
+}
+
+void* SkeletonRenderer::requestDrawInfo(int idx) {
+    if (_drawInfoArray.size() < idx + 1) {
+        RenderDrawInfo *draw = new RenderDrawInfo();
+        draw->setDrawInfoType((uint32_t)RenderDrawInfoType::IA);
+        _drawInfoArray.push_back((void *)draw);
+    }
+    return (void*)_drawInfoArray[idx];
+}
+
+void *SkeletonRenderer::requestMaterial(uint16_t blendSrc, uint16_t blendDst) {
+    uint32_t key = ((uint32_t)blendSrc << 16) | ((uint32_t)blendDst);
+    if (_materialCaches.find(key) == _materialCaches.end()) {
+        const IMaterialInstanceInfo info {
+            (Material*)_material,
+            0
+        };
+        MaterialInstance* materialInstance = new MaterialInstance(info);
+        const PassOverrides overrides;
+        BlendStateInfo stateInfo;
+        stateInfo.blendColor = gfx::Color{1.0F, 1.0F, 1.0F, 1.0F};
+        BlendTargetInfo targetInfo;
+        targetInfo.blendEq = gfx::BlendOp::ADD;
+        targetInfo.blendAlphaEq = gfx::BlendOp::ADD;
+        targetInfo.blendSrc = (gfx::BlendFactor)blendSrc;
+        targetInfo.blendDst = (gfx::BlendFactor)blendDst;
+        targetInfo.blendSrcAlpha = (gfx::BlendFactor)blendSrc;
+        targetInfo.blendDstAlpha = (gfx::BlendFactor)blendDst;
+        BlendTargetInfoList targetList {targetInfo};
+        stateInfo.targets = targetList;
+        materialInstance->overridePipelineStates(overrides);
+        const MacroRecord macros {{"TWO_COLORED", _useTint}, {"USE_LOCAL", false}};
+        materialInstance->recompileShaders(macros);
+        _materialCaches[key] = (void*)materialInstance;
+    }
+    return _materialCaches[key];
 }

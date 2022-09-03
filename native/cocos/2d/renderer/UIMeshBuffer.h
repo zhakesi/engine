@@ -73,7 +73,7 @@ public:
     inline const ccstd::vector<gfx::Attribute>& getAttributes() const {
         return _attributes;
     }
-
+    void createLayout();
 protected:
     CC_DISALLOW_COPY_MOVE_ASSIGN(UIMeshBuffer);
 
