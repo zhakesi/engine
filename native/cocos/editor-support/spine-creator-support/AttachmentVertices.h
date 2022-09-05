@@ -40,8 +40,10 @@ class AttachmentVertices {
 public:
     AttachmentVertices(cc::middleware::Texture2D *texture, int verticesCount, uint16_t *triangles, int trianglesCount);
     virtual ~AttachmentVertices();
-
+    void updateColor(cc::middleware::Color4B& color);
     cc::middleware::Texture2D *_texture = nullptr;
     cc::middleware::Triangles *_triangles = nullptr;
+private:
+    cc::middleware::Color4B _color;
 };
 } // namespace spine

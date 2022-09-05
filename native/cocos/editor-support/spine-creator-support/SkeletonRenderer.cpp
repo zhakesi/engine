@@ -274,20 +274,23 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
     if (!mgr->isRendering) return;
 
     // If opacity is 0,then return.
-    if (_skeleton->getColor().a == 0) {
+    spine::Color skeletonColor = _skeleton->getColor();
+    if (skeletonColor.a < 0.5F) {
         return;
     }
-    cc::Mat4 nodeWorldMat = entity->getNode()->getWorldMatrix();
 
     // color range is [0.0, 1.0]
-    cc::middleware::Color4F color;
-    cc::middleware::Color4F darkColor;
+    cc::middleware::Color4B color;
+    cc::middleware::Color4B darkColor;
+
+    cc::Mat4 nodeWorldMat = entity->getNode()->getWorldMatrix();
     AttachmentVertices *attachmentVertices = nullptr;
     bool inRange = !(_startSlotIndex != -1 || _endSlotIndex != -1);
     auto vertexFormat = _useTint ? VF_XYZUVCC : VF_XYZUVC;
     cc::middleware::MeshBuffer *mb = mgr->getMeshBuffer(vertexFormat);
     cc::middleware::IOBuffer &vb = mb->getVB();
     cc::middleware::IOBuffer &ib = mb->getIB();
+
 
     // vertex size int bytes with one color
     unsigned int vbs1 = sizeof(V3F_T2F_C4B);
@@ -405,9 +408,9 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
             _clipper->clipEnd(*slot);
             continue;
         }
-
+        spine::Color slotColor = slot->getColor();
         // Early exit if slot is invisible
-        if (slot->getColor().a == 0) {
+        if (slotColor.a < 0.5F) {
             _clipper->clipEnd(*slot);
             continue;
         }
@@ -420,10 +423,39 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
             attachmentVertices = reinterpret_cast<AttachmentVertices *>(attachment->getRendererObject());
 
             // Early exit if attachment is invisible
-            if (attachment->getColor().a == 0) {
+            spine::Color attachmentColor = attachment->getColor();
+            if (attachmentColor.a < 0.5F) {
                 _clipper->clipEnd(*slot);
                 continue;
             }
+
+            color.a = (uint8_t)(skeletonColor.a * slotColor.a * attachmentColor.a * _nodeColor.a * 255);
+            // skip rendering if the color of this attachment is 0
+            if (color.a < 1) {
+                _clipper->clipEnd(*slot);
+                continue;
+            }
+
+            float multiplier = _premultipliedAlpha ? attachmentColor.a : 255;
+            float red = _nodeColor.r * skeletonColor.r * attachmentColor.r * multiplier;
+            float green = _nodeColor.g * skeletonColor.g * attachmentColor.g * multiplier;
+            float blue = _nodeColor.b * skeletonColor.b * attachmentColor.b * multiplier;
+
+            color.r = (uint8_t)(red * slotColor.r);
+            color.g = (uint8_t)(green * slotColor.g);
+            color.b = (uint8_t)(blue * slotColor.b);
+            attachmentVertices->updateColor(color);
+
+            if (slot->hasDarkColor()) {
+                darkColor.r = (uint8_t)(red * slot->getDarkColor().r);
+                darkColor.g = (uint8_t)(green * slot->getDarkColor().g);
+                darkColor.b = (uint8_t)(blue * slot->getDarkColor().b);
+            } else {
+                darkColor.r = 0;
+                darkColor.g = 0;
+                darkColor.b = 0;
+            }
+            darkColor.a = _premultipliedAlpha ? 255 : 0;
 
             if (!_useTint) {
                 triangles.vertCount = attachmentVertices->_triangles->vertCount;
@@ -445,6 +477,8 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
                 trianglesTwoColor.verts = reinterpret_cast<V3F_T2F_C4B_C4B *>(vb.getCurBuffer());
                 for (int ii = 0; ii < trianglesTwoColor.vertCount; ii++) {
                     trianglesTwoColor.verts[ii].texCoord = attachmentVertices->_triangles->verts[ii].texCoord;
+                    trianglesTwoColor.verts[ii].color = color;
+                    trianglesTwoColor.verts[ii].color2 = darkColor;
                 }
                 attachment->computeWorldVertices(slot->getBone(), reinterpret_cast<float *>(trianglesTwoColor.verts), 0, vs2);
 
@@ -454,11 +488,6 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
                 trianglesTwoColor.indices = reinterpret_cast<uint16_t *>(ib.getCurBuffer());
                 memcpy(trianglesTwoColor.indices, attachmentVertices->_triangles->indices, ibSize);
             }
-
-            color.r = attachment->getColor().r;
-            color.g = attachment->getColor().g;
-            color.b = attachment->getColor().b;
-            color.a = attachment->getColor().a;
 
             if (_debugSlots) {
                 _debugBuffer->writeFloat32(DebugType::SLOTS);
@@ -477,10 +506,39 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
             attachmentVertices = static_cast<AttachmentVertices *>(attachment->getRendererObject());
 
             // Early exit if attachment is invisible
-            if (attachment->getColor().a == 0) {
+            spine::Color attachmentColor = attachment->getColor();
+            if (attachmentColor.a < 0.5F) {
                 _clipper->clipEnd(*slot);
                 continue;
             }
+
+            color.a = (uint8_t)(skeletonColor.a * slotColor.a * attachmentColor.a * _nodeColor.a * 255);
+            // skip rendering if the color of this attachment is 0
+            if (color.a < 1) {
+                _clipper->clipEnd(*slot);
+                continue;
+            }
+
+            float multiplier = _premultipliedAlpha ? attachmentColor.a : 255;
+            float red = _nodeColor.r * skeletonColor.r * attachmentColor.r * multiplier;
+            float green = _nodeColor.g * skeletonColor.g * attachmentColor.g * multiplier;
+            float blue = _nodeColor.b * skeletonColor.b * attachmentColor.b * multiplier;
+
+            color.r = (uint8_t)(red * slotColor.r);
+            color.g = (uint8_t)(green * slotColor.g);
+            color.b = (uint8_t)(blue * slotColor.b);
+            attachmentVertices->updateColor(color);
+
+            if (slot->hasDarkColor()) {
+                darkColor.r = (uint8_t)(red * slot->getDarkColor().r);
+                darkColor.g = (uint8_t)(green * slot->getDarkColor().g);
+                darkColor.b = (uint8_t)(blue * slot->getDarkColor().b);
+            } else {
+                darkColor.r = 0;
+                darkColor.g = 0;
+                darkColor.b = 0;
+            }
+            darkColor.a = _premultipliedAlpha ? 255 : 0;
 
             if (!_useTint) {
                 triangles.vertCount = attachmentVertices->_triangles->vertCount;
@@ -502,6 +560,8 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
                 trianglesTwoColor.verts = reinterpret_cast<V3F_T2F_C4B_C4B *>(vb.getCurBuffer());
                 for (int ii = 0; ii < trianglesTwoColor.vertCount; ii++) {
                     trianglesTwoColor.verts[ii].texCoord = attachmentVertices->_triangles->verts[ii].texCoord;
+                    trianglesTwoColor.verts[ii].color = color;
+                    trianglesTwoColor.verts[ii].color2 = darkColor;
                 }
                 attachment->computeWorldVertices(*slot, 0, attachment->getWorldVerticesLength(), reinterpret_cast<float *>(trianglesTwoColor.verts), 0, vs2);
 
@@ -511,11 +571,6 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
                 trianglesTwoColor.indices = reinterpret_cast<uint16_t *>(ib.getCurBuffer());
                 memcpy(trianglesTwoColor.indices, attachmentVertices->_triangles->indices, ibSize);
             }
-
-            color.r = attachment->getColor().r;
-            color.g = attachment->getColor().g;
-            color.b = attachment->getColor().b;
-            color.a = attachment->getColor().a;
 
             if (_debugMesh) {
                 int indexCount = _useTint ? trianglesTwoColor.indexCount : triangles.indexCount;
@@ -547,41 +602,8 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
             continue;
         }
 
-        color.a = _skeleton->getColor().a * slot->getColor().a * color.a * _nodeColor.a * 255;
-        // skip rendering if the color of this attachment is 0
-        if (color.a == 0) {
-            _clipper->clipEnd(*slot);
-            continue;
-        }
-
-        float multiplier = _premultipliedAlpha ? color.a : 255;
-        float red = _nodeColor.r * _skeleton->getColor().r * color.r * multiplier;
-        float green = _nodeColor.g * _skeleton->getColor().g * color.g * multiplier;
-        float blue = _nodeColor.b * _skeleton->getColor().b * color.b * multiplier;
-
-        color.r = red * slot->getColor().r;
-        color.g = green * slot->getColor().g;
-        color.b = blue * slot->getColor().b;
-
-        if (slot->hasDarkColor()) {
-            darkColor.r = red * slot->getDarkColor().r;
-            darkColor.g = green * slot->getDarkColor().g;
-            darkColor.b = blue * slot->getDarkColor().b;
-        } else {
-            darkColor.r = 0;
-            darkColor.g = 0;
-            darkColor.b = 0;
-        }
-        darkColor.a = _premultipliedAlpha ? 255 : 0;
-
         // One color tint logic
         if (!_useTint) {
-            // Cliping logic
-            Color4B light;
-            light.r = (uint8_t)color.r;
-            light.g = (uint8_t)color.g;
-            light.b = (uint8_t)color.b;
-            light.a = (uint8_t)color.a;
             if (_clipper->isClipping()) {
                 _clipper->clipTriangles(reinterpret_cast<float *>(&triangles.verts[0].vertex), triangles.indices, triangles.indexCount, reinterpret_cast<float *>(&triangles.verts[0].texCoord), vs1);
 
@@ -612,7 +634,6 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
                         vertex->texCoord.u = uvs[vv];
                         vertex->texCoord.v = uvs[vv + 1];
                         effect->transform(vertex->vertex.x, vertex->vertex.y);
-                        vertex->color = light;
                     }
                 } else {
                     for (int v = 0, vn = triangles.vertCount, vv = 0; v < vn; ++v, vv += 2) {
@@ -621,7 +642,6 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
                         vertex->vertex.y = verts[vv + 1];
                         vertex->texCoord.u = uvs[vv];
                         vertex->texCoord.v = uvs[vv + 1];
-                        vertex->color = light;
                     }
                 }
                 // No cliping logic
@@ -630,28 +650,14 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
                     for (int v = 0, vn = triangles.vertCount; v < vn; ++v) {
                         V3F_T2F_C4B *vertex = triangles.verts + v;
                         effect->transform(vertex->vertex.x, vertex->vertex.y);
-                        vertex->color = light;
                     }
                 } else {
-                    for (int v = 0, vn = triangles.vertCount; v < vn; ++v) {
-                        V3F_T2F_C4B *vertex = triangles.verts + v;
-                        vertex->color = light;
-                    }
+                    //
                 }
             }
         }
         // Two color tint logic
         else {
-            Color4B light;
-            Color4B dark;
-            light.r = (uint8_t)color.r;
-            light.g = (uint8_t)color.g;
-            light.b = (uint8_t)color.b;
-            light.a = (uint8_t)color.a;
-            dark.r = (uint8_t)darkColor.r;
-            dark.g = (uint8_t)darkColor.g;
-            dark.b = (uint8_t)darkColor.b;
-            dark.a = (uint8_t)darkColor.a;
             if (_clipper->isClipping()) {
                 _clipper->clipTriangles(reinterpret_cast<float *>(&trianglesTwoColor.verts[0].vertex), trianglesTwoColor.indices, trianglesTwoColor.indexCount, reinterpret_cast<float *>(&trianglesTwoColor.verts[0].texCoord), vs2);
 
@@ -681,8 +687,6 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
                         vertex->texCoord.u = uvs[vv];
                         vertex->texCoord.v = uvs[vv + 1];
                         effect->transform(vertex->vertex.x, vertex->vertex.y);
-                        vertex->color = light;
-                        vertex->color2 = dark;
                     }
                 } else {
                     for (int v = 0, vn = trianglesTwoColor.vertCount, vv = 0; v < vn; ++v, vv += 2) {
@@ -691,8 +695,6 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
                         vertex->vertex.y = verts[vv + 1];
                         vertex->texCoord.u = uvs[vv];
                         vertex->texCoord.v = uvs[vv + 1];
-                        vertex->color = light;
-                        vertex->color2 = dark;
                     }
                 }
             } else {
@@ -700,14 +702,10 @@ void SkeletonRenderer::render(float /*deltaTime*/) {
                     for (int v = 0, vn = trianglesTwoColor.vertCount; v < vn; ++v) {
                         V3F_T2F_C4B_C4B *vertex = trianglesTwoColor.verts + v;
                         effect->transform(vertex->vertex.x, vertex->vertex.y);
-                        vertex->color = light;
-                        vertex->color2 = dark;
                     }
                 } else {
                     for (int v = 0, vn = trianglesTwoColor.vertCount; v < vn; ++v) {
-                        V3F_T2F_C4B_C4B *vertex = trianglesTwoColor.verts + v;
-                        vertex->color = light;
-                        vertex->color2 = dark;
+                        //
                     }
                 }
             }

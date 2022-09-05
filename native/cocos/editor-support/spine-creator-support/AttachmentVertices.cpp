@@ -50,4 +50,13 @@ AttachmentVertices::~AttachmentVertices() {
     if (_texture) _texture->release();
 }
 
+void AttachmentVertices::updateColor(cc::middleware::Color4B& color) {
+    if (*((uint32_t*)&_color) != *((uint32_t*)&color)) {
+        for (int i = 0; i < _triangles->vertCount; i++) {
+            _triangles->verts[i].color = color;
+        }
+        _color = color;
+    }
+}
+
 } // namespace spine
