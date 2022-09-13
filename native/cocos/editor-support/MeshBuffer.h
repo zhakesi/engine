@@ -88,6 +88,10 @@ public:
         return _uiMeshBufferArr[_bufferPos];
     }
 
+    const ccstd::vector<void *> &uiMeshBuffers() {
+        return _uiMeshBufferArr;
+    }
+
     void uploadVB();
     void uploadIB();
     void reset();

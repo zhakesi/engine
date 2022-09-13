@@ -32,6 +32,17 @@
 #include "scene/Pass.h"
 
 namespace cc {
+
+static Batcher2d* batcher2DInstance {nullptr};
+
+Batcher2d* Batcher2d::getInstance(Root* root) {
+    if (batcher2DInstance) {
+        return batcher2DInstance;
+    }
+    batcher2DInstance = ccnew Batcher2d(root);
+    return batcher2DInstance;
+}
+
 Batcher2d::Batcher2d() : Batcher2d(nullptr) {
 }
 
@@ -278,25 +289,6 @@ CC_FORCE_INLINE void Batcher2d::handleIADraw(RenderEntity* entity, RenderDrawInf
     setIndexRange(drawInfo);
 
     UIMeshBuffer* currMeshBuffer = drawInfo->getMeshBuffer();
-    if (currMeshBuffer != _currMeshBuffer) {
-        uint16_t accID = currMeshBuffer->getAttributes().size() == 3 ? 65534 : 65535;
-        ccstd::vector<UIMeshBuffer*> buffers;
-        if (_meshBuffersMap.find(accID) != _meshBuffersMap.end()) {
-            buffers = _meshBuffersMap[accID];
-            bool find = false;
-            for (auto& item : buffers) {
-                if (item == currMeshBuffer) {
-                    find = true;
-                    break;
-                }
-            }
-            if (!find) {
-                _meshBuffersMap[accID].push_back(currMeshBuffer);
-            }
-        } else {
-            _meshBuffersMap[accID].push_back(currMeshBuffer);
-        }
-    }
     currMeshBuffer->setDirty(true);
     _currMeshBuffer = currMeshBuffer;
     gfx::InputAssembler* ia = currMeshBuffer->requireFreeIA(getDevice());
