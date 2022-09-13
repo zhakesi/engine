@@ -38,7 +38,7 @@ static const ccstd::vector<gfx::Attribute> ATTRIBUTES_V3F_T2F_C4B_C4B{
     gfx::Attribute{gfx::ATTR_NAME_POSITION, gfx::Format::RGB32F},
     gfx::Attribute{gfx::ATTR_NAME_TEX_COORD, gfx::Format::RG32F},
     gfx::Attribute{gfx::ATTR_NAME_COLOR, gfx::Format::RGBA8, true},
-    gfx::Attribute{gfx::ATTR_NAME_COLOR, gfx::Format::RGBA8, true},
+    gfx::Attribute{gfx::ATTR_NAME_COLOR2, gfx::Format::RGBA8, true},
 };
 
 MeshBuffer::MeshBuffer(int vertexFormat)
@@ -135,10 +135,10 @@ void MeshBuffer::reset() {
 void MeshBuffer::addUIMeshBuffer() {
     UIMeshBuffer* uiMeshBuffer = new UIMeshBuffer();
     ccstd::vector<gfx::Attribute> attrs;
-    if (_vertexFormat == 6) {
+    if (_vertexFormat == VF_XYZUVC) {
         attrs = ATTRIBUTES_V3F_T2F_C4B;
     } else {
-        attrs = ATTRIBUTES_V3F_T2F_C4B;
+        attrs = ATTRIBUTES_V3F_T2F_C4B_C4B;
     }
     uiMeshBuffer->initialize(std::move(attrs), true);
     _uiMeshBufferArr.push_back(uiMeshBuffer);
