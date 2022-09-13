@@ -801,23 +801,13 @@ const cacheManager = require('./jsb-cache-manager');
     };
 
     const _tempAttachMat4 = cc.mat4();
-    let _tempVfmt; let _tempBufferIndex; let _tempIndicesOffset; let _tempIndicesCount;
 
-    skeleton._render = function (ui) {
+    skeleton._render = function () {
         const nativeSkeleton = this._nativeSkeleton;
         if (!nativeSkeleton) return;
 
-        const node = this.node;
-        if (!node) return;
-        const entity = this.renderEntity;
-        entity.clearDynamicRenderDrawInfos();
-
         const sharedBufferOffset = this._sharedBufferOffset;
         if (!sharedBufferOffset) return;
-
-        const renderInfoOffset = sharedBufferOffset[0];
-        // reset render info offset
-        sharedBufferOffset[0] = 0;
 
         const socketNodes = this.socketNodes;
         if (socketNodes.size > 0) {
@@ -847,55 +837,52 @@ const cacheManager = require('./jsb-cache-manager');
             }
         }
 
-        const renderInfoMgr = middleware.renderInfoMgr;
-        const renderInfo = renderInfoMgr.renderInfo;
+        // const renderInfoMgr = middleware.renderInfoMgr;
+        // const renderInfo = renderInfoMgr.renderInfo;
 
-        let materialIdx = 0; let realTextureIndex; let realTexture;
-        // verify render border
-        const border = renderInfo[renderInfoOffset + materialIdx++];
-        if (border !== 0xffffffff) return;
+        // let materialIdx = 0; let realTextureIndex; let realTexture;
+        // // verify render border
+        // const border = renderInfo[renderInfoOffset + materialIdx++];
+        // if (border !== 0xffffffff) return;
 
-        const matLen = renderInfo[renderInfoOffset + materialIdx++];
-        const useTint = this.useTint || this.isAnimationCached();
-        const vfmt = useTint ? middleware.vfmtPosUvTwoColor : middleware.vfmtPosUvColor;
+        // const matLen = renderInfo[renderInfoOffset + materialIdx++];
+        // const useTint = this.useTint || this.isAnimationCached();
+        // const vfmt = useTint ? middleware.vfmtPosUvTwoColor : middleware.vfmtPosUvColor;
 
-        _tempVfmt = vfmt;
+        // _tempVfmt = vfmt;
 
-        if (matLen === 0) return;
+        // if (matLen === 0) return;
 
-        for (let index = 0; index < matLen; index++) {
-            realTextureIndex = renderInfo[renderInfoOffset + materialIdx++];
-            realTexture = this.skeletonData.getTextureByIndex(realTextureIndex);
-            if (!realTexture) return;
+        // for (let index = 0; index < matLen; index++) {
+        //     realTextureIndex = renderInfo[renderInfoOffset + materialIdx++];
+        //     realTexture = this.skeletonData.getTextureByIndex(realTextureIndex);
+        //     if (!realTexture) return;
 
-            // SpineMaterialType.TWO_COLORED 1
-            // SpineMaterialType.COLORED_TEXTURED 0
-            //HACK
-            const mat = this.material;
-            // cache material
-            this.material = this.getMaterialForBlendAndTint(
-                renderInfo[renderInfoOffset + materialIdx++],
-                renderInfo[renderInfoOffset + materialIdx++],
-                useTint ? 1 : 0,
-            );
+        //     // SpineMaterialType.TWO_COLORED 1
+        //     // SpineMaterialType.COLORED_TEXTURED 0
+        //     //HACK
+        //     const mat = this.material;
+        //     // cache material
+        //     this.material = this.getMaterialForBlendAndTint(
+        //         renderInfo[renderInfoOffset + materialIdx++],
+        //         renderInfo[renderInfoOffset + materialIdx++],
+        //         useTint ? 1 : 0,
+        //     );
 
-            _tempBufferIndex = renderInfo[renderInfoOffset + materialIdx++];
-            _tempIndicesOffset = renderInfo[renderInfoOffset + materialIdx++];
-            _tempIndicesCount = renderInfo[renderInfoOffset + materialIdx++];
+        //     _tempBufferIndex = renderInfo[renderInfoOffset + materialIdx++];
+        //     _tempIndicesOffset = renderInfo[renderInfoOffset + materialIdx++];
+        //     _tempIndicesCount = renderInfo[renderInfoOffset + materialIdx++];
 
-            const renderData = middleware.RenderInfoLookup[_tempVfmt][_tempBufferIndex];
-            const drawInfo = this.requestDrawInfo(index);
-            drawInfo.setDrawInfoType(renderData.drawInfoType);
-            drawInfo.setAccAndBuffer(renderData.accessor.id, renderData.chunk.bufferId);
-            drawInfo.setTexture(realTexture.getGFXTexture());
-            drawInfo.setSampler(realTexture.getGFXSampler());
-            drawInfo.setMaterial(this.material);
-            drawInfo.setIndexOffset(_tempIndicesOffset);
-            drawInfo.setIBCount(_tempIndicesCount);
-
-            entity.setDynamicRenderDrawInfo(drawInfo, index);
-            this.material = mat;
-        }
+        //     const renderData = middleware.RenderInfoLookup[_tempVfmt][_tempBufferIndex];
+        //     const drawInfo = this.requestDrawInfo(index);
+        //     drawInfo.setDrawInfoType(renderData.drawInfoType);
+        //     drawInfo.setAccAndBuffer(renderData.accessor.id, renderData.chunk.bufferId);
+        //     drawInfo.setTexture(realTexture.getGFXTexture());
+        //     drawInfo.setSampler(realTexture.getGFXSampler());
+        //     drawInfo.setMaterial(this.material);
+        //     drawInfo.setIndexOffset(_tempIndicesOffset);
+        //     drawInfo.setIBCount(_tempIndicesCount);
+        // }
     };
 
     //////////////////////////////////////////
