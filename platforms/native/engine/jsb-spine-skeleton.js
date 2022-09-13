@@ -120,6 +120,7 @@ const cacheManager = require('./jsb-cache-manager');
             spTex.setRealTextureIndex(textureIdx);
             spTex.setPixelsWide(texture.width);
             spTex.setPixelsHigh(texture.height);
+            spTex.setRealTexture(texture);
             jsbTextures[textureNames[i]] = spTex;
         }
         this._jsbTextures = jsbTextures;
@@ -325,6 +326,9 @@ const cacheManager = require('./jsb-cache-manager');
         nativeSkeleton.setBatchEnabled(this.enableBatch);
         const compColor = this.color;
         nativeSkeleton.setColor(compColor.r, compColor.g, compColor.b, compColor.a);
+        const materialTemplate = this.getMaterialTemplate();
+        nativeSkeleton.setMaterial(materialTemplate);
+        nativeSkeleton.setRenderEntity(this._renderEntity.nativeObj);
 
         this._skeleton = nativeSkeleton.getSkeleton();
 
@@ -336,8 +340,6 @@ const cacheManager = require('./jsb-cache-manager');
         this._interruptListener && this.setInterruptListener(this._interruptListener);
         this._disposeListener && this.setDisposeListener(this._disposeListener);
 
-        this._sharedBufferOffset = nativeSkeleton.getSharedBufferOffset();
-        this._sharedBufferOffset[0] = 0;
         this._useAttach = false;
         this._renderOrder = -1;
 
@@ -813,9 +815,9 @@ const cacheManager = require('./jsb-cache-manager');
             const attachInfoMgr = middleware.attachInfoMgr;
             const attachInfo = attachInfoMgr.attachInfo;
 
-            const attachInfoOffset = sharedBufferOffset[1];
+            const attachInfoOffset = sharedBufferOffset[0];
             // reset attach info offset
-            sharedBufferOffset[1] = 0;
+            sharedBufferOffset[0] = 0;
             for (const boneIdx of socketNodes.keys()) {
                 const boneNode = socketNodes.get(boneIdx);
                 // Node has been destroy
