@@ -50,6 +50,7 @@ export * from './skeleton-texture';
 export * from './vertex-effect-delegate';
 export * from './assembler';
 export * from './deprecated';
+export * from './spine-2d/skeleton2d-renderer';
 
 export { spine };
 

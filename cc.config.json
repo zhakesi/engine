@@ -111,7 +111,8 @@
             "modules": [ "spine" ], 
             "dependentAssets":[ 
                 "c27215d8-6835-4b68-bfbb-bdeac6100c04",
-                "b5d6115f-0370-4d7c-aad3-c194cc71cf98"
+                "b5d6115f-0370-4d7c-aad3-c194cc71cf98",
+                "bbbe6cbc-d6e1-4b7c-8dc5-a66d16b33abc"
             ],
             "dependentModules": [ "2d" ]
         },
