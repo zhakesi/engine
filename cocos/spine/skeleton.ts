@@ -44,6 +44,7 @@ import { Batcher2D } from '../2d/renderer/batcher-2d';
 import { RenderEntity, RenderEntityType } from '../2d/renderer/render-entity';
 import { RenderDrawInfo } from '../2d/renderer/render-draw-info';
 import { director } from '../core/director';
+import { promiseForSpineInstantiation } from './spine-2d/instantiated';
 
 export const timeScale = 1.0;
 
