@@ -20,10 +20,11 @@
 */
 import { ccclass, executeInEditMode, executionOrder, help, menu, serializable, type } from 'cc.decorator';
 import { builtinResMgr, Color, Material, ModelRenderer, ccenum, Enum, CCClass, Texture2D } from '../../core';
+import { retry } from '../../core/asset-manager/utilities';
 import { editable, displayName,  tooltip } from '../../core/data/decorators';
 import { errorID, warnID } from '../../core/platform/debug';
 import { SkeletonData } from '../skeleton-data';
-import { promiseForSpineInstantiation, getSpineSpineWasmInterface } from './instantiated';
+import { SkeletonWasmObject } from './skeleton-wasm';
 
 // eslint-disable-next-line dot-notation
 SkeletonData.prototype['init'] = function () {
@@ -42,13 +43,7 @@ SkeletonData.prototype['init'] = function () {
     const textureNames = this.textureNames;
     if (!(textures && textures.length > 0 && textureNames && textureNames.length > 0)) {
         errorID(7507, this.name);
-        return;
     }
-    const wasmUtil = getSpineSpineWasmInterface();
-    const handleID = wasmUtil.createSkeletonObject();
-    console.log(handleID);
-    const result = wasmUtil.setSkeletonData(handleID);
-    console.log(result);
 };
 
 @ccclass('cc.Skeleton2DRenderer')
@@ -86,19 +81,25 @@ export class Skeleton2DRenderer extends ModelRenderer {
         console.log('set skeletonData');
     }
 
+    private _wasmObj : SkeletonWasmObject | null = null;
+
     public __preload () {
+        if (!this._wasmObj) return;
         console.log('__preload');
     }
 
     public onLoad () {
+        if (!this._wasmObj) return;
         console.log('onLoad');
     }
 
     public onRestore () {
+        if (!this._wasmObj) return;
         console.log('onRestore');
     }
 
     public update (dt: number) {
+        //if (!this._wasmObj) return;
         //console.log('update');
     }
 
@@ -109,17 +110,21 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public onDisable () {
+        if (!this._wasmObj) return;
         console.log('onDisable');
     }
 
     public onDestroy () {
+        if (!this._wasmObj) return;
         console.log('onDestroy');
     }
 
-    protected async _updateSkeletonData () {
+    protected _updateSkeletonData () {
         if (this._skeletonData === null) return;
-        const skeletonData = this._skeletonData as any;
-        await promiseForSpineInstantiation();
-        skeletonData.init();
+        if (!this._wasmObj) {
+            this._wasmObj = new SkeletonWasmObject();
+        }
+        const jsonStr = this._skeletonData.skeletonJsonStr;
+        this._wasmObj.initSkeletonData(jsonStr);
     }
 }

@@ -28,139 +28,67 @@
 import { SpineWasmUtil } from './spine-wasm-util';
 
 const spineWasmUrl = 'scripting/engine/cocos/spine/spine-2d/spine2d.wasm';
+let wasmUtil:SpineWasmUtil;
+let wasmMemory;
+let HEAPU8: Uint8Array;
 
-const err = console.warn.bind(console);
 function assert (condition, text) {
     if (!condition) {
         console.error(`Assertion failed${text ? `: ${text}` : ''}`);
     }
 }
 
-let wasmUtil:SpineWasmUtil;
-
-function _console_error_report (message) {
-    console.log(message);
+function _reportError () {
+    console.error('invalid operation');
 }
 
-let wasmMemory;
-let HEAP;
-/** @type {!ArrayBuffer} */
-let buffer;
-/** @type {!Int8Array} */
-let HEAP8;
-/** @type {!Uint8Array} */
-let HEAPU8;
-/** @type {!Int16Array} */
-let HEAP16;
-/** @type {!Uint16Array} */
-let HEAPU16;
-/** @type {!Int32Array} */
-let HEAP32;
-/** @type {!Uint32Array} */
-let HEAPU32;
-/** @type {!Float32Array} */
-let HEAPF32;
-/** @type {!Float64Array} */
-let HEAPF64;
-
-function updateGlobalBufferAndViews (buf) {
-    buffer = buf;
-    HEAP8 = new Int8Array(buf);
-    HEAP16 = new Int16Array(buf);
-    HEAP32 = new Int32Array(buf);
-    HEAPU8 = new Uint8Array(buf);
-    HEAPU16 = new Uint16Array(buf);
-    HEAPU32 = new Uint32Array(buf);
-    HEAPF32 = new Float32Array(buf);
-    HEAPF64 = new Float64Array(buf);
-}
-
-function reportLog () {
-    console.log('xxx');
-}
 function _emscripten_memcpy_big (dest, src, num) {
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
     HEAPU8.copyWithin(dest, src, src + num);
 }
 
-function getHeapMax () {
-    // Stay one Wasm page short of 4GB: while e.g. Chrome is able to allocate
-    // full 4GB Wasm memories, the size will wrap back to 0 bytes in Wasm side
-    // for any code that deals with heap sizes, which would require special
-    // casing all heap size related code to treat 0 specially.
-    return 2147483648;
-}
-
-function emscripten_realloc_buffer (size) {
-    try {
-        // round size grow request up to wasm page size (fixed 64KB per spec)
-        wasmMemory.grow((size - buffer.byteLength + 65535) >>> 16); // .grow() takes a delta compared to the previous size
-        updateGlobalBufferAndViews(wasmMemory.buffer);
-        return 1;
-    } catch (e) {
-        err(`emscripten_realloc_buffer: Attempted to grow heap from ${buffer.byteLength} bytes to ${size} bytes, but got error: ${e}`);
-    }
-    return 0;
-}
-
 function _emscripten_resize_heap (requestedSize) {
-    const oldSize = HEAPU8.length;
-    requestedSize >>>= 0;
-    // With multithreaded builds, races can happen (another thread might increase the size
-    // in between), so return a failure, and let the caller retry.
-    assert(requestedSize > oldSize, 'no need resize_heap');
-
-    // A limit is set for how much we can grow. We should not exceed that
-    // (the wasm binary specifies it, so if we tried, we'd fail anyhow).
-    const maxHeapSize = getHeapMax();
-    if (requestedSize > maxHeapSize) {
-        err(`Cannot enlarge memory, asked to go up to ${requestedSize} bytes, but the limit is ${maxHeapSize} bytes!`);
-        return false;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands, @typescript-eslint/no-unsafe-return
-    const alignUp = (x, multiple) => x + (multiple - x % multiple) % multiple;
-
-    // Loop through potential heap size increases. If we attempt a too eager
-    // reservation that fails, cut down on the attempted size and reserve a
-    // smaller bump instead. (max 3 times, chosen somewhat arbitrarily)
-    for (let cutDown = 1; cutDown <= 4; cutDown *= 2) {
-        let overGrownHeapSize = oldSize * (1 + 0.2 / cutDown); // ensure geometric growth
-        // but limit overreserving (default to capping at +96MB overgrowth at most)
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        overGrownHeapSize = Math.min(overGrownHeapSize, requestedSize + 100663296);
-
-        // eslint-disable-next-line vars-on-top, no-var
-        var newSize = Math.min(maxHeapSize, alignUp(Math.max(requestedSize, overGrownHeapSize), 65536));
-
-        const replacement = emscripten_realloc_buffer(newSize);
-        if (replacement) {
-            return true;
-        }
-    }
-    err(`Failed to grow the heap, not enough memory!`);
+    console.error('no support _emscripten_resize_heap');
     return false;
 }
 
 const assemblyMemory = new WebAssembly.Memory({ initial: 256 });
 
+function _abort (err) {
+    console.error(err);
+}
+
+function _abortOnCannotGrowMemory (err) {
+    console.error(`abortOnCannotGrowMemory${err}`);
+}
+
+function _cxa_throw (ptr, type, destructor) {
+    console.error(`cxa_throw: throwing an exception, ${[ptr, type, destructor]}`);
+}
+
+function _cxa_allocate_exception (size) {
+    console.error(`cxa_allocate_exception${size}`);
+    return false; // always fail
+}
+
 const asmLibraryArg = {
     memory: assemblyMemory,
-    __cxa_allocate_exception: reportLog,
-    __cxa_throw: reportLog,
-    abort: reportLog,
+    abortOnCannotGrowMemory: _abortOnCannotGrowMemory,
+    __cxa_allocate_exception: _cxa_allocate_exception,
+    __cxa_throw: _cxa_throw,
+    abort: _abort,
     emscripten_memcpy_big: _emscripten_memcpy_big,
     emscripten_resize_heap: _emscripten_resize_heap,
-    fd_close: reportLog,
-    fd_seek: reportLog,
-    fd_write: reportLog,
+    fd_close: _reportError,
+    fd_seek: _reportError,
+    fd_write: _reportError,
 };
 
 function receiveInstance (instance) {
     wasmUtil = instance.exports as unknown as SpineWasmUtil;
     wasmMemory = instance.exports.memory;
     assert(wasmMemory, 'memory not found in wasm exports');
-    updateGlobalBufferAndViews(wasmMemory.buffer);
+    HEAPU8 = new Uint8Array(wasmMemory.buffer);
 }
 
 function receiveInstantiationResult (result) {
@@ -183,6 +111,6 @@ export function promiseForSpineInstantiation () {
     });
 }
 
-export function getSpineSpineWasmInterface () {
+export function getSpineSpineWasmUtil () {
     return wasmUtil;
 }

@@ -33,7 +33,7 @@ Module['ready'] = new Promise(function(resolve, reject) {
   readyPromiseResolve = resolve;
   readyPromiseReject = reject;
 });
-["_createSkeletonObject","_setSkeletonData","_setAnimation","_setSkin","_updateAnimation","_updateRenderData","_fflush","onRuntimeInitialized"].forEach((prop) => {
+["_createSkeletonObject","_setSkeletonData","_setAnimation","_setSkin","_updateAnimation","_updateRenderData","_queryMemory","_freeMemory","_fflush","onRuntimeInitialized"].forEach((prop) => {
   if (!Object.getOwnPropertyDescriptor(Module['ready'], prop)) {
     Object.defineProperty(Module['ready'], prop, {
       get: () => abort('You are getting ' + prop + ' on the Promise object, instead of the instance. Use .then() to get called back with the instance, see the MODULARIZE docs in src/settings.js'),
@@ -1453,6 +1453,12 @@ var _updateAnimation = Module["_updateAnimation"] = createExportWrapper("updateA
 
 /** @type {function(...*):?} */
 var _updateRenderData = Module["_updateRenderData"] = createExportWrapper("updateRenderData");
+
+/** @type {function(...*):?} */
+var _queryMemory = Module["_queryMemory"] = createExportWrapper("queryMemory");
+
+/** @type {function(...*):?} */
+var _freeMemory = Module["_freeMemory"] = createExportWrapper("freeMemory");
 
 /** @type {function(...*):?} */
 var _malloc = Module["_malloc"] = createExportWrapper("malloc");
