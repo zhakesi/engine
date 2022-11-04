@@ -125,6 +125,7 @@ export class Skeleton2DRenderer extends ModelRenderer {
             this._wasmObj = new SkeletonWasmObject();
         }
         const jsonStr = this._skeletonData.skeletonJsonStr;
-        this._wasmObj.initSkeletonData(jsonStr);
+        this._wasmObj.testFunc();
+        //this._wasmObj.initSkeletonData(jsonStr);
     }
 }

@@ -29,7 +29,6 @@ import { SpineWasmUtil } from './spine-wasm-util';
 
 const spineWasmUrl = 'scripting/engine/cocos/spine/spine-2d/spine2d.wasm';
 let wasmUtil:SpineWasmUtil;
-let wasmMemory;
 let HEAPU8: Uint8Array;
 
 function assert (condition, text) {
@@ -71,8 +70,20 @@ function _cxa_allocate_exception (size) {
     return false; // always fail
 }
 
+function _consoleInfo (start:number, length: number) {
+    const decoder = new TextDecoder();
+    const source = HEAPU8.subarray(start, start + length);
+    const result = decoder.decode(source);
+    console.log(result);
+}
+
 const asmLibraryArg = {
     memory: assemblyMemory,
+    __assert_fail: _reportError,
+    __syscall_fcntl64: _reportError,
+    __syscall_ioctl: _reportError,
+    __syscall_openat: _reportError,
+    consoleInfo: _consoleInfo,
     abortOnCannotGrowMemory: _abortOnCannotGrowMemory,
     __cxa_allocate_exception: _cxa_allocate_exception,
     __cxa_throw: _cxa_throw,
@@ -82,17 +93,20 @@ const asmLibraryArg = {
     fd_close: _reportError,
     fd_seek: _reportError,
     fd_write: _reportError,
+    fd_read: _reportError,
 };
 
 function receiveInstance (instance) {
-    wasmUtil = instance.exports as unknown as SpineWasmUtil;
-    wasmMemory = instance.exports.memory;
+    const wasmMemory = instance.exports.memory;
+    const exports = instance.exports;
     assert(wasmMemory, 'memory not found in wasm exports');
     HEAPU8 = new Uint8Array(wasmMemory.buffer);
+    wasmUtil = exports as unknown as SpineWasmUtil;
 }
 
 function receiveInstantiationResult (result) {
     receiveInstance(result.instance);
+    wasmUtil.spineWasmUtilInit();
 }
 
 export function promiseForSpineInstantiation () {
