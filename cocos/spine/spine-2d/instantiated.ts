@@ -26,6 +26,7 @@
  */
 
 import { SpineWasmUtil } from './spine-wasm-util';
+import { FileResourceInstance } from './file-resource';
 
 const spineWasmUrl = 'scripting/engine/cocos/spine/spine-2d/spine2d.wasm';
 let wasmUtil:SpineWasmUtil;
@@ -51,8 +52,6 @@ function _emscripten_resize_heap (requestedSize) {
     return false;
 }
 
-const assemblyMemory = new WebAssembly.Memory({ initial: 256 });
-
 function _abort (err) {
     console.error(err);
 }
@@ -77,12 +76,22 @@ function _consoleInfo (start:number, length: number) {
     console.log(result);
 }
 
+function _jsReadFile (start:number, length: number) : number {
+    const decoder = new TextDecoder();
+    const source = HEAPU8.subarray(start, start + length);
+    const filePath = decoder.decode(source);
+    const fileResouce = FileResourceInstance();
+    const arrayData = fileResouce.RequireFileBuffer(filePath);
+    const dataSize = arrayData.length;
+    const address = wasmUtil.getStoreMemory();
+    const storeArray = HEAPU8.subarray(address, address + dataSize);
+    storeArray.set(arrayData);
+    return dataSize;
+}
+
 const asmLibraryArg = {
-    memory: assemblyMemory,
+    memory: new WebAssembly.Memory({ initial: 1024, maximum: 2048 }),
     __assert_fail: _reportError,
-    __syscall_fcntl64: _reportError,
-    __syscall_ioctl: _reportError,
-    __syscall_openat: _reportError,
     consoleInfo: _consoleInfo,
     abortOnCannotGrowMemory: _abortOnCannotGrowMemory,
     __cxa_allocate_exception: _cxa_allocate_exception,
@@ -93,7 +102,7 @@ const asmLibraryArg = {
     fd_close: _reportError,
     fd_seek: _reportError,
     fd_write: _reportError,
-    fd_read: _reportError,
+    jsReadFile: _jsReadFile,
 };
 
 function receiveInstance (instance) {
@@ -127,4 +136,8 @@ export function promiseForSpineInstantiation () {
 
 export function getSpineSpineWasmUtil () {
     return wasmUtil;
+}
+
+export function WasmHEAPU8 (): Uint8Array {
+    return HEAPU8!;
 }

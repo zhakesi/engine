@@ -19,6 +19,9 @@
         "source.fixAll": true,
     },
     "files.associations": {
-        "iterator": "cpp"
+        "iterator": "cpp",
+        "atomic": "cpp",
+        "memory": "cpp",
+        "*.ipp": "cpp"
     },
 }

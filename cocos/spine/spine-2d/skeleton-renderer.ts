@@ -25,6 +25,7 @@ import { editable, displayName,  tooltip } from '../../core/data/decorators';
 import { errorID, warnID } from '../../core/platform/debug';
 import { SkeletonData } from '../skeleton-data';
 import { SkeletonWasmObject } from './skeleton-wasm';
+import { FileResourceInstance } from './file-resource';
 
 // eslint-disable-next-line dot-notation
 SkeletonData.prototype['init'] = function () {
@@ -84,6 +85,7 @@ export class Skeleton2DRenderer extends ModelRenderer {
     private _wasmObj : SkeletonWasmObject | null = null;
 
     public __preload () {
+        if (!this._skeletonData) return;
         if (!this._wasmObj) return;
         console.log('__preload');
     }
@@ -124,8 +126,6 @@ export class Skeleton2DRenderer extends ModelRenderer {
         if (!this._wasmObj) {
             this._wasmObj = new SkeletonWasmObject();
         }
-        const jsonStr = this._skeletonData.skeletonJsonStr;
-        this._wasmObj.testFunc();
-        //this._wasmObj.initSkeletonData(jsonStr);
+        this._wasmObj.initSkeletonData(this._skeletonData);
     }
 }

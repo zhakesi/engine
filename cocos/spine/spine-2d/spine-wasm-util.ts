@@ -1,6 +1,7 @@
 export interface SpineWasmUtil {
     spineWasmUtilInit(): number;
     spineWasmUtilDestroy() : number;
+    getStoreMemory():number;
     createSkeletonObject () : number;
     setSkeletonData(objID: number, start: number, length: number): number;
     setAnimation(objID: number) : number;
@@ -10,5 +11,5 @@ export interface SpineWasmUtil {
     queryMemory(size : number) : number;
     freeMemory(data:Uint8Array);
     testFunction(objID: number, start: number, length: number): number;
-    memory : any;
+    memory: any;
 }
