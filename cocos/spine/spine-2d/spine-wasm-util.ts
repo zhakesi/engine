@@ -4,9 +4,9 @@ export interface SpineWasmUtil {
     getStoreMemory():number;
     createSkeletonObject () : number;
     setSkeletonData(objID: number, start: number, length: number): number;
-    setAnimation(objID: number) : number;
+    setAnimation(objID: number, start: number, length: number) : number;
     setSkin(objID: number) : number;
-    updateAnimation(objID: number) : number;
+    updateAnimation(objID: number, dltTime: number) : number;
     updateRenderData(objID: number) : number;
     queryMemory(size : number) : number;
     freeMemory(data:Uint8Array);

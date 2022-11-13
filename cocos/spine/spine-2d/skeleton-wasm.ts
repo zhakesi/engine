@@ -53,6 +53,21 @@ export class SkeletonWasmObject {
         return this._meshArray;
     }
 
+    public setAnimation (name: string) {
+        const encoder = new TextEncoder();
+        const encoded = encoder.encode(name);
+        const length = encoded.length;
+
+        const local = this._wasmUtil.queryMemory(length);
+        const array = this._wasmHEAPU8.subarray(local, local + length);
+        array.set(encoded);
+        this._wasmUtil.setAnimation(this._objID, local, length);
+    }
+
+    public updateAnimation (dltTime: number) {
+        this._wasmUtil.updateAnimation(this._objID, dltTime);
+    }
+
     public getStoreMemory () {
         const addres = this._wasmUtil.getStoreMemory();
         return addres;

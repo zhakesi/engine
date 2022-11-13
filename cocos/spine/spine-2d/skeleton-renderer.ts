@@ -124,6 +124,10 @@ export class Skeleton2DRenderer extends ModelRenderer {
 
     public update (dt: number) {
         if (!this._wasmObj) return;
+
+        this._wasmObj.updateAnimation(dt);
+        this._meshArray = this._wasmObj.updateRenderData();
+
         this.realTimeTraverse();
         this._onUpdateLocalDescriptorSet();
     }
@@ -133,6 +137,7 @@ export class Skeleton2DRenderer extends ModelRenderer {
         this._attachToScene();
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         this._updateSkeletonData();
+        this.setAnimation('run');
     }
 
     public onDisable () {
@@ -151,7 +156,10 @@ export class Skeleton2DRenderer extends ModelRenderer {
             this._wasmObj = new SkeletonWasmObject();
         }
         this._wasmObj.initSkeletonData(this._skeletonData);
-        this._meshArray = this._wasmObj.updateRenderData();
+    }
+    public setAnimation (name:string) {
+        if (!this._wasmObj) return;
+        this._wasmObj.setAnimation(name);
     }
 
     protected _onUpdateLocalDescriptorSet () {
