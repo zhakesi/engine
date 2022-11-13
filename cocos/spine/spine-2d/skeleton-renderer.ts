@@ -20,12 +20,19 @@
 */
 import { ccclass, executeInEditMode, executionOrder, help, menu, serializable, type } from 'cc.decorator';
 import { builtinResMgr, Color, Material, ModelRenderer, ccenum, Enum, CCClass, Texture2D } from '../../core';
-import { retry } from '../../core/asset-manager/utilities';
 import { editable, displayName,  tooltip } from '../../core/data/decorators';
 import { errorID, warnID } from '../../core/platform/debug';
 import { SkeletonData } from '../skeleton-data';
+import { vfmtPosUvColor, getAttributeStride, getComponentPerVertex, vfmtPosUvTwoColor } from '../../2d/renderer/vertex-format';
+import { ModelLocalBindings } from '../../core/pipeline/define';
+import { Format, PrimitiveMode, Attribute, Device, BufferUsageBit, BufferInfo, MemoryUsageBit, deviceManager } from '../../core/gfx';
+import { Model } from '../../core/renderer/scene';
+import { Root } from '../../core/root';
+import { RenderingSubMesh } from '../../core/assets';
+import { legacyCC } from '../../core/global-exports';
+
 import { SkeletonWasmObject } from './skeleton-wasm';
-import { FileResourceInstance } from './file-resource';
+import { SKMesh } from './sk-mesh';
 
 // eslint-disable-next-line dot-notation
 SkeletonData.prototype['init'] = function () {
@@ -82,7 +89,19 @@ export class Skeleton2DRenderer extends ModelRenderer {
         console.log('set skeletonData');
     }
 
+    @serializable
+    private _texture : Texture2D | null = null;
+    @type(Texture2D)
+    get texture () {
+        return this._texture;
+    }
+    set texture (tex: Texture2D| null) {
+        this._texture = tex;
+    }
+
     private _wasmObj : SkeletonWasmObject | null = null;
+
+    private _meshArray : SKMesh[] = [];
 
     public __preload () {
         if (!this._skeletonData) return;
@@ -91,6 +110,9 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public onLoad () {
+        if (this._models.length < 1) {
+            this._createModel();
+        }
         if (!this._wasmObj) return;
         console.log('onLoad');
     }
@@ -101,12 +123,14 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public update (dt: number) {
-        //if (!this._wasmObj) return;
-        //console.log('update');
+        if (!this._wasmObj) return;
+        this.realTimeTraverse();
+        this._onUpdateLocalDescriptorSet();
     }
 
     public onEnable () {
         console.log('onEnable');
+        this._attachToScene();
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         this._updateSkeletonData();
     }
@@ -127,5 +151,88 @@ export class Skeleton2DRenderer extends ModelRenderer {
             this._wasmObj = new SkeletonWasmObject();
         }
         this._wasmObj.initSkeletonData(this._skeletonData);
+        this._meshArray = this._wasmObj.updateRenderData();
+    }
+
+    protected _onUpdateLocalDescriptorSet () {
+        const subModels = this._models[0].subModels;
+        const binding = ModelLocalBindings.SAMPLER_SPRITE;
+        for (let i = 0; i < subModels.length; i++) {
+            const { descriptorSet } = subModels[i];
+            const texture = this._texture!;
+            descriptorSet.bindTexture(binding, texture.getGFXTexture()!);
+            descriptorSet.bindSampler(binding, texture.getGFXSampler()!);
+            descriptorSet.update();
+        }
+    }
+
+    protected _createModel () {
+        const model = (legacyCC.director.root as Root).createModel<Model>(Model);
+        this._models[0] = model;
+        model.visFlags = this.visibility;
+        model.node = model.transform = this.node;
+    }
+
+    protected _attachToScene () {
+        if (!this.node.scene || this._models.length < 1) {
+            return;
+        }
+        const renderScene = this._getRenderScene();
+        if (this._models[0].scene !== null) {
+            this._detachFromScene();
+        }
+        renderScene.addModel(this._models[0]);
+    }
+
+    protected _detachFromScene () {
+        if (this._models.length > 0 && this._models[0].scene) {
+            this._models[0].scene.removeModel(this._models[0]);
+        }
+    }
+
+    public _activeSubModel (idx: number) {
+        if (this._models.length < 1) {
+            return;
+        }
+        const attrs = vfmtPosUvColor;
+        const stride = getAttributeStride(attrs);
+
+        if (this._models[0].subModels.length <= idx) {
+            const gfxDevice: Device = deviceManager.gfxDevice;
+            const vertexBuffer = gfxDevice.createBuffer(new BufferInfo(
+                BufferUsageBit.VERTEX | BufferUsageBit.TRANSFER_DST,
+                MemoryUsageBit.DEVICE,
+                65535 * stride,
+                stride,
+            ));
+            const indexBuffer = gfxDevice.createBuffer(new BufferInfo(
+                BufferUsageBit.INDEX | BufferUsageBit.TRANSFER_DST,
+                MemoryUsageBit.DEVICE,
+                65535 * Uint16Array.BYTES_PER_ELEMENT * 2,
+                Uint16Array.BYTES_PER_ELEMENT,
+            ));
+
+            const renderMesh = new RenderingSubMesh([vertexBuffer], attrs, PrimitiveMode.TRIANGLE_LIST, indexBuffer);
+            renderMesh.subMeshIdx = 0;
+
+            const mat = builtinResMgr.get<Material>('default-spine2d-material');
+            this._models[0].initSubModel(idx, renderMesh, mat);
+            this._models[0].enabled = true;
+        }
+    }
+    public realTimeTraverse () {
+        const count = this._meshArray.length;
+        for (let idx = 0;  idx < count; idx++) {
+            const mesh = this._meshArray[idx];
+
+            this._activeSubModel(idx);
+            const subModel = this._models[0].subModels[idx];
+            const ia = subModel.inputAssembler;
+            ia.vertexBuffers[0].update(mesh.vertices);
+            ia.vertexCount = mesh.vCount;
+            const ib = new Uint16Array(mesh.indeices);
+            ia.indexBuffer!.update(ib);
+            ia.indexCount = ib.length;
+        }
     }
 }

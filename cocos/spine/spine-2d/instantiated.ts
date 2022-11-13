@@ -90,7 +90,6 @@ function _jsReadFile (start:number, length: number) : number {
 }
 
 const asmLibraryArg = {
-    memory: new WebAssembly.Memory({ initial: 1024, maximum: 2048 }),
     __assert_fail: _reportError,
     consoleInfo: _consoleInfo,
     abortOnCannotGrowMemory: _abortOnCannotGrowMemory,

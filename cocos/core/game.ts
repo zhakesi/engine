@@ -791,10 +791,10 @@ export class Game extends EventTarget {
                 return this.onPostProjectInitDelegate.dispatch();
             })
             // #endregion Project
-            .then(async () => {
+            .then(() => {
                 this._inited = true;
                 this._safeEmit(Game.EVENT_GAME_INITED);
-                await promiseForSpineInstantiation();
+                true && promiseForSpineInstantiation();
             });
     }
 
