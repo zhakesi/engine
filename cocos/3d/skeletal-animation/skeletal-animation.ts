@@ -143,10 +143,10 @@ export class SkeletalAnimation extends Animation {
     set useBakedAnimation (val) {
         this._useBakedAnimation = val;
 
-        for (const stateName in this._nameToState) {
-            const state = this._nameToState[stateName] as SkeletalAnimationState;
-            state.setUseBaked(val);
-        }
+        // for (const stateName in this._nameToState) {
+        //     const state = this._nameToState[stateName] as SkeletalAnimationState;
+        //     state.setUseBaked(val);
+        // }
 
         this._users.forEach((user) => {
             user.setUseBakedAnimation(val);

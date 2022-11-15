@@ -82,16 +82,37 @@ export class SkeletalAnimationState extends AnimationState {
         this._frames = frames - 1;
         this._animInfo = this._animInfoMgr.getData(root.uuid);
         this._bakedDuration = this._frames / samples; // last key
-        this.setUseBaked(baked);
+        //this.setUseBaked(baked);
     }
 
     /**
      * @internal This method only friends to `SkeletalAnimation`.
      */
-    public setUseBaked (useBaked: boolean) {
-        if (useBaked) {
+    // public setUseBaked (useBaked: boolean) {
+    //     if (useBaked) {
+    //         this._sampleCurves = this._sampleCurvesBaked;
+    //         this.duration = this._bakedDuration;
+    //     } else {
+    //         this._sampleCurves = super._sampleCurves;
+    //         this.duration = this.clip.duration;
+    //         if (!this._curvesInited) {
+    //             this._curveLoaded = false;
+    //             super.initialize(this._targetNode!);
+    //             this._curvesInited = true;
+    //         }
+    //     }
+    // }
+    public onPlay () {
+        super.onPlay();
+        const baked = this._parent!.useBakedAnimation;
+        if (baked) {
             this._sampleCurves = this._sampleCurvesBaked;
             this.duration = this._bakedDuration;
+            this._animInfoMgr.switchClip(this._animInfo!, this.clip);
+            const users = this._parent!.getUsers();
+            users.forEach((user) => {
+                user.uploadAnimation(this.clip);
+            });
         } else {
             this._sampleCurves = super._sampleCurves;
             this.duration = this.clip.duration;
