@@ -327,6 +327,8 @@ export class JointTexturePool {
         if (buildTexture) {
             this._pool.update(texture.handle, textureBuffer.buffer);
             this._textureBuffers.set(hash, texture);
+            console.log(`${skinningRoot._id}update texture buffer`);
+            console.log(texture.handle.texture.info);
         }
         return texture;
     }
@@ -474,6 +476,8 @@ export class JointAnimationInfo {
         ));
         const data = new Float32Array([0, 0, 0, 0]);
         buffer.update(data);
+        console.log(`${nodeID}  getData`);
+        console.log(data);
         const info = { buffer, data, dirty: false, dirtyForJSB: new Uint8Array([0]), currentClip: null };
 
         this._pool.set(nodeID, info);

@@ -143,6 +143,8 @@ export class BakedSkinningModel extends MorphModel {
             }
         }
         if (hasNonInstancingPass && info.dirty) {
+            console.log(`${this.node._id}  updateUBOs animInfo`);
+            console.log(info.data);
             info.buffer.update(info.data);
             info.dirty = false;
         }
@@ -192,12 +194,18 @@ export class BakedSkinningModel extends MorphModel {
         jointTextureInfo[2] = texture.pixelOffset + 0.1; // guard against floor() underflow
         jointTextureInfo[3] = 1 / jointTextureInfo[0];
         this.updateInstancedJointTextureInfo();
-        if (buffer) { buffer.update(jointTextureInfo); }
+        if (buffer) {
+            console.log(`${this.node._id}  jointTextureInfo`);
+            console.log(jointTextureInfo);
+            buffer.update(jointTextureInfo);
+        }
         const tex = texture.handle.texture;
 
         for (let i = 0; i < this._subModels.length; ++i) {
             const descriptorSet = this._subModels[i].descriptorSet;
             descriptorSet.bindTexture(UNIFORM_JOINT_TEXTURE_BINDING, tex);
+            console.log(this.node._id);
+            console.log(texture.handle.texture.info);
         }
     }
 
@@ -210,6 +218,11 @@ export class BakedSkinningModel extends MorphModel {
             const sampler = this._device.getSampler(jointTextureSamplerInfo);
             descriptorSet.bindTexture(UNIFORM_JOINT_TEXTURE_BINDING, texture.handle.texture);
             descriptorSet.bindSampler(UNIFORM_JOINT_TEXTURE_BINDING, sampler);
+            console.log(this.node._id);
+            console.log(texture.handle.texture.info);
+        } else {
+            console.log(this.node._id);
+            console.log('no texture');
         }
     }
 
@@ -217,6 +230,16 @@ export class BakedSkinningModel extends MorphModel {
         super._updateInstancedAttributes(attributes, subModel);
         this._instAnimInfoIdx = subModel.getInstancedAttributeIndex(INST_JOINT_ANIM_INFO);
         this.updateInstancedJointTextureInfo();
+        const idx = this._instAnimInfoIdx;
+        for (let i = 0; i < this._subModels.length; i++) {
+            const subModel = this._subModels[i];
+            const views = subModel.instancedAttributeBlock.views;
+            if (idx >= 0 && views.length > 0) { // update instancing data too
+                const view = views[idx];
+                console.log(`${this.node._id}  :view:`);
+                console.log(view);
+            }
+        }
     }
 
     private updateInstancedJointTextureInfo () {

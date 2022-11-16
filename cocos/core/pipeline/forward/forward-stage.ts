@@ -140,8 +140,17 @@ export class ForwardStage extends RenderStage {
         for (let i = 0; i < renderObjects.length; ++i) {
             const ro = renderObjects[i];
             const subModels = ro.model.subModels;
+
             for (m = 0; m < subModels.length; ++m) {
                 const subModel = subModels[m];
+                const instAnimInfoIdx = subModel.getInstancedAttributeIndex('a_jointAnimInfo');
+                const views = subModel.instancedAttributeBlock.views;
+
+                if (views && instAnimInfoIdx >= 0 && views.length > 0) { // update instancing data too
+                    const view = views[instAnimInfoIdx];
+                    console.log(`${ro.model.node._id}  view:`);
+                    console.log(view);
+                }
                 const passes = subModel.passes;
                 for (p = 0; p < passes.length; ++p) {
                     const pass = passes[p];

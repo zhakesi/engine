@@ -167,6 +167,11 @@ export class SkeletalAnimationState extends AnimationState {
         // Ensure I'm the one on which the anim info is sampling.
         if (info.currentClip !== clip) {
             // If not, switch to me.
+            this._animInfo!.data[0] = -1;
+            // this._animInfo!.data[0] = 17;
+            // this._animInfo!.data[0] = 0.10000000149011612;
+            console.log(`${this._parent?.node._id}   animInfo`);
+            console.log(this._animInfo?.data);
             this._animInfoMgr.switchClip(this._animInfo!, clip);
 
             const users = this._parent!.getUsers();
@@ -176,9 +181,16 @@ export class SkeletalAnimationState extends AnimationState {
         }
 
         const curFrame = (ratio * this._frames + 0.5) | 0;
-        if (curFrame === info.data[0]) { return; }
+        if (curFrame === info.data[0]) {
+            console.log(this._parent?.node._id);
+            console.log(`frame:${curFrame} return`);
+            return;
+        }
         info.data[0] = curFrame;
         info.dirty = true;
+        const users = this._parent!.getUsers();
+        console.log(this._parent?.node._id);
+        console.log(`frame:${curFrame}`);
         if (JSB) {
             info.dirtyForJSB[0] = 1;
         }
@@ -187,5 +199,9 @@ export class SkeletalAnimationState extends AnimationState {
             const { pos, rot, scale } = frames[curFrame]; // ratio guaranteed to be in [0, 1]
             target.setRTS(rot, pos, scale);
         }
+    }
+    public onPlay () {
+        super.onPlay();
+        this._sampleCurvesBaked(0.0);
     }
 }
