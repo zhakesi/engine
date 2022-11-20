@@ -51,6 +51,7 @@ import { assert } from '../core/platform/debug';
 import { IBundleOptions } from '../asset/asset-manager/shared';
 import { ICustomJointTextureLayout } from '../3d/skeletal-animation/skeletal-animation-utils';
 import { IPhysicsConfig } from '../physics/framework/physics-config';
+import { promiseForSpineInstantiation } from '../spine/spine-2d/instantiated';
 
 /**
  * @zh
@@ -792,6 +793,7 @@ export class Game extends EventTarget {
             // #endregion Project
             .then(() => {
                 this._inited = true;
+                true && promiseForSpineInstantiation();
                 this._safeEmit(Game.EVENT_GAME_INITED);
             });
     }
