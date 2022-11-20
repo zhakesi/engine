@@ -53,6 +53,17 @@ export class SkeletonWasmObject {
         return this._meshArray;
     }
 
+    public setSkin (name: string) {
+        const encoder = new TextEncoder();
+        const encoded = encoder.encode(name);
+        const length = encoded.length;
+
+        const local = this._wasmUtil.queryMemory(length);
+        const array = this._wasmHEAPU8.subarray(local, local + length);
+        array.set(encoded);
+        this._wasmUtil.setSkin(this._objID, local, length);
+    }
+
     public setAnimation (name: string) {
         const encoder = new TextEncoder();
         const encoded = encoder.encode(name);

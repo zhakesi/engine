@@ -5,7 +5,7 @@ export interface SpineWasmUtil {
     createSkeletonObject () : number;
     setSkeletonData(objID: number, start: number, length: number): number;
     setAnimation(objID: number, start: number, length: number) : number;
-    setSkin(objID: number) : number;
+    setSkin(objID: number, start: number, length: number) : number;
     updateAnimation(objID: number, dltTime: number) : number;
     updateRenderData(objID: number) : number;
     queryMemory(size : number) : number;

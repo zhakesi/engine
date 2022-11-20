@@ -38,6 +38,20 @@ import { CCClass } from '../../core/data/class';
 import { SkeletonWasmObject } from './skeleton-wasm';
 import { SKMesh } from './sk-mesh';
 
+export enum SkelSkinsEnum {
+    default = 0,
+}
+ccenum(SkelSkinsEnum);
+
+export enum SkelAnimsEnum {
+    '<None>' = 0
+}
+
+function setEnumAttr (obj, propName, enumDef) {
+    CCClass.Attr.setClassAttr(obj, propName, 'type', 'Enum');
+    CCClass.Attr.setClassAttr(obj, propName, 'enumList', Enum.getList(enumDef));
+}
+
 // eslint-disable-next-line dot-notation
 SkeletonData.prototype['init'] = function () {
     console.log('SkeletonData.prototype init');
@@ -66,24 +80,24 @@ SkeletonData.prototype['init'] = function () {
 export class Skeleton2DRenderer extends ModelRenderer {
     @serializable
     protected _skeletonData: SkeletonData | null = null;
-
     @serializable
     private _defaultSkinName = 'default';
-    protected _enumSkins: any = Enum({});
-    constructor () {
+    @serializable
+    private _defaultAnimationName = '<None>';
+    @serializable
+    private _texture : Texture2D | null = null;
+
+
+    private _wasmObj : SkeletonWasmObject | null = null;
+    private _meshArray : SKMesh[] = [];
+
+
+    constructor() {
         super();
+        setEnumAttr(this, 'defaultSkinIndex', Enum({}));
+        setEnumAttr(this, 'animationIndex', Enum({}));
     }
 
-    /**
-     * @en
-     * The skeleton data contains the skeleton information (bind pose bones, slots, draw order,
-     * attachments, skins, etc) and animations but does not hold any state.<br/>
-     * Multiple skeletons can share the same skeleton data.
-     * @zh
-     * 骨骼数据包含了骨骼信息（绑定骨骼动作，slots，渲染顺序，
-     * attachments，皮肤等等）和动画但不持有任何状态。<br/>
-     * 多个 Skeleton 可以共用相同的骨骼数据。
-     */
     @editable
     @type(SkeletonData)
     get skeletonData () {
@@ -95,13 +109,125 @@ export class Skeleton2DRenderer extends ModelRenderer {
             console.log('need release');
         }
         this._skeletonData = value;
+        this._defaultSkinName = 'default';
+        this._defaultAnimationName = '<None>';
+        
+        this._updateSkinEnum();
+        this._updateAnimEnum();
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         this._updateSkeletonData();
-        console.log('set skeletonData');
+        // console.log('set skeletonData');
     }
 
-    @serializable
-    private _texture : Texture2D | null = null;
+    /**
+     * @internal
+     */
+    @displayName('Default Skin')
+    @type(SkelSkinsEnum)
+    get defaultSkinIndex (): number {
+        if (!this.skeletonData) return 0;
+        const skinsEnum = this.skeletonData.getSkinsEnum();
+        if (!skinsEnum) return 0;
+        if (this._defaultSkinName === 'default') {
+            // eslint-disable-next-line no-prototype-builtins
+            if (skinsEnum.hasOwnProperty(0)) {
+                this.defaultSkinIndex = 0;
+                return 0;
+            }
+        } else {
+            const skinIndex = skinsEnum[this._defaultSkinName];
+            if (skinIndex !== undefined) return skinIndex;
+        }
+        return 0;
+    }
+    set defaultSkinIndex (value: number) {
+        let skinsEnum;
+        if (!this.skeletonData) return;
+        skinsEnum = this.skeletonData.getSkinsEnum();
+        if (!skinsEnum) {
+            console.error(`${this.name} skin enums are invalid`);
+            return;
+        }
+        const skinName = skinsEnum[value];
+        if (skinName !== undefined) {
+            this._defaultSkinName = skinName;
+            this.setSkin(skinName);
+            if (EDITOR) this._updateSkinEnum();
+        } else {
+            console.error(`${this.name} skin enums are invalid`);
+        }
+    }
+
+    /**
+     * @internal
+     */
+     @displayName('Animation')
+     @type(SkelAnimsEnum)
+    get animationIndex () {
+        if (!this.skeletonData) return 0;
+        const animsEnum = this.skeletonData.getAnimsEnum();
+        if (!animsEnum) return 0;
+        const animName = this._defaultAnimationName;
+        const animIndex = animsEnum[animName];
+        if (animIndex !== undefined) return animIndex;
+        return 0;
+    }
+    set animationIndex (value: number) {
+        let animsEnum;
+        if (!this.skeletonData) return;
+        animsEnum = this.skeletonData.getAnimsEnum();
+        if (!animsEnum) {
+            console.error(`${this.name} animation enums are invalid`);
+            return;
+        }
+        const animName = animsEnum[value];
+        if (animName !== undefined) {
+            this._defaultAnimationName = animName;
+            this.setAnimation(animName);
+            if (EDITOR) this._updateAnimEnum();
+        } else {
+            console.error(`${this.name} animation enums are invalid`);
+        }
+    }
+
+    public setSkin (skinName: string) {
+        if (!this._wasmObj) return;
+        this._wasmObj.setSkin(skinName);
+    }
+
+    // update skin list for editor
+    protected _updateSkinEnum () {
+        if (!EDITOR) return;
+        let skinEnum;
+        if (this.skeletonData) {
+            skinEnum = this.skeletonData.getSkinsEnum();
+        } else {
+            skinEnum = SkelSkinsEnum;
+        }
+
+        let enumSkins = Enum({});
+        Object.assign(enumSkins, skinEnum);
+        Enum.update(enumSkins);
+        setEnumAttr(this, 'defaultSkinIndex', enumSkins);
+    }
+
+    // update animation list for editor
+    protected _updateAnimEnum () {
+        let animEnum;
+        if (this.skeletonData) {
+            animEnum = this.skeletonData.getAnimsEnum();
+        } else {
+            animEnum = SkelAnimsEnum;
+        }
+        // reset enum type
+        const enumAnimations = Enum({});
+        Object.assign(enumAnimations, animEnum);
+        Enum.update(enumAnimations);
+        setEnumAttr(this, 'animationIndex', enumAnimations);
+    }
+
+
+
     @type(Texture2D)
     get texture () {
         return this._texture;
@@ -110,27 +236,21 @@ export class Skeleton2DRenderer extends ModelRenderer {
         this._texture = tex;
     }
 
-    private _wasmObj : SkeletonWasmObject | null = null;
-
-    private _meshArray : SKMesh[] = [];
-
     public __preload () {
-        if (!this._skeletonData) return;
-        if (!this._wasmObj) return;
-        console.log('__preload');
+        // if (!this._skeletonData) return;
+        // if (!this._wasmObj) return;
+        // console.log('__preload');
     }
 
     public onLoad () {
         if (this._models.length < 1) {
             this._createModel();
         }
-        if (!this._wasmObj) return;
-        console.log('onLoad');
     }
 
     public onRestore () {
-        if (!this._wasmObj) return;
-        console.log('onRestore');
+        // if (!this._wasmObj) return;
+        // console.log('onRestore');
     }
 
     public update (dt: number) {
@@ -144,21 +264,21 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public onEnable () {
-        console.log('onEnable');
+        // console.log('onEnable');
         this._attachToScene();
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        //this._defaultSkinName = 'goblin'
         this._updateSkeletonData();
-        this.setAnimation('run');
+        this.setAnimation('walk');
     }
 
     public onDisable () {
-        if (!this._wasmObj) return;
-        console.log('onDisable');
+        // if (!this._wasmObj) return;
+        // console.log('onDisable');
     }
 
     public onDestroy () {
-        if (!this._wasmObj) return;
-        console.log('onDestroy');
+        // if (!this._wasmObj) return;
+        // console.log('onDestroy');
     }
 
     protected _updateSkeletonData () {
@@ -166,7 +286,9 @@ export class Skeleton2DRenderer extends ModelRenderer {
         if (!this._wasmObj) {
             this._wasmObj = new SkeletonWasmObject();
         }
+
         this._wasmObj.initSkeletonData(this._skeletonData);
+        this.setSkin(this._defaultSkinName);
     }
 
     public setAnimation (name:string) {
