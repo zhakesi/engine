@@ -34,10 +34,11 @@ import { Root } from '../../root';
 import { legacyCC } from '../../core/global-exports';
 import { ccenum, Enum } from '../../core/value-types/enum';
 import { CCClass } from '../../core/data/class';
+import { Node } from '../../scene-graph/node';
 
 import { SkeletonWasmObject } from './skeleton-wasm';
-import { SKMesh } from './sk-mesh';
-import { forEach } from '../../asset/asset-manager/utilities';
+import { SKMesh, SkModelUtil } from './sk-mesh';
+import { SkeletonSeparatorRenderer } from './skeleton-separator-renderer';
 
 export enum SkelSlotEnum {
     default = 0,
@@ -60,6 +61,10 @@ export enum SkelAnimsEnum {
 function setEnumAttr (obj, propName, enumDef) {
     CCClass.Attr.setClassAttr(obj, propName, 'type', 'Enum');
     CCClass.Attr.setClassAttr(obj, propName, 'enumList', Enum.getList(enumDef));
+}
+
+export class SkSlotInfo {
+    public name = '';
 }
 
 // eslint-disable-next-line dot-notation
@@ -101,6 +106,7 @@ export class Skeleton2DRenderer extends ModelRenderer {
 
     private _wasmObj : SkeletonWasmObject | null = null;
     private _meshArray : SKMesh[] = [];
+    private _separatorNodes: Node[] = [];
 
     constructor () {
         super();
@@ -283,6 +289,8 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public onEnable () {
+        const slots = ['xx', 'yy'];
+        this.setRenderSeparators(slots);
         // console.log('onEnable');
         // this._attachToScene();
         // this._defaultSkinName = 'goblin';
@@ -352,42 +360,12 @@ export class Skeleton2DRenderer extends ModelRenderer {
         }
     }
 
-    public _activeSubModel (idx: number) {
-        if (this._models.length < 1) {
-            return;
-        }
-        const attrs = vfmtPosUvColor;
-        const stride = getAttributeStride(attrs);
-
-        if (this._models[0].subModels.length <= idx) {
-            const gfxDevice: Device = deviceManager.gfxDevice;
-            const vertexBuffer = gfxDevice.createBuffer(new BufferInfo(
-                BufferUsageBit.VERTEX | BufferUsageBit.TRANSFER_DST,
-                MemoryUsageBit.DEVICE,
-                65535 * stride,
-                stride,
-            ));
-            const indexBuffer = gfxDevice.createBuffer(new BufferInfo(
-                BufferUsageBit.INDEX | BufferUsageBit.TRANSFER_DST,
-                MemoryUsageBit.DEVICE,
-                65535 * Uint16Array.BYTES_PER_ELEMENT * 2,
-                Uint16Array.BYTES_PER_ELEMENT,
-            ));
-
-            const renderMesh = new RenderingSubMesh([vertexBuffer], attrs, PrimitiveMode.TRIANGLE_LIST, indexBuffer);
-            renderMesh.subMeshIdx = 0;
-
-            const mat = builtinResMgr.get<Material>('default-spine2d-material');
-            this._models[0].initSubModel(idx, renderMesh, mat);
-            this._models[0].enabled = true;
-        }
-    }
     public realTimeTraverse () {
         const count = this._meshArray.length;
         for (let idx = 0;  idx < count; idx++) {
             const mesh = this._meshArray[idx];
 
-            this._activeSubModel(idx);
+            SkModelUtil.activeSubModel(this._models[0], idx);
             const subModel = this._models[0].subModels[idx];
             const ia = subModel.inputAssembler;
             ia.vertexBuffers[0].update(mesh.vertices);
@@ -396,5 +374,27 @@ export class Skeleton2DRenderer extends ModelRenderer {
             ia.indexBuffer!.update(ib);
             ia.indexCount = ib.length;
         }
+    }
+
+    private setRenderSeparators (slotArray: string[]) {
+        this._separatorNodes.forEach((node) => {
+            this.node.removeChild(node);
+        });
+        this._separatorNodes.length = 0;
+        const node = new Node('0');
+        node.addComponent(SkeletonSeparatorRenderer);
+        const separatorRenderer = node.getComponent(SkeletonSeparatorRenderer);
+        separatorRenderer!.initRenderMesh(
+            this._texture!,
+            this.visibility,
+        );
+        this._separatorNodes.push(node);
+        this.node.addChild(node);
+        slotArray.forEach((slot) => {
+            const node = new Node(slot);
+            node.addComponent(SkeletonSeparatorRenderer);
+            this._separatorNodes.push(node);
+            this.node.addChild(node);
+        });
     }
 }
