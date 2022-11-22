@@ -12,25 +12,19 @@ export class SkeletonSeparatorRenderer extends Component {
     private _texture: Texture2D | null = null;
     public slotStart = '';
     public slotEnd = '';
-    private _visibility = 0;
-    public initRenderMesh (tex: Texture2D, visibility:number) {
-        this._texture = tex;
+    constructor () {
+        super();
     }
+
     get model () {
         return this._model;
     }
 
     onEnable () {
-        this._model = this.createModel();
-        if (this.model) {
-            this._attachToScene(this.model);
-        }
+        this.attachToScene();
     }
 
     onDisable () {
-        if (this.model) {
-            this._detachFromScene(this.model);
-        }
     }
 
     update () {
@@ -39,12 +33,6 @@ export class SkeletonSeparatorRenderer extends Component {
 
     lateUpdate () {
         this._onUpdateLocalDescriptorSet();
-    }
-    get texture () {
-        return this._texture;
-    }
-    set texture (val) {
-        this._texture = val;
     }
 
     protected _onUpdateLocalDescriptorSet () {
@@ -60,31 +48,28 @@ export class SkeletonSeparatorRenderer extends Component {
         }
     }
 
-    private _attachToScene (model: Model) {
-        if (!this.node.scene) {
+    public attachToScene () {
+        if (!this.node.scene || !this._model) {
             return;
         }
         const renderScene = this._getRenderScene();
-        if (model.scene !== null) {
-            model.scene.removeModel(model);
+        if (this._model.scene !== null) {
+            this._model.scene.removeModel(this._model);
         }
-        renderScene.addModel(model);
+        renderScene.addModel(this._model);
     }
 
-    protected _detachFromScene (model: Model) {
-        if (model.scene) {
-            model.scene.removeModel(model);
+    public detachFromScene () {
+        if (!this._model) return;
+        if (this._model.scene) {
+            this._model.scene.removeModel(this._model);
         }
     }
 
-    set visibility (val) {
-        this._visibility = val;
-    }
-
-    private createModel () {
-        const model = (legacyCC.director.root as Root).createModel<Model>(Model);
-        model.visFlags = this._visibility;
-        model.node = model.transform = this.node;
-        return model;
+    public initModelData (tex:Texture2D, visibility:number) {
+        this._model = (legacyCC.director.root as Root).createModel<Model>(Model);
+        this._model.visFlags = visibility;
+        this._model.node = this._model.transform = this.node;
+        this._texture = tex;
     }
 }

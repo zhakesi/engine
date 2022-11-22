@@ -39,16 +39,6 @@ import { Node } from '../../scene-graph/node';
 import { SkeletonWasmObject } from './skeleton-wasm';
 import { SKMesh, SkModelUtil } from './sk-mesh';
 import { SkeletonSeparatorRenderer } from './skeleton-separator-renderer';
-import { labelAssembler } from '../../2d';
-
-export enum SkelSlotEnum {
-    default = 0,
-}
-ccenum(SkelSlotEnum);
-
-export class SlotSeparatorItem {
-    public slotIdx = 0;
-}
 
 export enum SkelSkinsEnum {
     default = 0,
@@ -103,12 +93,12 @@ export class Skeleton2DRenderer extends ModelRenderer {
     @serializable
     private _texture : Texture2D | null = null;
 
-    private _separators : (SkelSlotEnum | null)[] = [];
-
     private _wasmObj : SkeletonWasmObject | null = null;
+    private _model : Model | null = null;
     private _meshArray : SKMesh[] = [];
-    private _separatorNodes: Node[] = [];
     private _slotsList : string[] = [];
+
+    private _separatorRenders: SkeletonSeparatorRenderer[] = [];
 
     @editable
     @type(SkeletonData)
@@ -207,15 +197,6 @@ export class Skeleton2DRenderer extends ModelRenderer {
         this._texture = tex;
     }
 
-    @type(SkelSlotEnum)
-    @displayName('Separator Items')
-    get renderSeparators () {
-        return this._separators;
-    }
-    set renderSeparators (val) {
-        this._separators = val;
-    }
-
     public setSkin (skinName: string) {
         if (!this._wasmObj) return;
         this._wasmObj.setSkin(skinName);
@@ -247,15 +228,6 @@ export class Skeleton2DRenderer extends ModelRenderer {
         setEnumAttr(this, 'animationIndex', enumAnimations);
     }
 
-    protected _updateSlotEnum () {
-        if (!EDITOR) return;
-
-        let enumDef : {[key: string]: number} | null = null;
-        if (!enumDef) enumDef = { xxa: 0, xxb: 1 };
-        const enumSlots = Enum(enumDef);
-        Enum.update(enumSlots);
-    }
-
     public __preload () {
         // if (!this._skeletonData) return;
         // if (!this._wasmObj) return;
@@ -263,12 +235,11 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public onLoad () {
-        // if (this._models.length < 1) {
-        //     this._createModel();
-        // }
+        if (this._models.length < 1) {
+            this._createModel();
+        }
         this._updateAnimEnum();
         this._updateSkinEnum();
-        this._updateSlotEnum();
     }
 
     public onRestore () {
@@ -281,30 +252,23 @@ export class Skeleton2DRenderer extends ModelRenderer {
 
         this._wasmObj.updateAnimation(dt);
         this._meshArray = this._wasmObj.updateRenderData();
-        if (this._separatorNodes.length < 1) {
+        if (this._separatorRenders.length < 1) {
             this.realTimeTraverse();
             this._onUpdateLocalDescriptorSet();
         } else {
-            let node = this._separatorNodes[0];
-            let start = 0;
-            let end = 5;
-            let separator = node.getComponent(SkeletonSeparatorRenderer);
-            this._fillSeparatorMesh(separator!, start, end);
-
-            node = this._separatorNodes[1];
-            start = 6;
-            end = 19;
-            separator = node.getComponent(SkeletonSeparatorRenderer);
-            this._fillSeparatorMesh(separator!, start, end);
+            const separator0 = this._separatorRenders[0];
+            this._fillSeparatorMesh(separator0, 0, 2);
+            const separator1 = this._separatorRenders[1];
+            this._fillSeparatorMesh(separator1, 3, 19);
         }
     }
 
     public onEnable () {
-        //this._attachToScene();
+        this._setSeparatorEnable(false);
         this._defaultSkinName = 'goblin';
         this._updateSkeletonData();
-        this.setRenderSeparators();
         this.setAnimation('walk');
+        this.addSeparatorRenderer('left-foot');
     }
 
     public onDisable () {
@@ -332,7 +296,7 @@ export class Skeleton2DRenderer extends ModelRenderer {
 
     protected _onUpdateLocalDescriptorSet () {
         if (!this.texture) return;
-        const subModels = this._models[0].subModels;
+        const subModels = this._model!.subModels;
         const binding = ModelLocalBindings.SAMPLER_SPRITE;
         for (let i = 0; i < subModels.length; i++) {
             const { descriptorSet } = subModels[i];
@@ -345,30 +309,31 @@ export class Skeleton2DRenderer extends ModelRenderer {
 
     protected _createModel () {
         const model = (legacyCC.director.root as Root).createModel<Model>(Model);
-        this._models[0] = model;
+        this._model = model;
         model.visFlags = this.visibility;
         model.node = model.transform = this.node;
     }
 
-    protected _attachToScene () {
-        if (!this.node.scene || this._models.length < 1) {
+    protected attachToScene () {
+        if (!this.node.scene || !this._model) {
             return;
         }
         const renderScene = this._getRenderScene();
-        if (this._models[0].scene !== null) {
-            this._models[0].scene.removeModel(this._models[0]);
+        if (this._model.scene !== null) {
+            this._model.scene.removeModel(this._model);
         }
-        renderScene.addModel(this._models[0]);
+        renderScene.addModel(this._model);
     }
 
-    protected _detachFromScene () {
-        if (this._models[0].scene) {
-            this._models[0].scene.removeModel(this._models[0]);
+    protected detachFromScene () {
+        if (!this._model) return;
+        if (this._model.scene) {
+            this._model.scene.removeModel(this._model);
         }
     }
 
-    private _fillSeparatorMesh (separator: SkeletonSeparatorRenderer, index1: number, index2: number) {
-        for (let idx = index1, i = 0;  idx < index2; idx++, i++) {
+    private _fillSeparatorMesh (separator: SkeletonSeparatorRenderer, index1:number, index2:number) {
+        for (let idx = index1, i = 0;  idx <= index2; idx++, i++) {
             const mesh = this._meshArray[idx];
             SkModelUtil.activeSubModel(separator.model!, i);
             const subModel = separator.model!.subModels[i];
@@ -382,12 +347,13 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public realTimeTraverse () {
+        if (!this._model) return;
         const count = this._meshArray.length;
         for (let idx = 0;  idx < count; idx++) {
             const mesh = this._meshArray[idx];
 
-            SkModelUtil.activeSubModel(this._models[0], idx);
-            const subModel = this._models[0].subModels[idx];
+            SkModelUtil.activeSubModel(this._model, idx);
+            const subModel = this._model.subModels[idx];
             const ia = subModel.inputAssembler;
             ia.vertexBuffers[0].update(mesh.vertices);
             ia.vertexCount = mesh.vCount;
@@ -397,33 +363,56 @@ export class Skeleton2DRenderer extends ModelRenderer {
         }
     }
 
-    private setRenderSeparators () {
-        this._separatorNodes.forEach((node) => {
-            this.node.removeChild(node);
+    public addSeparatorRenderer (slot : string) {
+        let isExist = false;
+        this._separatorRenders.forEach((separator) => {
+            if (separator.name === slot) isExist = true;
         });
-        this._separatorNodes.length = 0;
+        if (isExist) return;
 
-        const length = this._slotsList.length;
-        const node1 = new Node('0');
-        this._separatorNodes.push(node1);
-        this.node.addChild(node1);
-        const separator = node1.addComponent(SkeletonSeparatorRenderer);
-        separator.slotStart = this._slotsList[0];
-        separator.slotEnd = this._slotsList[5];
-        separator.texture = this.texture;
-        separator.visibility = this.visibility;
+        const count = this._separatorRenders.length;
+        if (count < 1) {
+            const node = new Node('0');
+            const separator = node.addComponent(SkeletonSeparatorRenderer);
+            separator.initModelData(this.texture!, this.visibility);
+            separator.attachToScene();
+            separator.name = '0';
+            this._separatorRenders.push(separator);
+            this.node.addChild(node);
+            this._setSeparatorEnable(true);
+        }
 
-        const node2 = new Node('1');
-        this._separatorNodes.push(node2);
-        this.node.addChild(node2);
-        const separator2 = node2.addComponent(SkeletonSeparatorRenderer);
-        separator2.slotStart = this._slotsList[6];
-        separator2.slotEnd = this._slotsList[length - 1];
-        separator.texture = this.texture;
-        separator.visibility = this.visibility;
+        const node = new Node(slot);
+        const separator = node.addComponent(SkeletonSeparatorRenderer);
+        separator.initModelData(this.texture!, this.visibility);
+        separator.attachToScene();
+        separator.name = slot;
+        this.node.addChild(node);
+        this._separatorRenders.push(separator);
+    }
+
+    public removeSeparatorRenderer (slot : string) {
+        const count = this._separatorRenders.length;
+        for (let i = 0; i < count; i++) {
+            const separator = this._separatorRenders[i];
+            if (separator.name === slot) {
+                separator.detachFromScene();
+                this._separatorRenders.splice(i, 1);
+                this.node.removeChild(separator.node);
+                break;
+            }
+        }
+        if (this._separatorRenders.length === 1) {
+            const separator = this._separatorRenders[0];
+            separator.detachFromScene();
+            this.node.removeChild(separator.node);
+            this._separatorRenders.length = 0;
+            this._setSeparatorEnable(false);
+        }
     }
 
     private _updateSlotsInfor () {
+        this._slotsList.length = 0;
         if (!this._skeletonData) return;
         const json = this._skeletonData.skeletonJson;
         const slots = (json as any).slots;
@@ -432,8 +421,11 @@ export class Skeleton2DRenderer extends ModelRenderer {
         });
     }
 
-    private _getSlotOrder (name:string) : number {
-        const index = this._slotsList.indexOf(name);
-        return index;
+    private _setSeparatorEnable (enbale:boolean) {
+        if (!enbale) {
+            this.attachToScene();
+        } else {
+            this.detachFromScene();
+        }
     }
 }
