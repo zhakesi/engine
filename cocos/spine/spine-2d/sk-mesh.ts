@@ -20,7 +20,7 @@ export class SKMesh {
     public indeices: Uint16Array;
 }
 
-class SkModelUtil {
+export class SkModelUtil {
     public static activeSubModel (model:Model, idx: number) {
         const attrs = vfmtPosUvColor;
         const stride = getAttributeStride(attrs);

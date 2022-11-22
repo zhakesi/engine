@@ -39,6 +39,7 @@ import { Node } from '../../scene-graph/node';
 import { SkeletonWasmObject } from './skeleton-wasm';
 import { SKMesh, SkModelUtil } from './sk-mesh';
 import { SkeletonSeparatorRenderer } from './skeleton-separator-renderer';
+import { labelAssembler } from '../../2d';
 
 export enum SkelSlotEnum {
     default = 0,
@@ -107,10 +108,7 @@ export class Skeleton2DRenderer extends ModelRenderer {
     private _wasmObj : SkeletonWasmObject | null = null;
     private _meshArray : SKMesh[] = [];
     private _separatorNodes: Node[] = [];
-
-    constructor () {
-        super();
-    }
+    private _slotsList : string[] = [];
 
     @editable
     @type(SkeletonData)
@@ -128,7 +126,7 @@ export class Skeleton2DRenderer extends ModelRenderer {
 
         this._updateSkinEnum();
         this._updateAnimEnum();
-        //this._updateSkeletonData();
+        this._updateSkeletonData();
     }
 
     /**
@@ -265,9 +263,9 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public onLoad () {
-        if (this._models.length < 1) {
-            this._createModel();
-        }
+        // if (this._models.length < 1) {
+        //     this._createModel();
+        // }
         this._updateAnimEnum();
         this._updateSkinEnum();
         this._updateSlotEnum();
@@ -279,37 +277,46 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public update (dt: number) {
-        // if (!this._wasmObj) return;
+        if (!this._wasmObj) return;
 
-        // this._wasmObj.updateAnimation(dt);
-        // this._meshArray = this._wasmObj.updateRenderData();
+        this._wasmObj.updateAnimation(dt);
+        this._meshArray = this._wasmObj.updateRenderData();
+        if (this._separatorNodes.length < 1) {
+            this.realTimeTraverse();
+            this._onUpdateLocalDescriptorSet();
+        } else {
+            let node = this._separatorNodes[0];
+            let start = 0;
+            let end = 5;
+            let separator = node.getComponent(SkeletonSeparatorRenderer);
+            this._fillSeparatorMesh(separator!, start, end);
 
-        // this.realTimeTraverse();
-        // this._onUpdateLocalDescriptorSet();
+            node = this._separatorNodes[1];
+            start = 6;
+            end = 19;
+            separator = node.getComponent(SkeletonSeparatorRenderer);
+            this._fillSeparatorMesh(separator!, start, end);
+        }
     }
 
     public onEnable () {
-        const slots = ['xx', 'yy'];
-        this.setRenderSeparators(slots);
-        // console.log('onEnable');
-        // this._attachToScene();
-        // this._defaultSkinName = 'goblin';
-        // this._updateSkeletonData();
-        // this.setAnimation('walk');
+        //this._attachToScene();
+        this._defaultSkinName = 'goblin';
+        this._updateSkeletonData();
+        this.setRenderSeparators();
+        this.setAnimation('walk');
     }
 
     public onDisable () {
-        // if (!this._wasmObj) return;
-        // console.log('onDisable');
     }
 
     public onDestroy () {
-        // if (!this._wasmObj) return;
-        // console.log('onDestroy');
     }
 
     protected _updateSkeletonData () {
         if (this._skeletonData === null) return;
+        this._updateSlotsInfor();
+
         if (!this._wasmObj) {
             this._wasmObj = new SkeletonWasmObject();
         }
@@ -349,14 +356,28 @@ export class Skeleton2DRenderer extends ModelRenderer {
         }
         const renderScene = this._getRenderScene();
         if (this._models[0].scene !== null) {
-            this._detachFromScene();
+            this._models[0].scene.removeModel(this._models[0]);
         }
         renderScene.addModel(this._models[0]);
     }
 
     protected _detachFromScene () {
-        if (this._models.length > 0 && this._models[0].scene) {
+        if (this._models[0].scene) {
             this._models[0].scene.removeModel(this._models[0]);
+        }
+    }
+
+    private _fillSeparatorMesh (separator: SkeletonSeparatorRenderer, index1: number, index2: number) {
+        for (let idx = index1, i = 0;  idx < index2; idx++, i++) {
+            const mesh = this._meshArray[idx];
+            SkModelUtil.activeSubModel(separator.model!, i);
+            const subModel = separator.model!.subModels[i];
+            const ia = subModel.inputAssembler;
+            ia.vertexBuffers[0].update(mesh.vertices);
+            ia.vertexCount = mesh.vCount;
+            const ib = new Uint16Array(mesh.indeices);
+            ia.indexBuffer!.update(ib);
+            ia.indexCount = ib.length;
         }
     }
 
@@ -376,25 +397,43 @@ export class Skeleton2DRenderer extends ModelRenderer {
         }
     }
 
-    private setRenderSeparators (slotArray: string[]) {
+    private setRenderSeparators () {
         this._separatorNodes.forEach((node) => {
             this.node.removeChild(node);
         });
         this._separatorNodes.length = 0;
-        const node = new Node('0');
-        node.addComponent(SkeletonSeparatorRenderer);
-        const separatorRenderer = node.getComponent(SkeletonSeparatorRenderer);
-        separatorRenderer!.initRenderMesh(
-            this._texture!,
-            this.visibility,
-        );
-        this._separatorNodes.push(node);
-        this.node.addChild(node);
-        slotArray.forEach((slot) => {
-            const node = new Node(slot);
-            node.addComponent(SkeletonSeparatorRenderer);
-            this._separatorNodes.push(node);
-            this.node.addChild(node);
+
+        const length = this._slotsList.length;
+        const node1 = new Node('0');
+        this._separatorNodes.push(node1);
+        this.node.addChild(node1);
+        const separator = node1.addComponent(SkeletonSeparatorRenderer);
+        separator.slotStart = this._slotsList[0];
+        separator.slotEnd = this._slotsList[5];
+        separator.texture = this.texture;
+        separator.visibility = this.visibility;
+
+        const node2 = new Node('1');
+        this._separatorNodes.push(node2);
+        this.node.addChild(node2);
+        const separator2 = node2.addComponent(SkeletonSeparatorRenderer);
+        separator2.slotStart = this._slotsList[6];
+        separator2.slotEnd = this._slotsList[length - 1];
+        separator.texture = this.texture;
+        separator.visibility = this.visibility;
+    }
+
+    private _updateSlotsInfor () {
+        if (!this._skeletonData) return;
+        const json = this._skeletonData.skeletonJson;
+        const slots = (json as any).slots;
+        slots.forEach((slot) => {
+            this._slotsList.push(slot.name);
         });
+    }
+
+    private _getSlotOrder (name:string) : number {
+        const index = this._slotsList.indexOf(name);
+        return index;
     }
 }
