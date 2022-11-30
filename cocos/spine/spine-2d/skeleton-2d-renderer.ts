@@ -19,15 +19,16 @@
  THE SOFTWARE.
 */
 import { ccclass, executeInEditMode, executionOrder, help, menu, serializable, type, displayName } from 'cc.decorator';
-import { JSB } from 'internal:constants';
+import { EDITOR, JSB } from 'internal:constants';
 import { editable } from '../../core/data/decorators';
 import { ccenum, Enum } from '../../core/value-types/enum';
-import { ModelRenderer } from '../../core/components/model-renderer';
+import { Renderer } from '../../core/components/renderer';
 import { Texture2D } from '../../core/assets';
 import { SkeletonData } from '../skeleton-data';
 import { Skeleton2DImplement } from './skeleton-2d-impl';
 import { Skeleton2DNativeImpl } from './skeleton-2d-native';
 import { Skeleton2DWasmImpl } from './skeleton-2d-wasm';
+import { ModelRenderer } from '../../core';
 
 export enum SkelSkinsEnum {
     default = 0,
@@ -57,12 +58,6 @@ export class Skeleton2DRenderer extends ModelRenderer {
 
     constructor () {
         super();
-        if (JSB) {
-            this._imply = new Skeleton2DNativeImpl();
-        } else {
-            this._imply = new Skeleton2DWasmImpl();
-        }
-        this._imply.init();
     }
 
     @editable
@@ -71,11 +66,12 @@ export class Skeleton2DRenderer extends ModelRenderer {
         return this._skeletonData;
     }
     set skeletonData (value: SkeletonData | null) {
+        if (!this._imply) return;
         if (this._skeletonData !== null) {
             this._imply.releaseSkeletonData();
         }
         this._skeletonData = value;
-        this._imply.
+        this._imply.updateSkeletonData(this._skeletonData!);
     }
 
     /**
@@ -110,6 +106,13 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public __preload () {
+        console.log('imply.init()');
+        if (JSB) {
+            this._imply = new Skeleton2DNativeImpl();
+        } else {
+            this._imply = new Skeleton2DWasmImpl();
+        }
+        this._imply.init();
     }
 
     public onLoad () {
@@ -121,11 +124,20 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public update (dt: number) {
+        if (EDITOR) return;
+        if (!this._imply) return;
+        this._imply.updateRenderData();
+    }
 
+    public lateUpdate (dt: number) {
+        if (EDITOR) return;
+        if (!this._imply) return;
+        this._imply.render();
     }
 
     public onEnable () {
-
+        if (!this._imply) return;
+        this._imply.updateSkeletonData(this._skeletonData!);
     }
 
     public onDisable () {
