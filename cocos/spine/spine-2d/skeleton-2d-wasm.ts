@@ -7,6 +7,7 @@ import { Material, Texture2D, RenderingSubMesh } from '../../core/assets';
 import { builtinResMgr } from '../../core/builtin/builtin-res-mgr';
 import { SpineWasmUtil, FileResourceInstance } from './wasm-util';
 import { getSpineSpineWasmUtil, promiseForSpineInstantiation } from './spine-instantiated';
+import { error } from '../../core';
 
 const floatStride = 9;
 class SKMesh {
@@ -29,6 +30,7 @@ export class Skeleton2DWasmImpl extends Skeleton2DImplement {
     protected _wasmUtil: SpineWasmUtil | null = null;
     protected _wasmHEAPU8: Uint8Array = new Uint8Array(0);
     protected _meshArray: SKMesh[] = [];
+    protected _isInit = false;
 
     public async init () {
         const wasm = getSpineSpineWasmUtil();
@@ -39,6 +41,10 @@ export class Skeleton2DWasmImpl extends Skeleton2DImplement {
         this._wasmHEAPU8 = new Uint8Array(this._wasmUtil.memory.buffer);
         this._objID = this._wasmUtil.createSkeletonObject();
         console.log('Skeleton2DWasmImpl::init');
+        this._isInit = true;
+    }
+    get isInit () {
+        return this._isInit;
     }
 
     public releaseSkeletonData () {
@@ -46,6 +52,7 @@ export class Skeleton2DWasmImpl extends Skeleton2DImplement {
     }
 
     public updateSkeletonData (data: SkeletonData) {
+        console.log('Skeleton2DWasmImpl::updateSkeletonData');
         if (!this._wasmUtil) return;
         const name = data.name;
         const altasName = `${name}.atlas`;
@@ -63,7 +70,6 @@ export class Skeleton2DWasmImpl extends Skeleton2DImplement {
         array.set(encoded);
 
         this._wasmUtil.setSkeletonData(this._objID, local, length);
-        console.log('Skeleton2DWasmImpl::updateSkeletonData');
     }
 
     public updateRenderData () {
@@ -89,7 +95,47 @@ export class Skeleton2DWasmImpl extends Skeleton2DImplement {
         console.log(this._meshArray.length);
     }
 
-    public render () {
+    public updateModel (model : Model) {
+        const count = this._meshArray.length;
+        for (let idx = 0;  idx < count; idx++) {
+            const mesh = this._meshArray[idx];
 
+            this.activeSubModel(model, idx);
+            const subModel = model.subModels[idx];
+            const ia = subModel.inputAssembler;
+            ia.vertexBuffers[0].update(mesh.vertices);
+            ia.vertexCount = mesh.vCount;
+            const ib = new Uint16Array(mesh.indeices);
+            ia.indexBuffer!.update(ib);
+            ia.indexCount = ib.length;
+        }
+    }
+
+    private activeSubModel (model : Model, idx: number) {
+        const attrs = vfmtPosUvColor;
+        const stride = getAttributeStride(attrs);
+
+        if (model.subModels.length <= idx) {
+            const gfxDevice: Device = deviceManager.gfxDevice;
+            const vertexBuffer = gfxDevice.createBuffer(new BufferInfo(
+                BufferUsageBit.VERTEX | BufferUsageBit.TRANSFER_DST,
+                MemoryUsageBit.DEVICE,
+                65535 * stride,
+                stride,
+            ));
+            const indexBuffer = gfxDevice.createBuffer(new BufferInfo(
+                BufferUsageBit.INDEX | BufferUsageBit.TRANSFER_DST,
+                MemoryUsageBit.DEVICE,
+                65535 * Uint16Array.BYTES_PER_ELEMENT * 2,
+                Uint16Array.BYTES_PER_ELEMENT,
+            ));
+
+            const renderMesh = new RenderingSubMesh([vertexBuffer], attrs, PrimitiveMode.TRIANGLE_LIST, indexBuffer);
+            renderMesh.subMeshIdx = 0;
+
+            const mat = builtinResMgr.get<Material>('default-spine2d-material');
+            model.initSubModel(idx, renderMesh, mat);
+            model.enabled = true;
+        }
     }
 }

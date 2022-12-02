@@ -1,8 +1,12 @@
 import { SkeletonData } from '../skeleton-data';
+import { Model } from '../../core/renderer/scene';
 
 export class Skeleton2DImplement {
     public init () {
 
+    }
+    get isInit () {
+        return true;
     }
 
     public releaseSkeletonData () {
@@ -17,7 +21,7 @@ export class Skeleton2DImplement {
 
     }
 
-    public render () {
+    public updateModel (model : Model) {
 
     }
 }

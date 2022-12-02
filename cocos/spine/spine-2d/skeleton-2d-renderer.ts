@@ -29,6 +29,10 @@ import { Skeleton2DImplement } from './skeleton-2d-impl';
 import { Skeleton2DNativeImpl } from './skeleton-2d-native';
 import { Skeleton2DWasmImpl } from './skeleton-2d-wasm';
 import { ModelRenderer } from '../../core';
+import { Model } from '../../core/renderer/scene';
+import { Root } from '../../core/root';
+import { legacyCC } from '../../core/global-exports';
+import { ModelLocalBindings } from '../../core/pipeline/define';
 
 export enum SkelSkinsEnum {
     default = 0,
@@ -106,13 +110,13 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public __preload () {
-        console.log('imply.init()');
         if (JSB) {
             this._imply = new Skeleton2DNativeImpl();
         } else {
             this._imply = new Skeleton2DWasmImpl();
         }
         this._imply.init();
+        console.log('imply.init() done');
     }
 
     public onLoad () {
@@ -123,21 +127,23 @@ export class Skeleton2DRenderer extends ModelRenderer {
 
     }
 
+    private frameCount = 0;
     public update (dt: number) {
-        if (EDITOR) return;
-        if (!this._imply) return;
-        this._imply.updateRenderData();
-    }
-
-    public lateUpdate (dt: number) {
-        if (EDITOR) return;
-        if (!this._imply) return;
-        this._imply.render();
+        // if (EDITOR) return;
+        // if (!this._imply) return;
+        // if (!this._imply.isInit) return;
+        // this.frameCount++;
+        // if (this.frameCount === 1) {
+        //     this._imply.updateSkeletonData(this._skeletonData!);
+        // }
+        // this._imply.updateRenderData();
+        // this._imply.updateModel(this._models[0]);
+        // this.onUpdateLocalDescriptorSet();
     }
 
     public onEnable () {
-        if (!this._imply) return;
-        this._imply.updateSkeletonData(this._skeletonData!);
+        // this._createModel();
+        // this._attachToScene();
     }
 
     public onDisable () {
@@ -146,5 +152,41 @@ export class Skeleton2DRenderer extends ModelRenderer {
 
     public onDestroy () {
 
+    }
+
+    protected _createModel () {
+        const model = (legacyCC.director.root as Root).createModel<Model>(Model);
+        this._models.push(model);
+        model.visFlags = this.visibility;
+        model.node = model.transform = this.node;
+    }
+
+    protected _attachToScene () {
+        if (!this.node.scene || this._models.length < 1) {
+            return;
+        }
+        const renderScene = this._getRenderScene();
+        if (this._models[0].scene !== null) {
+            this._detachFromScene();
+        }
+        renderScene.addModel(this._models[0]);
+    }
+
+    protected _detachFromScene () {
+        if (this._models.length > 0 && this._models[0].scene) {
+            this._models[0].scene.removeModel(this._models[0]);
+        }
+    }
+
+    protected onUpdateLocalDescriptorSet () {
+        const subModels = this._models[0].subModels;
+        const binding = ModelLocalBindings.SAMPLER_SPRITE;
+        for (let i = 0; i < subModels.length; i++) {
+            const { descriptorSet } = subModels[i];
+            const texture = this._texture!;
+            descriptorSet.bindTexture(binding, texture.getGFXTexture()!);
+            descriptorSet.bindSampler(binding, texture.getGFXSampler()!);
+            descriptorSet.update();
+        }
     }
 }

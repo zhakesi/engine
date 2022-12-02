@@ -110,21 +110,20 @@ function receiveInstantiationResult (result) {
     wasmUtil.spineWasmUtilInit();
 }
 
-export function promiseForSpineInstantiation () {
+export async function promiseForSpineInstantiation () {
     const info = {
         env: asmLibraryArg,
         wasi_snapshot_preview1: asmLibraryArg,
     };
 
-    return new Promise<void>((resolve, reject) => {
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        WebAssembly.instantiateStreaming(fetch(spineWasmUrl), info).then(
-            (results) => {
-                receiveInstantiationResult(results);
-                resolve();
-            },
-        );
-    });
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    const response = await fetch(spineWasmUrl);
+    const bytes = await response.arrayBuffer();
+    await WebAssembly.instantiate(bytes, info).then(
+        (results) => {
+            receiveInstantiationResult(results);
+        },
+    );
 }
 
 export function getSpineSpineWasmUtil () {
