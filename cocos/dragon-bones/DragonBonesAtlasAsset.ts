@@ -45,10 +45,12 @@ export class DragonBonesAtlasAsset extends Asset {
         super();
         this._clear();
     }
-
+    /**
+     * @en atlas of json file.
+     * @zh 纹理图集的json文件。
+     */
     @serializable
     _atlasJson = '';
-
     get atlasJson () {
         return this._atlasJson;
     }
@@ -57,6 +59,10 @@ export class DragonBonesAtlasAsset extends Asset {
         this._atlasJsonData = JSON.parse(this.atlasJson);
         this._clear();
     }
+    /**
+     * @en 2D Texture.
+     * @zh 2D纹理。
+     */
     @serializable
     @type(Texture2D)
     _texture: Texture2D | null = null;
@@ -75,7 +81,10 @@ export class DragonBonesAtlasAsset extends Asset {
         this._texture = value;
         this._clear();
     }
-
+    /**
+     * @en The texture atlas data.
+     * @zh 贴图集数据。
+     */
     @serializable
     _textureAtlasData: TextureAtlasData | null = null;
 

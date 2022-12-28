@@ -142,12 +142,14 @@ interface BoneIndex extends Number {
  * Armature Display has a reference to a DragonBonesAsset and stores the state for ArmatureDisplay instance,
  * which consists of the current pose's bone SRT, slot colors, and which slot attachments are visible. <br/>
  * Multiple Armature Display can use the same DragonBonesAsset which includes all animations, skins, and attachments. <br/>
+ * Cocos Creator supports DragonBones version to 5.6.300.
  * @zh
  * DragonBones 骨骼动画 <br/>
  * <br/>
  * Armature Display 具有对骨骼数据的引用并且存储了骨骼实例的状态，
  * 它由当前的骨骼动作，slot 颜色，和可见的 slot attachments 组成。<br/>
  * 多个 Armature Display 可以使用相同的骨骼数据，其中包括所有的动画，皮肤和 attachments。<br/>
+ * Cocos Creator 支持 DragonBones 版本最高到 v5.6.300.
  *
  * @class ArmatureDisplay
  * @extends RenderComponent
@@ -426,13 +428,31 @@ export class ArmatureDisplay extends UIRenderer {
             this._frameCache.enableCacheAttachedInfo();
         }
     }
-
+    /**
+     * @en
+     * The socket nodes contains the attached node be registered Synchronous motion
+     * transformation with bones.
+     * @zh
+     * Socket nodes存储挂载到骨骼上的节点，可以随骨骼做同步运动变换。
+     */
     get socketNodes () { return this._socketNodes; }
-
-    /* protected */ _armature: Armature | null = null;
-
+    /**
+     * @en
+     * The armature is the core of the skeletal animation system.
+     * @zh
+     * 骨架是骨骼动画系统的核心。
+     */
+    _armature: Armature | null = null;
+    /**
+     * @en
+     * The tool for mounting functionality.
+     * @zh
+     * 挂载工具。
+     */
     public attachUtil: AttachUtil;
-
+    /**
+     * @internal since v3.7.0 this is an engine private function.
+     */
     get drawList () { return this._drawList; }
 
     @serializable
@@ -530,7 +550,7 @@ export class ArmatureDisplay extends UIRenderer {
     protected _sockets: DragonBoneSocket[] = [];
 
     private _inited;
-    private _drawInfoList : RenderDrawInfo[] = [];
+    private _drawInfoList: RenderDrawInfo[] = [];
     private requestDrawInfo (idx: number) {
         if (!this._drawInfoList[idx]) {
             this._drawInfoList[idx] = new RenderDrawInfo();
@@ -553,23 +573,23 @@ export class ArmatureDisplay extends UIRenderer {
         setEnumAttr(this, '_defaultArmatureIndex', this._enumArmatures);
         this._useVertexOpacity = true;
     }
-
+    /**
+     * @en
+     * Gets the instance of CCFactory, CCFactory can create instance of Armature.
+     * @zh
+     * 获取工厂实例，工厂实例可以创建骨架实例。
+     */
     initFactory () {
         this._factory = CCFactory.getInstance();
     }
-
+    /**
+     * @en
+     * Called before the component is loaded.
+     * @zh
+     * 组件被加载时调用。
+     */
     onLoad () {
         super.onLoad();
-        // Adapt to old code,remove unuse child which is created by old code.
-        // This logic can be remove after 2.2 or later.
-        const children = this.node.children;
-        for (let i = 0, n = children.length; i < n; i++) {
-            const child = children[i];
-            const pos = child.name && child.name.search('CHILD_ARMATURE-');
-            if (pos === 0) {
-                child.destroy();
-            }
-        }
     }
 
     /**
@@ -583,19 +603,27 @@ export class ArmatureDisplay extends UIRenderer {
         draw.indexCount = indexCount;
         return draw;
     }
-
+    /**
+     * @en
+     * Destroy render data，called when need to rebuild render data or component is destroyed.
+     * @zh
+     * 销毁渲染数据，一般在重新生成渲染数据时或销毁组件时调用。
+     */
     public destroyRenderData () {
         this._drawList.reset();
         super.destroyRenderData();
     }
 
-    private getMaterialTemplate () : Material {
+    private getMaterialTemplate (): Material {
         if (this.customMaterial !== null) return this.customMaterial;
         if (this.material) return this.material;
         this.updateMaterial();
         return this.material!;
     }
 
+    /**
+     * @internal since v3.7.0 this is an engine private function.
+     */
     public getMaterialForBlend (src: BlendFactor, dst: BlendFactor): MaterialInstance {
         const key = `${src}/${dst}`;
         let inst = this._materialCache[key];
@@ -675,7 +703,12 @@ export class ArmatureDisplay extends UIRenderer {
         super.__preload();
         this._init();
     }
-
+    /**
+     * @en
+     * Initialize asset data and internal data within the component.
+     * @zh
+     * 初始化资产数据以及组件内部数据。
+     */
     _init () {
         if (EDITOR && !cclegacy.GAME_VIEW) {
             const Flags = CCObject.Flags;
@@ -757,7 +790,11 @@ export class ArmatureDisplay extends UIRenderer {
         if (EDITOR && !cclegacy.GAME_VIEW) return false;
         return this._cacheMode !== AnimationCacheMode.REALTIME;
     }
-
+    /**
+     * @en Be called when the component state becomes available.
+     * instance of ArmatureDisplay will be added into ArmatureSystem.
+     * @zh 组件状态变为可用时调用。ArmatureDisplay实例将被添加到ArmatureSystem。
+     */
     onEnable () {
         super.onEnable();
         // If cache mode is cache, no need to update by dragonbones library.
@@ -767,7 +804,11 @@ export class ArmatureDisplay extends UIRenderer {
         this._flushAssembler();
         ArmatureSystem.getInstance().add(this);
     }
-
+    /**
+     * @en Be called when the component state becomes invalid.
+     * instance of ArmatureDisplay will be removed from ArmatureSystem.
+     * @zh 组件状态变为不可用时调用。ArmatureDisplay实例将被从ArmatureSystem移除。
+     */
     onDisable () {
         super.onDisable();
         // If cache mode is cache, no need to update by dragonbones library.
@@ -776,7 +817,9 @@ export class ArmatureDisplay extends UIRenderer {
         }
         ArmatureSystem.getInstance().remove(this);
     }
-
+    /**
+     * @internal since v3.7.0 this is an engine private function.
+     */
     _emitCacheCompleteEvent () {
         // Animation loop complete, the event diffrent from dragonbones inner event,
         // It has no event object.
@@ -786,7 +829,11 @@ export class ArmatureDisplay extends UIRenderer {
         // It has no event object.
         this._eventTarget.emit(EventObject.COMPLETE);
     }
-
+    /**
+     * @en Update animation frame.
+     * @zh 跟新动画序列。
+     * @param {number} dt @en delta time @zh 时间差
+     */
     updateAnimation (dt) {
         this.markForUpdateRenderData();
         if (!this.isAnimationCached()) return;
@@ -863,7 +910,10 @@ export class ArmatureDisplay extends UIRenderer {
         this._curFrame = frames[frameIdx];
         this.attachUtil._syncAttachedNode();
     }
-
+    /**
+     * @en Destroy component, release resource.
+     * @zh 销毁组件时调用，释放相关资源。
+     */
     onDestroy () {
         this._materialInstances = this._materialInstances.filter((instance) => !!instance);
         this._inited = false;
@@ -887,7 +937,9 @@ export class ArmatureDisplay extends UIRenderer {
         this._drawList.destroy();
         super.onDestroy();
     }
-
+    /**
+     * @internal since v3.7.0 this is an engine private function.
+     */
     _updateDebugDraw () {
         if (this.debugBones) {
             if (!this._debugDraw) {
@@ -906,12 +958,18 @@ export class ArmatureDisplay extends UIRenderer {
         }
         this.markForUpdateRenderData();
     }
-
+    /**
+     * @en Update related data due to batching settings.
+     * @zh 更新由于合批设置导致的相关数据。
+     */
     protected _updateBatch () {
         this._cleanMaterialCache();
         this.markForUpdateRenderData();
     }
-
+    /**
+     * @en Building data of armature.
+     * @zh 构建骨架数据。
+     */
     _buildArmature () {
         if (!this.dragonAsset || !this.dragonAtlasAsset || !this.armatureName) return;
 
@@ -986,7 +1044,10 @@ export class ArmatureDisplay extends UIRenderer {
         }
         this._flushAssembler();
     }
-
+    /**
+     * @en Get sockets binding on this component.
+     * @zh 获取绑定在本组件上的socket。
+     */
     public querySockets () {
         if (!this._armature) {
             return [];
@@ -1012,12 +1073,17 @@ export class ArmatureDisplay extends UIRenderer {
         return ret;
     }
 
+    /**
+     * @internal since v3.7.0 this is an engine private function.
+     */
     _parseDragonAtlasAsset () {
         if (this.dragonAtlasAsset) {
             this.dragonAtlasAsset.init(this._factory!);
         }
     }
-
+    /**
+     * @internal since v3.7.0 this is an engine private function.
+     */
     _refresh () {
         this._buildArmature();
         this._indexBoneSockets();
@@ -1044,6 +1110,9 @@ export class ArmatureDisplay extends UIRenderer {
     }
 
     // update animation list for editor
+    /**
+     * @internal since v3.7.0 this is an engine private function.
+     */
     _updateAnimEnum () {
         let animEnum;
         if (this.dragonAsset) {
@@ -1060,6 +1129,9 @@ export class ArmatureDisplay extends UIRenderer {
     }
 
     // update armature list for editor
+    /**
+     * @internal since v3.7.0 this is an engine private function.
+     */
     _updateArmatureEnum () {
         let armatureEnum;
         if (this.dragonAsset) {
@@ -1074,7 +1146,9 @@ export class ArmatureDisplay extends UIRenderer {
         // change enum
         setEnumAttr(this, '_defaultArmatureIndex', this._enumArmatures);
     }
-
+    /**
+     * @internal since v3.7.0 this is an engine private function.
+     */
     _indexBoneSockets () {
         if (!this._armature) {
             return;
@@ -1382,7 +1456,10 @@ export class ArmatureDisplay extends UIRenderer {
         renderEntity.setUseLocal(false);
         return renderEntity;
     }
-
+    /**
+     * @en Sets flag for update render data.
+     * @zh 标记组件渲染数据更新。
+     */
     public markForUpdateRenderData (enable = true) {
         super.markForUpdateRenderData(enable);
         if (this._debugDraw) {

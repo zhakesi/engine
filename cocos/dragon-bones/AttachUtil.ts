@@ -32,35 +32,44 @@ const _tempMat4 = new Mat4();
 const { ccclass } = _decorator;
 
 /**
- * @en Attach node tool
- * @zh 挂点工具类
+ * @en Attach node tool.
+ * @zh 挂点工具类。
  * @class dragonBones.AttachUtil
  */
 
 @ccclass('dragonBones.AttachUtil')
 export class AttachUtil {
-    _inited = false;
-    _armature: Armature | null = null;
-    _armatureNode: Node | null = null;
-    _armatureDisplay: ArmatureDisplay | null = null;
+    private _inited = false;
+    private _armature: Armature | null = null;
+    private _armatureNode: Node | null = null;
+    private _armatureDisplay: ArmatureDisplay | null = null;
     constructor () {
 
     }
-
+    /**
+     * @en Initialize parameter settings.
+     * @zh 初始化参数设置。
+     */
     init (armatureDisplay: ArmatureDisplay) {
         this._inited = true;
         this._armature = armatureDisplay._armature;
         this._armatureNode = armatureDisplay.node;
         this._armatureDisplay = armatureDisplay;
     }
-
+    /**
+     * @en Reset parameter settings.
+     * @zh 重置参数设置。
+     */
     reset () {
         this._inited = false;
         this._armature = null;
         this._armatureNode = null;
         this._armatureDisplay = null;
     }
-
+    /**
+     * @en Synchronize transformation of nodes attached to bones.
+     * @zh 同步变换附着在骨骼上节点。
+     */
     _syncAttachedNode () {
         if (!this._inited) return;
         const rootMatrix = this._armatureNode!.worldMatrix;
@@ -116,5 +125,5 @@ export class AttachUtil {
 }
 
 interface NodeExt extends Node{
-    _oldScale?:Vec3;
+    _oldScale?: Vec3;
 }

@@ -39,6 +39,7 @@ const { ccclass } = _decorator;
  * DragonBones factory
  * @class CCFactory
  * @extends BaseFactory
+ * @internal
  * @deprecated since v3.5.1, this is an engine private interface that will be removed in the future.
 */
 @ccclass('CCFactory')

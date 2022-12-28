@@ -22,6 +22,10 @@
  THE SOFTWARE.
 */
 
+/**
+ * @internal since v3.7, this is an engine private enum type.
+ * @deprecated since v3.7, will be removed in the future.
+ */
 export enum ExtensionType {
     FFD = 0,
     AdjustColor = 10,
@@ -32,12 +36,18 @@ export enum ExtensionType {
     GradientBevelFilter = 15,
     GradientGlowFilter = 16
 }
-
+/**
+ * @internal since v3.7, this is an engine private enum type.
+ * @deprecated since v3.7, will be removed in the future.
+ */
 export enum EventType {
     Frame = 0,
     Sound = 1
 }
-
+/**
+ * @internal since v3.7, this is an engine private enum type.
+ * @deprecated since v3.7, will be removed in the future.
+ */
 export enum AnimationFadeOutMode {
     None = 0,
     SameLayer = 1,

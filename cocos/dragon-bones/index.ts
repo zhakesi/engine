@@ -22,6 +22,10 @@
  THE SOFTWARE.
 */
 
+/**
+ * @internal since v3.7, this is an engine private enum type.
+ * @deprecated since v3.7, will be removed in the future.
+ */
 export enum ExtensionType {
     FFD = 0,
     AdjustColor = 10,
@@ -33,20 +37,19 @@ export enum ExtensionType {
     GradientGlowFilter = 16
 }
 
+/**
+ * @internal since v3.7, this is an engine private enum type.
+ * @deprecated since v3.7, will be removed in the future.
+ */
 export enum EventType {
     Frame = 0,
     Sound = 1
 }
 
-// export enum ActionType {
-//     Play = 0,
-//     Stop = 1,
-//     GotoAndPlay = 2,
-//     GotoAndStop = 3,
-//     FadeIn = 4,
-//     FadeOut = 5
-// }
-
+/**
+ * @internal since v3.7, this is an engine private enum type.
+ * @deprecated since v3.7, will be removed in the future.
+ */
 export enum AnimationFadeOutMode {
     None = 0,
     SameLayer = 1,
@@ -54,11 +57,6 @@ export enum AnimationFadeOutMode {
     SameLayerAndGroup = 3,
     All = 4
 }
-
-// export enum BoneType {
-//     Bone = 0,
-//     Surface = 1
-// }
 
 export * from './CCFactory';
 export * from './CCSlot';

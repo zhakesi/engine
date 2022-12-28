@@ -67,7 +67,9 @@ export class DragonBonesAsset extends Asset {
     constructctor () {
         this.reset();
     }
-
+    /**
+     * @internal since v3.7, this is an engine private function.
+     */
     createNode (callback: (err: Error | null, node: Node) => void) {
         const node = new Node(this.name);
         const armatureDisplay = node.addComponent('dragonBones.ArmatureDisplay') as any;
@@ -75,14 +77,26 @@ export class DragonBonesAsset extends Asset {
 
         return callback(null, node);
     }
-
+    /**
+     * @en
+     * reset DragonBonesAsset data and state.
+     * @zh
+     * 重置DragonBonesAsset数据和状态。
+     */
     reset () {
         this._clear();
         if (EDITOR && !cclegacy.GAME_VIEW) {
             this._armaturesEnum = null;
         }
     }
-
+    /**
+     * @en
+     * Initialize with altas uuid.
+     * @zh
+     * 使用uuid初始化DragonBonesAsset资产数据。
+     * @param {CCFactory} factory @en CCFactory @zh 工厂类
+     * @param {string} atlasUUID @en atlas uuid @zh atlas uuid
+     */
     init (factory?: CCFactory, atlasUUID?: string) {
         this._factory = factory || CCFactory.getInstance();
 
@@ -90,7 +104,7 @@ export class DragonBonesAsset extends Asset {
             this._dragonBonesJsonData = JSON.parse(this.dragonBonesJson);
         }
 
-        let rawData:any = null;
+        let rawData: any = null;
         if (this._dragonBonesJsonData) {
             rawData = this._dragonBonesJsonData;
         } else {
@@ -111,12 +125,15 @@ export class DragonBonesAsset extends Asset {
         const dragonBonesData = this._factory.getDragonBonesData(armatureKey);
         if (dragonBonesData) return armatureKey;
 
+        // eslint-disable-next-line max-len
         this._factory.parseDragonBonesData(rawData instanceof ArrayBuffer ? rawData : (rawData.buffer instanceof ArrayBuffer ? rawData.buffer : rawData), armatureKey);
         return armatureKey;
     }
 
     // EDITOR
-
+    /**
+     * @internal since v3.7, this is an engine private function.
+     */
     getArmatureEnum (): any {
         if (this._armaturesEnum) {
             return this._armaturesEnum as unknown as any;
@@ -134,7 +151,9 @@ export class DragonBonesAsset extends Asset {
         }
         return null;
     }
-
+    /**
+     * @internal since v3.7, this is an engine private function.
+     */
     public getAnimsEnum (armatureName: string) {
         this.init();
         const dragonBonesData = this._factory!.getDragonBonesDataByUUID(this._uuid);
@@ -158,7 +177,12 @@ export class DragonBonesAsset extends Asset {
         }
         return null;
     }
-
+    /**
+     * @en
+     * Destroy DragonBonesAsset data。
+     * @zh
+     * 销毁DragonBonesAsset资产数据
+     */
     public destroy () {
         this._clear();
         return super.destroy();
