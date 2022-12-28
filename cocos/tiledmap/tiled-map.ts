@@ -46,7 +46,9 @@ interface ImageExtendedNode extends Node {
 
 /**
  * @en Renders a TMX Tile Map in the scene.
+ * Cocos Creator recommends using Tiled version 1.4.0，you can still try a higher version.
  * @zh 在场景中渲染一个 tmx 格式的 Tile Map。
+ * Cocos Creator推荐使用v1.4.0版本的Tiled编辑器，不过你仍然可以尝试更高版本的编辑器制作地图素材。
  * @class TiledMap
  * @extends Component
  */
@@ -317,6 +319,12 @@ export class TiledMap extends Component {
         this.node.off(NodeEventType.ANCHOR_CHANGED, this._syncAnchorPoint, this);
     }
 
+    /**
+     * @en
+     * Apply tmx file to build tiled map.
+     * @zh
+     * 应用地图文件创建地图数据。
+     */
     _applyFile () {
         const spriteFrames: SpriteFrame[] = [];
         const spriteFramesCache = {};
@@ -371,6 +379,12 @@ export class TiledMap extends Component {
         }
     }
 
+    /**
+     * @en
+     * Release resource of map information.
+     * @zh
+     * 释放地图资源数据。
+     */
     _releaseMapInfo () {
         // remove the layers & object groups added before
         const layers = this._layers;
@@ -397,6 +411,12 @@ export class TiledMap extends Component {
         images.length = 0;
     }
 
+    /**
+     * @en
+     * Synchronize anchor position.
+     * @zh
+     * 同步锚点位置。
+     */
     _syncAnchorPoint () {
         const anchor = this.node._uiProps.uiTransformComp!.anchorPoint;
         const leftTopX = this.node._uiProps.uiTransformComp!.width * anchor.x;
@@ -432,7 +452,9 @@ export class TiledMap extends Component {
             this._images[i].setPosition(x, y);
         }
     }
-
+    /**
+     * @internal since v3.7.0 this is an engine private function.
+     */
     _fillAniGrids (texGrids: TiledTextureGrids, animations: TiledAnimationType) {
         for (const i of animations.keys()) {
             const animation = animations.get(i);
@@ -444,7 +466,12 @@ export class TiledMap extends Component {
             }
         }
     }
-
+    /**
+     * @en
+     * Build Information data of tiled layer and group.
+     * @zh
+     * 创建图层和组的数据。
+     */
     _buildLayerAndGroup () {
         const tilesets = this._tilesets;
         const texGrids = this._texGrids;
@@ -602,7 +629,12 @@ export class TiledMap extends Component {
             });
         }
     }
-
+    /**
+     * @en
+     * Release images cache of textures resources.
+     * @zh
+     * 清除释放纹理的图像数据。
+     */
     doCleanupImageCache (texture) {
         if (texture._image instanceof HTMLImageElement) {
             texture._image.src = '';

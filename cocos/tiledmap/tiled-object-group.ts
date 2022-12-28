@@ -30,7 +30,8 @@ import { Label } from '../2d/components/label';
 import { BlendFactor } from '../gfx';
 
 import { TMXMapInfo } from './tmx-xml-parser';
-import { TiledTextureGrids, GID, TileFlag, Orientation, StaggerAxis, TMXObjectType, PropertiesInfo, TiledAnimationType, TMXObject, TMXObjectGroupInfo } from './tiled-types';
+import { TiledTextureGrids, GID, TileFlag, Orientation, StaggerAxis, TMXObjectType, PropertiesInfo,
+    TiledAnimationType, TMXObject, TMXObjectGroupInfo } from './tiled-types';
 import { UITransform } from '../2d/framework/ui-transform';
 import { CCBoolean, Vec2, Color, CCObject } from '../core';
 import { SpriteFrame } from '../2d/assets';
@@ -52,7 +53,7 @@ export class TiledObjectGroup extends Component {
     get premultiplyAlpha () {
         return this._premultiplyAlpha;
     }
-    set premultiplyAlpha (value:boolean) {
+    set premultiplyAlpha (value: boolean) {
         this._premultiplyAlpha = value;
     }
 
@@ -112,7 +113,7 @@ export class TiledObjectGroup extends Component {
      * @example
      * let object = tMXObjectGroup.getObject("Group");
      */
-    public getObject (objectName:string) {
+    public getObject (objectName: string) {
         for (let i = 0, len = this._objects.length; i < len; i++) {
             const obj = this._objects[i];
             if (obj && obj.name === objectName) {

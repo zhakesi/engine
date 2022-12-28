@@ -53,6 +53,12 @@ const _vec3_temp = new Vec3();
 const _vec3_temp2 = new Vec3();
 const _tempRowCol = { row: 0, col: 0 };
 
+/**
+ * @en
+ * User node data，used for adding user node on tiled layer.
+ * @zh
+ * 用户节点数据，可用于在layer上添加用户节点。
+ */
 @ccclass('cc.TiledUserNodeData')
 export class TiledUserNodeData extends Component {
     _index = -1;
@@ -88,7 +94,10 @@ export class TiledLayer extends UIRenderer {
     protected _userNodeMap: { [key: string]: TiledUserNodeData } = {};// [id] = node;
     protected _userNodeDirty = false;
 
-    // store the layer tiles node, index is caculated by 'x + width * y', format likes '[0]=tileNode0,[1]=tileNode1, ...'
+    /**
+     * @en store the layer tiles node, index is caculated by 'x + width * y', format likes '[0]=tileNode0,[1]=tileNode1, ...'.
+     * @zh 存储图层上的瓦片节点，序号计算方式为 'x + width * y'。
+    */
     public tiledTiles: (TiledTile | null)[] = [];
 
     // // store the layer tilesets index array
@@ -117,10 +126,16 @@ export class TiledLayer extends UIRenderer {
     protected _leftOffset = 0;
     protected _rightOffset = 0;
 
-    // store the layer tiles, index is caculated by 'x + width * y', format likes '[0]=gid0,[1]=gid1, ...'
+    /**
+     * @en store the layer tiles, index is caculated by 'x + width * y', format likes '[0]=gid0,[1]=gid1, ...'.
+     * @zh 存储图层上的瓦片，序号计算方式为 'x + width * y'。
+    */
     public tiles: MixedGID[] = [];
 
-    // vertex array
+    /**
+     * @en vertex array.
+     * @zh 顶点数组。
+    */
     public vertices: { minCol: number, maxCol: number, [key: number]: { left: number, bottom: number, index: number } }[] = [];
     // vertices dirty
     protected _verticesDirty = true;
@@ -137,7 +152,10 @@ export class TiledLayer extends UIRenderer {
     protected _opacity?: number;
     protected _tintColor?: Color;
 
-    // store all layer gid corresponding texture info, index is gid, format likes '[gid0]=tex-info,[gid1]=tex-info, ...'
+    /**
+     * @en store all layer grid corresponding texture info, index is gid, format likes '[gid0]=tex-info,[gid1]=tex-info, ...'
+     * @zh 根据纹理信息存储所有图块数据，序号为gid。
+    */
     public texGrids: TiledTextureGrids | null = null;
     // store all tileset texture, index is tileset index, format likes '[0]=texture0, [1]=texture1, ...'
     protected _textures: SpriteFrame[] = [];
@@ -152,10 +170,17 @@ export class TiledLayer extends UIRenderer {
 
     // switch of culling
     protected _enableCulling?: boolean;
-
+    /**
+     * @internal
+     * @deprecated since v3.7, will be removed in the future.
+     */
     public colorChanged = false;
 
     protected _properties?: PropertiesInfo;
+    /**
+     * @en Render order. Can be [RightDown, RightUp, LeftDown, LeftUp]
+     * @zh 渲染顺序，可选值包括[右下，右上，左下，左上]
+    */
     public renderOrder?: RenderOrder;
     protected _staggerAxis?: StaggerAxis;
     protected _staggerIndex?: StaggerIndex;
@@ -175,7 +200,7 @@ export class TiledLayer extends UIRenderer {
     get leftDownToCenterX () { return this._leftDownToCenterX; }
     get leftDownToCenterY () { return this._leftDownToCenterY; }
 
-    private _drawInfoList : RenderDrawInfo[] = [];
+    private _drawInfoList: RenderDrawInfo[] = [];
     private requestDrawInfo (idx: number) {
         if (!this._drawInfoList[idx]) {
             this._drawInfoList[idx] = new RenderDrawInfo();
@@ -187,17 +212,23 @@ export class TiledLayer extends UIRenderer {
     constructor () {
         super();
     }
-
+    /**
+     * @en Whether contain Tiled Tile Node.
+     * @zh 是否包含瓦片节点。
+    */
     public hasTiledNode () {
         return this._hasTiledNodeGrid;
     }
-
+    /**
+     * @en Whether contain Animation Tile.
+     * @zh 是否包含动画。
+    */
     public hasAnimation () {
         return this._hasAniGrid;
     }
 
     /**
-      * @en enable or disable culling
+      * @en enable or disable culling.
       * @zh 开启或关闭裁剪。
       * @method enableCulling
       * @param value
@@ -282,13 +313,19 @@ export class TiledLayer extends UIRenderer {
         out.x = nodePos.x + this._leftDownToCenterX;
         out.y = nodePos.y + this._leftDownToCenterY;
     }
-
+    /**
+      * @en Get user nodes by row and col.
+      * @zh 根据行和列获取对应位置的用户节点。
+      */
     public getNodesByRowCol (row: number, col: number) {
         const rowData = this._userNodeGrid[row];
         if (!rowData) return null;
         return rowData[col];
     }
-
+    /**
+      * @en Get user nodes count in specified row.
+      * @zh 获取指定行上的用户节点数量。
+      */
     public getNodesCountByRow (row) {
         const rowData = this._userNodeGrid[row];
         if (!rowData) return 0;
@@ -391,11 +428,17 @@ export class TiledLayer extends UIRenderer {
         colData.list.push(dataComp);
         this._userNodeDirty = true;
     }
-
+    /**
+      * @en Is user node state dirty.
+      * @zh 用户节点状态是否被修改。
+      */
     public isUserNodeDirty () {
         return this._userNodeDirty;
     }
-
+    /**
+      * @en Set user node state dirty.
+      * @zh 设置用户节点状态为被修改。
+      */
     public setUserNodeDirty (value) {
         this._userNodeDirty = value;
     }
@@ -446,7 +489,7 @@ export class TiledLayer extends UIRenderer {
 
     /**
       * @en Set the layer name.
-      * @zh 设置层的名称
+      * @zh 设置层的名称。
       * @method setLayerName
       * @param {String} layerName
       * @example
@@ -503,7 +546,10 @@ export class TiledLayer extends UIRenderer {
         }
         return null;
     }
-
+    /**
+     * @en Check the position(x,y) is in range of layer size.
+     * @zh 检查坐标(x,y)所在位置是否在layer的有效区域内。
+     */
     public isInvalidPosition (x: number, y: number) {
         return x >= this._layerSize!.width || y >= this._layerSize!.height || x < 0 || y < 0;
     }
@@ -590,7 +636,7 @@ export class TiledLayer extends UIRenderer {
       * @en
       * Sets the tiles gid (gid = tile global id) at a given tiles rect.
       * @zh
-      * 设置给定区域的 tile 的 gid (gid = tile 全局 id)，
+      * 设置给定区域的 tile 的 gid (gid = tile 全局 id)。
       * @method setTilesGIDAt
       * @param {Array} gids an array contains gid
       * @param {Number} beginCol begin col number
@@ -727,17 +773,26 @@ export class TiledLayer extends UIRenderer {
 
         return ((tile & TileFlag.FLIPPED_ALL) >>> 0) as unknown as GIDFlags;
     }
-
+    /**
+     * @en Set culling flag is dirty.
+     * @zh 设置裁切状态藏标记。
+     */
     public setCullingDirty (value: boolean) {
         this._cullingDirty = value;
     }
-
+    /**
+     * @en Check culling flag is dirty.
+     * @zh 检查裁切状态藏标记。
+     */
     public isCullingDirty (): boolean {
         return this._cullingDirty;
     }
 
-    // 'x, y' is the position of viewPort, which's anchor point is at the center of rect.
-    // 'width, height' is the size of viewPort.
+    /**
+     * @en 'x, y' is the position of viewPort, which's anchor point is at the center of rect.
+     * 'width, height' is the size of viewPort.
+     * @zh x,y为视口的锚点，width,height为视口宽高。
+     */
     public updateViewPort (x: number, y: number, width: number, height: number): void {
         if (this._viewPort.width === width
              && this._viewPort.height === height
@@ -850,7 +905,10 @@ export class TiledLayer extends UIRenderer {
         result.col = col;
         return result;
     }
-
+    /**
+     * @en Update rendering data based on the new culling settings.
+     * @zh 根据新的裁切设置生成更新渲染数据。
+     */
     public updateCulling () {
         if (EDITOR && !legacyCC.GAME_VIEW) {
             this.enableCulling = false;
@@ -1298,7 +1356,15 @@ export class TiledLayer extends UIRenderer {
         }
         this._prepareToRender();
     }
-
+    /**
+      * @en Tiled layer initialize Data.
+      * @zh 图层初始化数据。
+      * @param {TMXLayerInfo} layerInfo
+      * @param {TMXMapInfo} mapInfo
+      * @param {TMXTilesetInfo} tilesets
+      * @param {SpriteFrame} textures
+      * @param {TiledTextureGrids} texGrids
+      */
     public init (layerInfo: TMXLayerInfo, mapInfo: TMXMapInfo, tilesets: TMXTilesetInfo[], textures: SpriteFrame[], texGrids: TiledTextureGrids) {
         this._cullingDirty = true;
         this._layerInfo = layerInfo;
@@ -1378,7 +1444,9 @@ export class TiledLayer extends UIRenderer {
         this._updateVertices();
         this._updateAllUserNode();
     }
-
+    /**
+     * @internal since v3.7.0. This is an engine private function.
+     */
     public requestTiledRenderData () {
         const arr = this._tiledDataArray as any[];
         while (arr.length > 0 && arr[arr.length - 1].subNodes && arr[arr.length - 1].subNodes.length === 0) {
@@ -1394,7 +1462,9 @@ export class TiledLayer extends UIRenderer {
         this._tiledDataArray.push(comb);
         return (comb as TiledRenderData);
     }
-
+    /**
+     * @internal since v3.7.0. This is an engine private function.
+     */
     public requestSubNodesData () {
         const arr = this._tiledDataArray as any[];
         if (arr.length > 0) {
@@ -1407,7 +1477,10 @@ export class TiledLayer extends UIRenderer {
         this._tiledDataArray.push(comb);
         return comb;
     }
-
+    /**
+      * @en Destroy render data. Generally called when the component is being destroyed.
+      * @zh 销毁渲染数据, 一般在组件销毁时调用。
+      */
     public destroyRenderData () {
         this._tiledDataArray.forEach((rd) => {
             const renderData = (rd as TiledRenderData).renderData;
@@ -1431,9 +1504,9 @@ export class TiledLayer extends UIRenderer {
 
     /**
       * @en
-      * Index of mesh render data array
+      * Index of mesh render data array.
       * @zh
-      * 网格渲染数据数组的索引
+      * 网格渲染数据数组的索引。
       * @deprecated since v3.5.0, this is an engine private interface that will be removed in the future.
       */
     public _tiledDataArrayIdx = 0;
@@ -1456,7 +1529,9 @@ export class TiledLayer extends UIRenderer {
         }
         this.node._static = true;
     }
-
+    /**
+     * @internal since v3.7.0. This is an engine private function.
+     */
     protected createRenderEntity () {
         return new RenderEntity(RenderEntityType.CROSSED);
     }
@@ -1481,7 +1556,9 @@ export class TiledLayer extends UIRenderer {
         renderData.chunk.meshBuffer.indexOffset = indexOffset;
         drawInfo.setIBCount(quadCount * 6);
     }
-
+    /**
+     * @internal since v3.7.0. This is an engine private function.
+     */
     public prepareDrawData () {
         this._drawInfoList.length = 0;
         const entity = this.renderEntity;

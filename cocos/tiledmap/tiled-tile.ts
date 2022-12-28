@@ -40,6 +40,11 @@ import { CCInteger, warn } from '../core';
 import { UITransform } from '../2d/framework';
 import { NodeEventType } from '../scene-graph/node-event';
 
+/**
+ * @en The TiledTile allows you to perform operations on a single map tile individually.
+ * @zh TiledTile 组件可以单独对某一个地图块进行操作
+ * @class TiledTile
+ */
 @ccclass('cc.TiledTile')
 @help('i18n:cc.TiledTile')
 @menu('TiledMap/TiledTile')
@@ -59,7 +64,7 @@ export class TiledTile extends Component {
 
     /**
      * @en Specify the TiledTile horizontal coordinate，use map tile as the unit.
-     * @zh 指定 TiledTile 的横向坐标，以地图块为单位
+     * @zh 指定 TiledTile 的横向坐标，以地图块为单位。
      * @property {Number} x
      * @default 0
      */
@@ -81,7 +86,7 @@ export class TiledTile extends Component {
 
     /**
      * @en Specify the TiledTile vertical coordinate，use map tile as the unit.
-     * @zh 指定 TiledTile 的纵向坐标，以地图块为单位
+     * @zh 指定 TiledTile 的纵向坐标，以地图块为单位。
      * @property {Number} y
      * @default 0
      */
@@ -101,7 +106,7 @@ export class TiledTile extends Component {
     }
     /**
      * @en Specify the TiledTile gid.
-     * @zh 指定 TiledTile 的 gid 值
+     * @zh 指定 TiledTile 的 gid 值。
      * @property {Number} gid
      * @default 0
      */
@@ -138,7 +143,12 @@ export class TiledTile extends Component {
             this._layer.setTiledTileAt(this._x, this._y, null);
         }
     }
-
+    /**
+     * @en
+     * update information of tiled tile.
+     * @zh
+     * 更新图块信息。
+     */
     public updateInfo () {
         if (!this._layer) return;
 
