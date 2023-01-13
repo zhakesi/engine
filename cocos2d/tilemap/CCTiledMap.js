@@ -349,7 +349,27 @@ let TiledMap = cc.Class({
                 }
             },
             type: cc.TiledMapAsset
-        }
+        },
+
+        _enableCulling: cc.macro.ENABLE_TILEDMAP_CULLING,
+        /**
+         * !#en enable or disable culling
+         * !#zh 开启或关闭裁剪。
+         * @method enableCulling
+         * @param {boolean} value
+         */
+        enableCulling: {
+            get () {
+                return this._enableCulling;
+            },
+            set (value) {
+                this._enableCulling = value;
+                let layers = this._layers;
+                for (let i = 0; i < layers.length; ++i) {
+                    layers[i].enableCulling(value);
+                }
+            },
+        },
     },
 
     /**
@@ -426,19 +446,6 @@ let TiledMap = cc.Class({
         }
 
         return null;
-    },
-
-    /**
-     * !#en enable or disable culling
-     * !#zh 开启或关闭裁剪。
-     * @method enableCulling
-     * @param {boolean} value
-     */
-    enableCulling (value) {
-        let layers = this._layers;
-        for (let i = 0; i < layers.length; ++i) {
-            layers[i].enableCulling(value);
-        }
     },
 
     /**
