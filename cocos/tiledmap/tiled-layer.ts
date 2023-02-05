@@ -61,15 +61,35 @@ const _tempRowCol = { row: 0, col: 0 };
  */
 @ccclass('cc.TiledUserNodeData')
 export class TiledUserNodeData extends Component {
+    /**
+     * @en Index in render queue.
+     * @zh 渲染序列
+    */
     _index = -1;
+    /**
+     * @en Row number of position in layer.
+     * @zh 在图层位置的所在行数。
+    */
     _row = -1;
+    /**
+     * @en Column number of position in layer.
+     * @zh 在图层位置的所在列数。
+    */
     _col = -1;
+    /**
+     * @en Which tiled layer the node added.
+     * @zh Node 所被添加到的图层。
+    */
     _tiledLayer: TiledLayer | null = null;
     constructor () {
         super();
     }
 }
 
+/**
+ * @en Base unit element of render data used in tiledmap component, include a Texture2D object.
+ * @zh Tiledmap组件中使用的渲染数据单元，包括一个 Texture2D 对象。
+ */
 export interface TiledRenderData {
     renderData: RenderData | null;
     texture: Texture2D | null;
@@ -95,7 +115,7 @@ export class TiledLayer extends UIRenderer {
     protected _userNodeDirty = false;
 
     /**
-     * @en store the layer tiles node, index is caculated by 'x + width * y', format likes '[0]=tileNode0,[1]=tileNode1, ...'.
+     * @en stores the layer tiles node, index is caculated by 'x + width * y', format likes '[0]=tileNode0,[1]=tileNode1, ...'.
      * @zh 存储图层上的瓦片节点，序号计算方式为 'x + width * y'。
     */
     public tiledTiles: (TiledTile | null)[] = [];
@@ -178,8 +198,8 @@ export class TiledLayer extends UIRenderer {
 
     protected _properties?: PropertiesInfo;
     /**
-     * @en Render order. Can be [RightDown, RightUp, LeftDown, LeftUp]
-     * @zh 渲染顺序，可选值包括[右下，右上，左下，左上]
+     * @en Render order. Can be [RightDown, RightUp, LeftDown, LeftUp].
+     * @zh 渲染顺序，可选值包括[右下，右上，左下，左上]。
     */
     public renderOrder?: RenderOrder;
     protected _staggerAxis?: StaggerAxis;
@@ -215,6 +235,7 @@ export class TiledLayer extends UIRenderer {
     /**
      * @en Whether contain Tiled Tile Node.
      * @zh 是否包含瓦片节点。
+     * @return {Boolean} @en Whether contain Animation Tile. @zh 是否包含瓦片节点。
     */
     public hasTiledNode () {
         return this._hasTiledNodeGrid;
@@ -222,6 +243,7 @@ export class TiledLayer extends UIRenderer {
     /**
      * @en Whether contain Animation Tile.
      * @zh 是否包含动画。
+     * @return {Boolean} @en Whether contain Animation Tile. @zh 是否包含动画。
     */
     public hasAnimation () {
         return this._hasAniGrid;
@@ -247,7 +269,7 @@ export class TiledLayer extends UIRenderer {
       * @zh 添加用户节点。
       * @method addUserNode
       * @param {cc.Node} node
-      * @return {Boolean}
+      * @return {Boolean} @en The node already exists return false. @zh 若节点已存在返回 false。
       */
     public addUserNode (node: Node) {
         let dataComp = node.getComponent(TiledUserNodeData);
@@ -278,7 +300,7 @@ export class TiledLayer extends UIRenderer {
       * @zh 移除用户节点。
       * @method removeUserNode
       * @param {cc.Node} node
-      * @return {Boolean}
+      * @return {Boolean} @en The node not exists return false. @zh 若节点不存在返回 false。
       */
     public removeUserNode (node: Node) {
         const dataComp = node.getComponent(TiledUserNodeData);
@@ -1359,11 +1381,11 @@ export class TiledLayer extends UIRenderer {
     /**
       * @en Tiled layer initialize Data.
       * @zh 图层初始化数据。
-      * @param {TMXLayerInfo} layerInfo
-      * @param {TMXMapInfo} mapInfo
-      * @param {TMXTilesetInfo} tilesets
-      * @param {SpriteFrame} textures
-      * @param {TiledTextureGrids} texGrids
+      * @param {TMXLayerInfo} layerInfo @en Information about tiled layer. @zh 图层信息。
+      * @param {TMXMapInfo} mapInfo @en Information about tiled map. @zh 地图信息。
+      * @param {TMXTilesetInfo} tilesets @en Information about tiled sets. @zh 瓦片集合信息。
+      * @param {SpriteFrame} textures @en Textures used by tiled map. @zh 地图中使用的纹理。
+      * @param {TiledTextureGrids} texGrids @en Grid sets include textures. @zh 图块信息包括纹理。
       */
     public init (layerInfo: TMXLayerInfo, mapInfo: TMXMapInfo, tilesets: TMXTilesetInfo[], textures: SpriteFrame[], texGrids: TiledTextureGrids) {
         this._cullingDirty = true;
@@ -1445,7 +1467,7 @@ export class TiledLayer extends UIRenderer {
         this._updateAllUserNode();
     }
     /**
-     * @internal since v3.7.0. This is an engine private function.
+     * @internal since v3.7.2. This is an engine private function.
      */
     public requestTiledRenderData () {
         const arr = this._tiledDataArray as any[];
@@ -1463,7 +1485,7 @@ export class TiledLayer extends UIRenderer {
         return (comb as TiledRenderData);
     }
     /**
-     * @internal since v3.7.0. This is an engine private function.
+     * @internal since v3.7.2. This is an engine private function.
      */
     public requestSubNodesData () {
         const arr = this._tiledDataArray as any[];
@@ -1530,7 +1552,7 @@ export class TiledLayer extends UIRenderer {
         this.node._static = true;
     }
     /**
-     * @internal since v3.7.0. This is an engine private function.
+     * @internal since v3.7.2. This is an engine private function.
      */
     protected createRenderEntity () {
         return new RenderEntity(RenderEntityType.CROSSED);
@@ -1557,7 +1579,7 @@ export class TiledLayer extends UIRenderer {
         drawInfo.setIBCount(quadCount * 6);
     }
     /**
-     * @internal since v3.7.0. This is an engine private function.
+     * @internal since v3.7.2. This is an engine private function.
      */
     public prepareDrawData () {
         this._drawInfoList.length = 0;

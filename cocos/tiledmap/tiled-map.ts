@@ -453,7 +453,7 @@ export class TiledMap extends Component {
         }
     }
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     _fillAniGrids (texGrids: TiledTextureGrids, animations: TiledAnimationType) {
         for (const i of animations.keys()) {

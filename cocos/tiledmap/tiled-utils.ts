@@ -28,7 +28,7 @@ import { Rect } from '../core';
 import { GID, TiledGrid, TiledTextureGrids, TMXTilesetInfo } from './tiled-types';
 
 /**
- * @internal since v3.7.0 this is an engine private function.
+ * @internal since v3.7.2 this is an engine private function.
  */
 export function fillTextureGrids (tileset: TMXTilesetInfo, texGrids: TiledTextureGrids, spFrame?: SpriteFrame) {
     const spf: SpriteFrame = spFrame || tileset.sourceImage!;

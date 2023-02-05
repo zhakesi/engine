@@ -65,7 +65,7 @@ let flipTexture: (grid: TiledGrid, gid: MixedGID) => void;
 let _accessor: StaticVBAccessor = null!;
 
 /**
- * @internal since v3.7.0, This is an engine private object.
+ * @internal since v3.7.2, This is an engine private object.
  * simple 组装器
  * 可通过 `UI.simple` 获取该组装器。
  */

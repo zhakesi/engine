@@ -34,7 +34,7 @@ import { Color, errorID, logID, Size, Vec2 } from '../core';
 import { SpriteFrame } from '../2d/assets';
 
 /**
- * @internal since v3.7.0 this is an engine private function.
+ * @internal since v3.7.2 this is an engine private function.
  */
 function uint8ArrayToUint32Array (uint8Arr: Uint8Array): null | Uint32Array | number[] {
     if (uint8Arr.length % 4 !== 0) return null;
@@ -48,7 +48,7 @@ function uint8ArrayToUint32Array (uint8Arr: Uint8Array): null | Uint32Array | nu
 }
 
 /**
- * @internal since v3.7.0 this is an engine private function.
+ * @internal since v3.7.2 this is an engine private function.
  */
 function strToHAlign (value): HorizontalTextAlignment {
     const hAlign = Label.HorizontalAlign;
@@ -63,7 +63,7 @@ function strToHAlign (value): HorizontalTextAlignment {
 }
 
 /**
- * @internal since v3.7.0 this is an engine private function.
+ * @internal since v3.7.2 this is an engine private function.
  */
 function strToVAlign (value): VerticalTextAlignment {
     const vAlign = Label.VerticalAlign;
@@ -78,7 +78,7 @@ function strToVAlign (value): VerticalTextAlignment {
 }
 
 /**
- * @internal since v3.7.0 this is an engine private function.
+ * @internal since v3.7.2 this is an engine private function.
  */
 function strToColor (value: string): Color {
     if (!value) {
@@ -100,7 +100,7 @@ function strToColor (value: string): Color {
 }
 
 /**
- * @internal since v3.7.0 this is an engine private function.
+ * @internal since v3.7.2 this is an engine private function.
  */
 function getPropertyList (node: Element, map?: PropertiesInfo): PropertiesInfo {
     const res: any[] = [];
@@ -296,8 +296,8 @@ export class TMXMapInfo {
     }
 
     /**
-     * @en Gets Hex side length.
-     * @zh 获取hex模式边长。
+     * @en Gets Hex side length. Unit is pixel.
+     * @zh 获取hex模式边长。单位为像素。
      * @return {Number}
      */
     getHexSideLength () {
@@ -305,8 +305,8 @@ export class TMXMapInfo {
     }
 
     /**
-     * @en Sets the Hex side length.
-     * @zh 设置hex模式边长。
+     * @en Sets the Hex side length. Unit is pixel.
+     * @zh 设置hex模式边长。单位为像素。
      * @param {Number} value
      */
     setHexSideLength (value: number) {
@@ -314,8 +314,8 @@ export class TMXMapInfo {
     }
 
     /**
-     * @en Gets map width & height.
-     * @zh 获取地图宽度和高度。
+     * @en Gets map width & height. Unit is pixel.
+     * @zh 获取地图宽度和高度。单位为像素。
      * @return {Size}
      */
     getMapSize () {
@@ -323,8 +323,8 @@ export class TMXMapInfo {
     }
 
     /**
-     * @en Sets map width & height.
-     * @zh 设置地图宽度和高度。
+     * @en Sets map width & height. Unit is pixel.
+     * @zh 设置地图宽度和高度。单位为像素。
      * @param {Size} value
      */
     setMapSize (value: Size) {
@@ -332,8 +332,8 @@ export class TMXMapInfo {
         this._mapSize.height = value.height;
     }
     /**
-     * @en Width of map.
-     * @zh 地图宽度。
+     * @en Width of map. Unit is pixel.
+     * @zh 地图宽度。单位为像素。
      */
     get mapWidth () {
         return this._mapSize.width;
@@ -343,8 +343,8 @@ export class TMXMapInfo {
     }
 
     /**
-     * @en Height of map.
-     * @zh 地图高度。
+     * @en Height of map. Unit is pixel.
+     * @zh 地图高度。单位为像素。
      */
     get mapHeight () {
         return this._mapSize.height;
@@ -354,8 +354,8 @@ export class TMXMapInfo {
     }
 
     /**
-     * @en Gets tiles width & height.
-     * @zh 获取瓦片尺寸。
+     * @en Gets tiles width & height. Unit is pixel.
+     * @zh 获取瓦片尺寸。单位为像素。
      * @return {Size}
      */
     getTileSize () {
@@ -363,8 +363,8 @@ export class TMXMapInfo {
     }
 
     /**
-     * @en Sets tiles width & height.
-     * @zh 设置瓦片尺寸。
+     * @en Sets tiles width & height. Unit is pixel.
+     * @zh 设置瓦片尺寸。单位为像素。
      * @param {Size} value
      */
     setTileSize (value: Size) {
@@ -373,8 +373,8 @@ export class TMXMapInfo {
     }
 
     /**
-     * @en Width of a tile.
-     * @zh 瓦片宽度。
+     * @en Width of a tile. Unit is pixel.
+     * @zh 瓦片宽度。单位为像素。
      */
     get tileWidth () {
         return this._tileSize.width;
@@ -385,8 +385,8 @@ export class TMXMapInfo {
     }
 
     /**
-     * @en Height of a tile.
-     * @zh 瓦片高度。
+     * @en Height of a tile. Unit is pixel.
+     * @zh 瓦片高度。单位为像素。
      */
     get tileHeight () {
         return this._tileSize.height;
@@ -569,11 +569,13 @@ export class TMXMapInfo {
     }
 
     /**
-     * @en Initializes a TMX format with an XML string and a TMX resource path.
-     * @zh 使用TMX格式的字符串初始化。
-     * @param {String} tmxString
-     * @param {Object} tsxMap
-     * @param {Object} spfTextureMap
+     * @en Initializes a TMX format with an XML string and related resources.
+     * @zh 使用TMX格式的字符串以及相关资源初始化。
+     * @param {String} tmxString @en String with TMX format. @zh TMX格式的字符串。
+     * @param {Object} tsxMap @en String with TSX format. @zh TSX格式的字符串。
+     * @param {Object} spfTextureMap @en Textures map set. @zh 图集信息。
+     * @param {Object} textureSizes @en Size information of textures in spfTextureMap . @zh 纹理尺寸信息。
+     * @param {Object} imageLayerTextures @en Textures used in imageLayers. @zh 图像图层的纹理。
      * @return {Boolean}
      */
     initWithXML (tmxString: string, tsxMap: { [key: string]: string }, spfTextureMap: { [key: string]: SpriteFrame },
@@ -607,7 +609,7 @@ export class TMXMapInfo {
      * @zh 转换xml格式字符串或tmx字符或tsx文件描述字符串。
      * @param {String} xmlString
      * @param {Number} tilesetFirstGid
-     * @return {Element}
+     * @return {Element} @en Return the map information.  @zh 返回地图信息。
      */
     parseXMLString (xmlStr: string, tilesetFirstGid?: number) {
         const parser = new SAXParser();
@@ -1146,7 +1148,7 @@ export class TMXMapInfo {
     }
 
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
     */
     static getNameWithPostfix (name: string) {
         name = name.replace(/\\/g, '/');
@@ -1156,7 +1158,7 @@ export class TMXMapInfo {
     }
 
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
     */
     static getShortName (name: string) {
         name = name.replace(/\\/g, '/');

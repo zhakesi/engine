@@ -42,7 +42,7 @@ import { NodeEventType } from '../scene-graph/node-event';
 
 /**
  * @en The TiledTile allows you to perform operations on a single map tile individually.
- * @zh TiledTile 组件可以单独对某一个地图块进行操作
+ * @zh TiledTile 组件可以单独对某一个地图块进行操作。
  * @class TiledTile
  */
 @ccclass('cc.TiledTile')
@@ -51,6 +51,10 @@ import { NodeEventType } from '../scene-graph/node-event';
 @requireComponent(UITransform)
 @executeInEditMode
 export class TiledTile extends Component {
+    /**
+     * @en The tiled layer tiled tile in.
+     * @zh TiledTile 所在的图层。
+     */
     _layer: TiledLayer | null = null;
 
     constructor () {
@@ -159,7 +163,7 @@ export class TiledTile extends Component {
             return;
         }
         const p = this._layer.getPositionAt(x, y);
-        this.node.setPosition(p!.x, p!.y);
+        this.node.setPosition(p.x, p.y);
         this._layer.setTiledTileAt(x, y, this);
         this._layer.markForUpdateRenderData();
     }
