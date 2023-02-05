@@ -112,10 +112,11 @@ export class AnimationCache {
     constructor () {
     }
     /**
+     * @internal since v3.7.2 this is an engine private function.
      * @en Initialization.
      * @zh 初始化。
-     * @param {ArmatureInfo} armatureInfo @en Armature info @zh 龙骨信息
-     * @param {string} animationName @en animation Name @zh 动画名称
+     * @param {ArmatureInfo} armatureInfo @en Armature info. @zh 龙骨信息。
+     * @param {string} animationName @en animation Name. @zh 动画名称。
      */
     init (armatureInfo: ArmatureInfo, animationName: string) {
         this._inited = true;
@@ -162,7 +163,7 @@ export class AnimationCache {
         this.isCompleted = false;
     }
     /**
-     * @en End of play cached frames.
+     * @en Ends of play cached frames.
      * @zh 结束播放缓存动画帧。
      */
     end () {
@@ -173,7 +174,7 @@ export class AnimationCache {
         }
     }
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     _needToUpdate (toFrameIdx?: number) {
         const armatureInfo = this._armatureInfo!;
@@ -186,7 +187,7 @@ export class AnimationCache {
     /**
      * @en Update to specified animation frame.
      * @zh 更新动画到指定帧序列。
-     * @param {number} toFrameIdx @en frame index @zh 帧序列
+     * @param {number} toFrameIdx @en frame index. @zh 帧序列。
      */
     updateToFrame (toFrameIdx?: number) {
         if (!this._inited) return;
@@ -209,8 +210,9 @@ export class AnimationCache {
         this.end();
     }
     /**
-     * @en Is inited?
+     * @en Check inited or not.
      * @zh 检查是否已初始化。
+     * @param {Boolean}
      */
     isInited () {
         return this._inited;
@@ -218,6 +220,7 @@ export class AnimationCache {
     /**
      * @en Check if current state is invalid.
      * @zh 检查当前状态是否为无效。
+     * @param {Boolean}
      */
     isInvalid () {
         return this._invalid;
@@ -251,8 +254,8 @@ export class AnimationCache {
     /**
      * @en Update to specified animation frame of armature.
      * @zh 更新龙骨动画到指定帧序列。
-     * @param {Armature} armature @en armature @zh 指定骨架
-     * @param {number} index @en frame index @zh 帧序列
+     * @param {Armature} armature @en armature. @zh 指定骨架。
+     * @param {number} index @en frame index. @zh 帧序列。
      */
     updateFrame (armature, index) {
         _vfOffset = 0;
@@ -345,7 +348,7 @@ export class AnimationCache {
         this.maxIndexCount = indices.length > this.maxIndexCount ? indices.length : this.maxIndexCount;
     }
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     _traverseArmature (armature: Armature, parentOpacity) {
         const colors = this._tempColors!;
@@ -484,7 +487,7 @@ export class ArmatureCache {
     }
 
     /**
-     * @en If cache is private, cache will be destroy when dragonbones node destroy.
+     * @en If using private cache mode, all cached data will be destroyed when corresponding dragonbone nodes are destroyed.
      * @zh 如果为私有缓存模式，cache数据将随组件一起销毁。
      */
     dispose () {
@@ -499,7 +502,7 @@ export class ArmatureCache {
         this._animationPool = {};
     }
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     _removeArmature (armatureKey: string) {
         const armatureInfo = this._armatureCache[armatureKey];
@@ -518,8 +521,8 @@ export class ArmatureCache {
         delete this._armatureCache[armatureKey];
     }
     /**
-     * @en When db assets be destroy, remove armature from db cache.
-     * @zh 当db assets销毁时,从cache中移除骨架。
+     * @en When dragonbones assets be destroy, remove armature from dragonbones cache.
+     * @zh 当 dragonbones assets 销毁时，从 cache 中移除骨架。
      */
     resetArmature (uuid: string) {
         for (const armatureKey in this._armatureCache) {
@@ -528,7 +531,7 @@ export class ArmatureCache {
         }
     }
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     getArmatureCache (armatureName: string, armatureKey: string, atlasUUID: string) {
         const armatureInfo = this._armatureCache[armatureKey];
@@ -558,7 +561,7 @@ export class ArmatureCache {
         return armature;
     }
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     getAnimationCache (armatureKey, animationName) {
         const armatureInfo = this._armatureCache[armatureKey];
@@ -568,7 +571,7 @@ export class ArmatureCache {
         return animationsCache[animationName];
     }
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     initAnimationCache (armatureKey: string, animationName: string) {
         if (!animationName) return null;
@@ -598,7 +601,7 @@ export class ArmatureCache {
         return animationCache;
     }
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     invalidAnimationCache (armatureKey: string) {
         const armatureInfo = this._armatureCache[armatureKey];
@@ -612,7 +615,7 @@ export class ArmatureCache {
         }
     }
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     updateAnimationCache (armatureKey: string, animationName: string) {
         if (animationName) {
@@ -632,7 +635,7 @@ export class ArmatureCache {
         }
     }
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     static canCache (armature: Armature) {
         const slots = armature._slots;

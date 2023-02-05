@@ -89,8 +89,9 @@ export class CCSlot extends Slot {
     }
 
     /**
-     * @en return dragonBones.CCTexture2D.
+     * @en Get a Texture2D object from _textureData.
      * @zh 获取2D纹理对象。
+     * @return @en if _textureData is null, will return null.  @zh 若 _textureData 为 null，将返回 null。
      */
     getTexture () {
         if (this._textureData) {
@@ -101,7 +102,7 @@ export class CCSlot extends Slot {
         return null;
     }
     /**
-     * @en Calculate world matrix of slot.
+     * @en Calculates world matrix of slot.
      * @zh 计算插槽世界矩阵。
      */
     calculWorldMatrix () {
@@ -115,8 +116,8 @@ export class CCSlot extends Slot {
         this._worldMatrixDirty = false;
     }
     /**
-     * @en Reset slot data and state.
-     * @zh 重置插槽数据和状态
+     * @en Resets slot data and state.
+     * @zh 重置插槽数据和状态。
      */
     _onClear () {
         super._onClear();
@@ -130,32 +131,32 @@ export class CCSlot extends Slot {
     }
     /**
      * just for adapt to dragonbones api,no need to do any thing
-     * @deprecated since v3.7.0, this interface that will be removed in the future.
+     * @deprecated since v3.7.2, this interface that will be removed in the future.
      */
     _onUpdateDisplay () {
     }
     /**
      * just for adapt to dragonbones api,no need to do any thing
-     * @deprecated since v3.7.0, this interface that will be removed in the future.
+     * @deprecated since v3.7.2, this interface that will be removed in the future.
      */
     _initDisplay (value) {
     }
     /**
      * just for adapt to dragonbones api,no need to do any thing
-     * @deprecated since v3.7.0, this interface that will be removed in the future.
+     * @deprecated since v3.7.2, this interface that will be removed in the future.
      */
     _addDisplay () {
         this._visible = true;
     }
     /**
      * just for adapt to dragonbones api,no need to do any thing
-     * @deprecated since v3.7.0, this interface that will be removed in the future.
+     * @deprecated since v3.7.2, this interface that will be removed in the future.
      */
     _replaceDisplay (value) {
     }
     /**
      * just for adapt to dragonbones api,no need to do any thing
-     * @deprecated since v3.7.0, this interface that will be removed in the future.
+     * @deprecated since v3.7.2, this interface that will be removed in the future.
      */
     _removeDisplay () {
         this._visible = false;
@@ -163,20 +164,20 @@ export class CCSlot extends Slot {
 
     /**
      * just for adapt to dragonbones api,no need to do any thing
-     * @deprecated since v3.7.0, this interface that will be removed in the future.
+     * @deprecated since v3.7.2, this interface that will be removed in the future.
      */
     _disposeDisplay (object) {
     }
     /**
      * just for adapt to dragonbones api,no need to do any thing
-     * @deprecated since v3.7.0, this interface that will be removed in the future.
+     * @deprecated since v3.7.2, this interface that will be removed in the future.
      */
     _updateVisible () {
         this._visible = this.parent.visible;
     }
     /**
      * just for adapt to dragonbones api,no need to do any thing
-     * @deprecated since v3.7.0, this interface that will be removed in the future.
+     * @deprecated since v3.7.2, this interface that will be removed in the future.
      */
     _updateGlueMesh () {
 
@@ -184,7 +185,7 @@ export class CCSlot extends Slot {
 
     /**
      * just for adapt to dragonbones api,no need to do any thing
-     * @deprecated since v3.7.0, this interface that will be removed in the future.
+     * @deprecated since v3.7.2, this interface that will be removed in the future.
      */
     _updateZOrder () {
     }
@@ -466,7 +467,7 @@ export class CCSlot extends Slot {
         }
     }
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     /* protected */ _mulMat (out: Mat4, a: Readonly<Mat4>, b: Readonly<Mat4>) {
         const aa = a.m00; const ab = a.m01; const ac = a.m04; const ad = a.m05; const atx = a.m12; const aty = a.m13;

@@ -23,8 +23,8 @@
 */
 
 /**
- * @internal since v3.7, this is an engine private enum type.
- * @deprecated since v3.7, will be removed in the future.
+ * @internal since v3.7.2, this is an engine private enum type.
+ * @deprecated since v3.7.2, will be removed in the future.
  */
 export enum ExtensionType {
     FFD = 0,
@@ -37,16 +37,16 @@ export enum ExtensionType {
     GradientGlowFilter = 16
 }
 /**
- * @internal since v3.7, this is an engine private enum type.
- * @deprecated since v3.7, will be removed in the future.
+ * @internal since v3.7.2, this is an engine private enum type.
+ * @deprecated since v3.7.2, will be removed in the future.
  */
 export enum EventType {
     Frame = 0,
     Sound = 1
 }
 /**
- * @internal since v3.7, this is an engine private enum type.
- * @deprecated since v3.7, will be removed in the future.
+ * @internal since v3.7.2, this is an engine private enum type.
+ * @deprecated since v3.7.2, will be removed in the future.
  */
 export enum AnimationFadeOutMode {
     None = 0,

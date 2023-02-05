@@ -58,6 +58,10 @@ enum DefaultCacheMode {
 }
 ccenum(DefaultAnimsEnum);
 
+/**
+ * @en Control animation speed, should be larger than 0.
+ * @zh 控制龙骨动画播放速度，数值应大于0。
+ */
 // eslint-disable-next-line prefer-const,import/no-mutable-exports
 export let timeScale = 1;
 
@@ -430,10 +434,9 @@ export class ArmatureDisplay extends UIRenderer {
     }
     /**
      * @en
-     * The socket nodes contains the attached node be registered Synchronous motion
-     * transformation with bones.
+     * Get the socket nodes. Socket nodes are registered synchronous motion transformation with bones.
      * @zh
-     * Socket nodes存储挂载到骨骼上的节点，可以随骨骼做同步运动变换。
+     * 获取socket nodes，socket nodes 被注册到组件上，可以随骨骼做同步运动变换。
      */
     get socketNodes () { return this._socketNodes; }
     /**
@@ -451,7 +454,7 @@ export class ArmatureDisplay extends UIRenderer {
      */
     public attachUtil: AttachUtil;
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     get drawList () { return this._drawList; }
 
@@ -574,10 +577,8 @@ export class ArmatureDisplay extends UIRenderer {
         this._useVertexOpacity = true;
     }
     /**
-     * @en
-     * Gets the instance of CCFactory, CCFactory can create instance of Armature.
-     * @zh
-     * 获取工厂实例，工厂实例可以创建骨架实例。
+     * @en Initializes _factory from CCFactory, if golbal factory not exists, will create a new one.
+     * @zh 初始化变量 _factory，如果全局工厂实例不存在将新创建一个工厂实列对象。
      */
     initFactory () {
         this._factory = CCFactory.getInstance();
@@ -622,7 +623,7 @@ export class ArmatureDisplay extends UIRenderer {
     }
 
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     public getMaterialForBlend (src: BlendFactor, dst: BlendFactor): MaterialInstance {
         const key = `${src}/${dst}`;
@@ -806,7 +807,7 @@ export class ArmatureDisplay extends UIRenderer {
     }
     /**
      * @en Be called when the component state becomes invalid.
-     * instance of ArmatureDisplay will be removed from ArmatureSystem.
+     * Instance of ArmatureDisplay will be removed from ArmatureSystem.
      * @zh 组件状态变为不可用时调用。ArmatureDisplay实例将被从ArmatureSystem移除。
      */
     onDisable () {
@@ -818,7 +819,7 @@ export class ArmatureDisplay extends UIRenderer {
         ArmatureSystem.getInstance().remove(this);
     }
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     _emitCacheCompleteEvent () {
         // Animation loop complete, the event diffrent from dragonbones inner event,
@@ -831,7 +832,7 @@ export class ArmatureDisplay extends UIRenderer {
     }
     /**
      * @en Update animation frame.
-     * @zh 跟新动画序列。
+     * @zh 更新动画序列。
      * @param {number} dt @en delta time @zh 时间差
      */
     updateAnimation (dt) {
@@ -938,7 +939,7 @@ export class ArmatureDisplay extends UIRenderer {
         super.onDestroy();
     }
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     _updateDebugDraw () {
         if (this.debugBones) {
@@ -1074,7 +1075,7 @@ export class ArmatureDisplay extends UIRenderer {
     }
 
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     _parseDragonAtlasAsset () {
         if (this.dragonAtlasAsset) {
@@ -1082,7 +1083,7 @@ export class ArmatureDisplay extends UIRenderer {
         }
     }
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     _refresh () {
         this._buildArmature();
@@ -1111,7 +1112,7 @@ export class ArmatureDisplay extends UIRenderer {
 
     // update animation list for editor
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     _updateAnimEnum () {
         let animEnum;
@@ -1130,7 +1131,7 @@ export class ArmatureDisplay extends UIRenderer {
 
     // update armature list for editor
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     _updateArmatureEnum () {
         let armatureEnum;
@@ -1147,7 +1148,7 @@ export class ArmatureDisplay extends UIRenderer {
         setEnumAttr(this, '_defaultArmatureIndex', this._enumArmatures);
     }
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     _indexBoneSockets () {
         if (!this._armature) {

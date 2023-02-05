@@ -76,7 +76,7 @@ export class CCTextureAtlasData extends TextureAtlasData {
 
     protected _renderTexture: TextureBase | null = null;
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     static toString () {
         return '[class dragonBones.CCTextureAtlasData]';
@@ -109,7 +109,7 @@ export class CCTextureData extends TextureData {
      */
     spriteFrame: SpriteFrame | null = null
     /**
-     * @internal since v3.7.0 this is an engine private function.
+     * @internal since v3.7.2 this is an engine private function.
      */
     static toString () {
         return '[class dragonBones.CCTextureData]';
