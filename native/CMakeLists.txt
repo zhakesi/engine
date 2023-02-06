@@ -2137,6 +2137,8 @@ cocos_source_files(
                             cocos/bindings/auto/jsb_render_auto.h
     NO_WERROR   NO_UBUILD   cocos/bindings/auto/jsb_2d_auto.cpp
                             cocos/bindings/auto/jsb_2d_auto.h
+    NO_WERROR   NO_UBUILD   cocos/bindings/auto/jsb_cspine_auto.cpp
+                            cocos/bindings/auto/jsb_cspine_auto.h
 )
 
 if(USE_AUDIO)
@@ -2364,6 +2366,16 @@ if(USE_MIDDLEWARE)
                         cocos/bindings/manual/jsb_spine_manual.h
         )
     endif()
+
+    ##### cspine
+    cocos_source_files(
+        cocos/editor-support/cspine/skeleton2d-mesh.cpp
+        cocos/editor-support/cspine/skeleton2d-mesh.h
+        cocos/editor-support/cspine/skeleton2d.cpp
+        cocos/editor-support/cspine/skeleton2d.h
+        cocos/bindings/auto/jsb_cspine_auto.cpp
+        cocos/bindings/auto/jsb_cspine_auto.h
+    )
 
     if(USE_DRAGONBONES)
         cocos_source_files(

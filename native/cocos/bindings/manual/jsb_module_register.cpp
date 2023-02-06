@@ -35,6 +35,7 @@
 #include "cocos/bindings/auto/jsb_pipeline_auto.h"
 #include "cocos/bindings/auto/jsb_render_auto.h"
 #include "cocos/bindings/auto/jsb_scene_auto.h"
+#include "cocos/bindings/auto/jsb_cspine_auto.h"
 #include "cocos/bindings/dop/jsb_dop.h"
 #include "cocos/bindings/jswrapper/SeApi.h"
 #include "cocos/bindings/manual/jsb_assets_manual.h"
@@ -150,6 +151,7 @@ bool jsb_register_all_modules() {
     se->addRegisterCallback(register_all_scene_manual);
     se->addRegisterCallback(register_all_render);
     se->addRegisterCallback(register_all_native2d);
+    se->addRegisterCallback(register_all_cspine);
 
 #if (CC_PLATFORM == CC_PLATFORM_IOS || CC_PLATFORM == CC_PLATFORM_MACOS)
     se->addRegisterCallback(register_javascript_objc_bridge);
