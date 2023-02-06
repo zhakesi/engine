@@ -41,6 +41,7 @@ import { bindingMappingInfo } from '../rendering/define';
 import { ICustomJointTextureLayout } from '../3d/skeletal-animation/skeletal-animation-utils';
 import { IPhysicsConfig } from '../physics/framework/physics-config';
 import { effectSettings } from '../core/effect-settings';
+import { promiseForSpineInstantiation } from '../spine/spine-2d/instantiated';
 /**
  * @zh
  * 游戏配置。
@@ -851,6 +852,7 @@ export class Game extends EventTarget {
             // #endregion Project
             .then(() => {
                 this._inited = true;
+                true && promiseForSpineInstantiation();
                 this._safeEmit(Game.EVENT_GAME_INITED);
             });
     }
