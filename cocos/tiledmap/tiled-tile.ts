@@ -163,9 +163,11 @@ export class TiledTile extends Component {
             return;
         }
         const p = this._layer.getPositionAt(x, y);
-        this.node.setPosition(p.x, p.y);
-        this._layer.setTiledTileAt(x, y, this);
-        this._layer.markForUpdateRenderData();
+        if (p !== null) {
+            this.node.setPosition(p.x, p.y);
+            this._layer.setTiledTileAt(x, y, this);
+            this._layer.markForUpdateRenderData();
+        }
     }
 
     private _updatePosition () {
