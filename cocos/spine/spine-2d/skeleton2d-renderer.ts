@@ -18,7 +18,7 @@
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  THE SOFTWARE.
 */
-import { EDITOR } from 'internal:constants';
+import { EDITOR, JSB } from 'internal:constants';
 import { ccclass, executeInEditMode, executionOrder, help, menu, serializable, type, displayName } from 'cc.decorator';
 import { builtinResMgr } from '../../asset/asset-manager/builtin-res-mgr';
 import { PrimitiveMode, Device, BufferUsageBit, BufferInfo, MemoryUsageBit, deviceManager } from '../../gfx';
@@ -34,9 +34,10 @@ import { Root } from '../../root';
 import { legacyCC } from '../../core/global-exports';
 import { ccenum, Enum } from '../../core/value-types/enum';
 import { CCClass } from '../../core/data/class';
-
-import { SkeletonWasmObject } from './skeleton-wasm';
+import { Skeleton2DImply } from './skeleton2d-imply';
 import { SKMesh } from './sk-mesh';
+import { Skeleton2DWasm } from './skeleton2d-wasm';
+import { Skeleton2DNative } from './skeleton2d-native';
 
 export enum SkelSkinsEnum {
     default = 0,
@@ -87,7 +88,7 @@ export class Skeleton2DRenderer extends ModelRenderer {
     @serializable
     private _texture: Texture2D | null = null;
 
-    private _wasmObj: SkeletonWasmObject | null = null;
+    private _imply: Skeleton2DImply | null = null;
     private _meshArray: SKMesh[] = [];
 
     constructor () {
@@ -107,14 +108,10 @@ export class Skeleton2DRenderer extends ModelRenderer {
             console.log('need release');
         }
         this._skeletonData = value;
-        this._defaultSkinName = 'default';
-        this._defaultAnimationName = '<None>';
 
         this._updateSkinEnum();
         this._updateAnimEnum();
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         this._updateSkeletonData();
-        // console.log('set skeletonData');
     }
 
     /**
@@ -187,8 +184,9 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public setSkin (skinName: string) {
-        if (!this._wasmObj) return;
-        this._wasmObj.setSkin(skinName);
+        if (!this._imply) return;
+
+        this._imply.setSkin(skinName);
     }
 
     // update skin list for editor
@@ -231,9 +229,10 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public __preload () {
-        // if (!this._skeletonData) return;
-        // if (!this._wasmObj) return;
-        // console.log('__preload');
+        if (EDITOR) {
+            this._updateSkinEnum();
+            this._updateAnimEnum();
+        }
     }
 
     public onLoad () {
@@ -248,10 +247,9 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public update (dt: number) {
-        if (!this._wasmObj) return;
-
-        this._wasmObj.updateAnimation(dt);
-        this._meshArray = this._wasmObj.updateRenderData();
+        if (!this._imply) return;
+        this._imply.updateAnimation(dt);
+        this._meshArray = this._imply.updateRenderData();
 
         this.realTimeTraverse();
         this._onUpdateLocalDescriptorSet();
@@ -274,18 +272,22 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     protected _updateSkeletonData () {
-        if (this._skeletonData === null) return;
-        if (!this._wasmObj) {
-            this._wasmObj = new SkeletonWasmObject();
+        if (this._skeletonData === null || EDITOR) return;
+        if (this._imply === null) {
+            if (JSB) {
+                this._imply = new Skeleton2DNative();
+            } else {
+                this._imply = new Skeleton2DWasm();
+            }
         }
-
-        this._wasmObj.initSkeletonData(this._skeletonData);
+        this._imply.initSkeletonData(this._skeletonData);
         this.setSkin(this._defaultSkinName);
+        this.setAnimation(this._defaultAnimationName);
     }
 
     public setAnimation (name: string) {
-        if (!this._wasmObj) return;
-        this._wasmObj.setAnimation(name);
+        if (!this._imply) return;
+        this._imply.setAnimation(name);
     }
 
     protected _onUpdateLocalDescriptorSet () {

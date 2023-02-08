@@ -3,16 +3,16 @@ import { getSpineSpineWasmUtil, WasmHEAPU8 } from './instantiated';
 import { SpineWasmUtil } from './spine-wasm-util';
 import { FileResourceInstance } from './file-resource';
 import { SKMesh } from './sk-mesh';
+import { Skeleton2DImply } from './skeleton2d-imply';
 
 const floatStride = 9;
-export class SkeletonWasmObject {
+export class Skeleton2DWasm implements Skeleton2DImply {
     constructor () {
         this._wasmUtil = getSpineSpineWasmUtil();
         this._wasmHEAPU8 = new Uint8Array(this._wasmUtil.memory.buffer);
-        //this._wasmHEAPU8 = WasmHEAPU8();
         this._objID = this._wasmUtil.createSkeletonObject();
     }
-    public initSkeletonData (data: SkeletonData) {
+    public initSkeletonData (data: SkeletonData): boolean {
         const name = data.name;
         const altasName = `${name}.atlas`;
         const jsonName = `${name}.json`;
@@ -29,9 +29,10 @@ export class SkeletonWasmObject {
         array.set(encoded);
 
         this._wasmUtil.setSkeletonData(this._objID, local, length);
+        return true;
     }
 
-    public updateRenderData () : SKMesh[] {
+    public updateRenderData (): SKMesh[] {
         this._meshArray.length = 0;
         const addres = this._wasmUtil.updateRenderData(this._objID);
         let start = addres / 4;
@@ -53,7 +54,7 @@ export class SkeletonWasmObject {
         return this._meshArray;
     }
 
-    public setSkin (name: string) {
+    public setSkin (name: string): boolean {
         const encoder = new TextEncoder();
         const encoded = encoder.encode(name);
         const length = encoded.length;
@@ -62,9 +63,10 @@ export class SkeletonWasmObject {
         const array = this._wasmHEAPU8.subarray(local, local + length);
         array.set(encoded);
         this._wasmUtil.setSkin(this._objID, local, length);
+        return true;
     }
 
-    public setAnimation (name: string) {
+    public setAnimation (name: string): boolean {
         const encoder = new TextEncoder();
         const encoded = encoder.encode(name);
         const length = encoded.length;
@@ -73,6 +75,7 @@ export class SkeletonWasmObject {
         const array = this._wasmHEAPU8.subarray(local, local + length);
         array.set(encoded);
         this._wasmUtil.setAnimation(this._objID, local, length);
+        return true;
     }
 
     public updateAnimation (dltTime: number) {
