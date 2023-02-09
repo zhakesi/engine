@@ -21,10 +21,13 @@
  THE SOFTWARE.
  */
 
+//import spineWasmUrl from 'url:native/external/emscripten/spine/spine2d.wasm';
+import { JSB } from 'internal:constants';
 import { SpineWasmUtil } from './spine-wasm-util';
 import { FileResourceInstance } from './file-resource';
 
 const spineWasmUrl = 'scripting/engine/cocos/spine/spine-2d/spine2d.wasm';
+
 let wasmUtil: SpineWasmUtil;
 let HEAPU8: Uint8Array;
 
@@ -121,6 +124,7 @@ export function promiseForSpineInstantiation () {
 
     return new Promise<void>((resolve, reject) => {
         WebAssembly.instantiateStreaming(fetch(spineWasmUrl), info).then(
+        //WebAssembly.instantiateStreaming(fetch(new URL(spineWasmUrl, import.meta.url).href)).then(
             (results) => {
                 receiveInstantiationResult(results);
                 resolve();
@@ -133,6 +137,6 @@ export function getSpineSpineWasmUtil () {
     return wasmUtil;
 }
 
-export function WasmHEAPU8 (): Uint8Array {
-    return HEAPU8!;
+if (!JSB) {
+    promiseForSpineInstantiation();
 }

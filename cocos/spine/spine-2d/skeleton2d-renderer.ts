@@ -36,8 +36,8 @@ import { ccenum, Enum } from '../../core/value-types/enum';
 import { CCClass } from '../../core/data/class';
 import { Skeleton2DImply } from './skeleton2d-imply';
 import { SKMesh } from './sk-mesh';
-import { Skeleton2DWasm } from './skeleton2d-wasm';
-import { Skeleton2DNative } from './skeleton2d-native';
+import { Skeleton2DImplyWasm } from './skeleton2d-imply-wasm';
+import { Skeleton2DImplyNative } from './skeleton2d-imply-native';
 
 export enum SkelSkinsEnum {
     default = 0,
@@ -275,9 +275,9 @@ export class Skeleton2DRenderer extends ModelRenderer {
         if (this._skeletonData === null || EDITOR) return;
         if (this._imply === null) {
             if (JSB) {
-                this._imply = new Skeleton2DNative();
+                this._imply = new Skeleton2DImplyNative();
             } else {
-                this._imply = new Skeleton2DWasm();
+                this._imply = new Skeleton2DImplyWasm();
             }
         }
         this._imply.initSkeletonData(this._skeletonData);

@@ -1,12 +1,12 @@
 import { SkeletonData } from '../skeleton-data';
-import { getSpineSpineWasmUtil, WasmHEAPU8 } from './instantiated';
+import { getSpineSpineWasmUtil } from './instantiated';
 import { SpineWasmUtil } from './spine-wasm-util';
 import { FileResourceInstance } from './file-resource';
 import { SKMesh } from './sk-mesh';
 import { Skeleton2DImply } from './skeleton2d-imply';
 
 const floatStride = 9;
-export class Skeleton2DWasm implements Skeleton2DImply {
+export class Skeleton2DImplyWasm implements Skeleton2DImply {
     constructor () {
         this._wasmUtil = getSpineSpineWasmUtil();
         this._wasmHEAPU8 = new Uint8Array(this._wasmUtil.memory.buffer);
@@ -80,18 +80,6 @@ export class Skeleton2DWasm implements Skeleton2DImply {
 
     public updateAnimation (dltTime: number) {
         this._wasmUtil.updateAnimation(this._objID, dltTime);
-    }
-
-    public getStoreMemory () {
-        const addres = this._wasmUtil.getStoreMemory();
-        return addres;
-    }
-
-    public getWasmHEAPU8 () {
-        return this._wasmHEAPU8;
-    }
-
-    public testFunc () {
     }
 
     private _objID: number;
