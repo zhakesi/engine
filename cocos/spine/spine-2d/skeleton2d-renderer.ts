@@ -258,7 +258,6 @@ export class Skeleton2DRenderer extends ModelRenderer {
     public onEnable () {
         this._attachToScene();
         this._updateSkeletonData();
-        this.setAnimation(this._defaultAnimationName);
     }
 
     public onDisable () {

@@ -11,16 +11,22 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
     }
 
     initSkeletonData (data: SkeletonData): boolean {
-        this._nativeObj.nativeFunctionTest();
+        if (data.skeletonJsonStr && data.atlasText) {
+            this._nativeObj.initSkeletonData(data.skeletonJsonStr, data.atlasText);
+        }
+
         return true;
     }
     setSkin (name: string): boolean {
+        this._nativeObj.setSkin(name);
         return true;
     }
     setAnimation (name: string): boolean {
+        this._nativeObj.setAnimation(name);
         return true;
     }
     updateAnimation (dltTime: number) {
+        this._nativeObj.updateAnimation(dltTime);
         return true;
     }
     updateRenderData (): SKMesh[] {
