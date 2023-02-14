@@ -35,11 +35,17 @@
 #pragma once
 #include "bindings/jswrapper/SeApi.h"
 #include "bindings/manual/jsb_conversions.h"
+#include "editor-support/cspine/skeleton2d-mesh.h"
 #include "editor-support/cspine/skeleton2d.h"
 
 
 
 bool register_all_cspine(se::Object* obj);
+
+
+JSB_REGISTER_OBJECT_TYPE(cc::cspine::Skeleton2DMesh);
+extern se::Object *__jsb_cc_cspine_Skeleton2DMesh_proto; // NOLINT
+extern se::Class * __jsb_cc_cspine_Skeleton2DMesh_class; // NOLINT
 
 
 JSB_REGISTER_OBJECT_TYPE(cc::cspine::Skeleton2D);

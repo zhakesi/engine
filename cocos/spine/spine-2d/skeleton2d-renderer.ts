@@ -35,9 +35,9 @@ import { legacyCC } from '../../core/global-exports';
 import { ccenum, Enum } from '../../core/value-types/enum';
 import { CCClass } from '../../core/data/class';
 import { Skeleton2DImply } from './skeleton2d-imply';
-import { SKMesh } from './sk-mesh';
 import { Skeleton2DImplyWasm } from './skeleton2d-imply-wasm';
 import { Skeleton2DImplyNative } from './skeleton2d-imply-native';
+import { Skeleton2DMesh } from './skeleton2d-native';
 
 export enum SkelSkinsEnum {
     default = 0,
@@ -89,7 +89,7 @@ export class Skeleton2DRenderer extends ModelRenderer {
     private _texture: Texture2D | null = null;
 
     private _imply: Skeleton2DImply | null = null;
-    private _meshArray: SKMesh[] = [];
+    private _meshArray: Skeleton2DMesh[] = [];
 
     constructor () {
         super();
@@ -366,7 +366,7 @@ export class Skeleton2DRenderer extends ModelRenderer {
             const ia = subModel.inputAssembler;
             ia.vertexBuffers[0].update(mesh.vertices);
             ia.vertexCount = mesh.vCount;
-            const ib = new Uint16Array(mesh.indeices);
+            const ib = new Uint16Array(mesh.indices);
             ia.indexBuffer!.update(ib);
             ia.indexCount = ib.length;
         }

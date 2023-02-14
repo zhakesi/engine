@@ -2,7 +2,7 @@ import { SkeletonData } from '../skeleton-data';
 import { getSpineSpineWasmUtil } from './instantiated';
 import { SpineWasmUtil } from './spine-wasm-util';
 import { FileResourceInstance } from './file-resource';
-import { SKMesh } from './sk-mesh';
+import { Skeleton2DMesh } from './skeleton2d-native';
 import { Skeleton2DImply } from './skeleton2d-imply';
 
 const floatStride = 9;
@@ -32,10 +32,10 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
         return true;
     }
 
-    public updateRenderData (): SKMesh[] {
+    public updateRenderData (): Skeleton2DMesh[] {
         this._meshArray.length = 0;
-        const addres = this._wasmUtil.updateRenderData(this._objID);
-        let start = addres / 4;
+        const address = this._wasmUtil.updateRenderData(this._objID);
+        let start = address / 4;
         const heap32 = new Uint32Array(this._wasmHEAPU8.buffer);
         const meshSize = heap32[start];
         for (let i = 0; i < meshSize; i++) {
@@ -44,11 +44,12 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
             const startV = heap32[++start];
             const startI = heap32[++start];
             const vertices = new Float32Array(heap32.buffer, startV, floatStride * vc);
-            const indeices = new Uint16Array(heap32.buffer, startI, ic);
+            const indices = new Uint16Array(heap32.buffer, startI, ic);
 
-            const mesh = new SKMesh(vc, ic);
+            const mesh = new Skeleton2DMesh();
+            mesh.intialize(vc, ic, 36);
             mesh.vertices.set(vertices);
-            mesh.indeices.set(indeices);
+            mesh.indices.set(indices);
             this._meshArray.push(mesh);
         }
         return this._meshArray;
@@ -86,5 +87,5 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
     private _wasmUtil: SpineWasmUtil;
     private _wasmHEAPU8: Uint8Array = new Uint8Array(0);
 
-    private _meshArray: SKMesh[] = [];
+    private _meshArray: Skeleton2DMesh[] = [];
 }

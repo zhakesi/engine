@@ -2375,8 +2375,10 @@ if(USE_MIDDLEWARE)
 
     ##### cspine
     cocos_source_files(
-        cocos/editor-support/cspine/Skeleton2D.cpp
-        cocos/editor-support/cspine/Skeleton2D.h
+        cocos/editor-support/cspine/skeleton2d-mesh.cpp
+        cocos/editor-support/cspine/skeleton2d-mesh.h
+        cocos/editor-support/cspine/skeleton2d.cpp
+        cocos/editor-support/cspine/skeleton2d.h
         cocos/bindings/auto/jsb_cspine_auto.cpp
         cocos/bindings/auto/jsb_cspine_auto.h
     )

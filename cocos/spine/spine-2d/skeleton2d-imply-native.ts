@@ -1,10 +1,10 @@
 import { SkeletonData } from '../skeleton-data';
-import { SKMesh } from './sk-mesh';
 import { Skeleton2DImply } from './skeleton2d-imply';
-import { NativeSkeleton2D } from './skeleton2d-native';
+import { NativeSkeleton2D, Skeleton2DMesh } from './skeleton2d-native';
 
 export class Skeleton2DImplyNative implements Skeleton2DImply {
     protected declare _nativeObj: NativeSkeleton2D;
+    protected declare _nativeMeshArray: Skeleton2DMesh[];
 
     constructor () {
         this._nativeObj = new NativeSkeleton2D();
@@ -29,7 +29,8 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
         this._nativeObj.updateAnimation(dltTime);
         return true;
     }
-    updateRenderData (): SKMesh[] {
-        return [];
+    updateRenderData (): Skeleton2DMesh[] {
+        this._nativeMeshArray = this._nativeObj.updateRenderData();
+        return this._nativeMeshArray;
     }
 }
