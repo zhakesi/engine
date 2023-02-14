@@ -285,8 +285,8 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public setAnimation (name: string) {
-        if (!this._imply) return;
-        this._imply.setAnimation(name);
+        // if (!this._imply) return;
+        // this._imply.setAnimation(name);
     }
 
     protected _onUpdateLocalDescriptorSet () {
@@ -364,7 +364,8 @@ export class Skeleton2DRenderer extends ModelRenderer {
             this._activeSubModel(idx);
             const subModel = this._models[0].subModels[idx];
             const ia = subModel.inputAssembler;
-            ia.vertexBuffers[0].update(mesh.vertices);
+            const vb = new Float32Array(mesh.vertices);
+            ia.vertexBuffers[0].update(vb);
             ia.vertexCount = mesh.vCount;
             const ib = new Uint16Array(mesh.indices);
             ia.indexBuffer!.update(ib);

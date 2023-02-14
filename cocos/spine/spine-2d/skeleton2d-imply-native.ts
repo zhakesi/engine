@@ -4,7 +4,7 @@ import { NativeSkeleton2D, Skeleton2DMesh } from './skeleton2d-native';
 
 export class Skeleton2DImplyNative implements Skeleton2DImply {
     protected declare _nativeObj: NativeSkeleton2D;
-    protected declare _nativeMeshArray: Skeleton2DMesh[];
+    protected _nativeMeshArray: Skeleton2DMesh[] = [];
 
     constructor () {
         this._nativeObj = new NativeSkeleton2D();

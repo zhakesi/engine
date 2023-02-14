@@ -58,6 +58,21 @@
 #include "bindings/auto/jsb_cspine_auto.h"
 
 
+#define cc_cspine_Skeleton2DMesh_vertices_get(self_) self_->getVertices()
+  
+
+#define cc_cspine_Skeleton2DMesh_indices_get(self_) self_->getIndices()
+  
+
+#define cc_cspine_Skeleton2DMesh_byteStride_get(self_) self_->getByteStride()
+  
+
+#define cc_cspine_Skeleton2DMesh_vCount_get(self_) self_->getVCount()
+  
+
+#define cc_cspine_Skeleton2DMesh_iCount_get(self_) self_->getICount()
+  
+
 
 se::Class* __jsb_cc_cspine_Skeleton2DMesh_class = nullptr;
 se::Object* __jsb_cc_cspine_Skeleton2DMesh_proto = nullptr;
@@ -133,169 +148,89 @@ static bool js_delete_cc_cspine_Skeleton2DMesh(se::State& s)
 }
 SE_BIND_FINALIZE_FUNC(js_delete_cc_cspine_Skeleton2DMesh) 
 
-static bool js_cc_cspine_Skeleton2DMesh_vertices_set(se::State& s)
-{
-    CC_UNUSED bool ok = true;
-    const auto& args = s.args();
-    size_t argc = args.size();
-    cc::cspine::Skeleton2DMesh *arg1 = (cc::cspine::Skeleton2DMesh *) NULL ;
-    
-    arg1 = SE_THIS_OBJECT<cc::cspine::Skeleton2DMesh>(s);
-    if (nullptr == arg1) return true;
-    
-    ok &= sevalue_to_native(args[0], &arg1->vertices, s.thisObject());
-    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
-    
-    
-    return true;
-}
-SE_BIND_PROP_SET(js_cc_cspine_Skeleton2DMesh_vertices_set) 
-
 static bool js_cc_cspine_Skeleton2DMesh_vertices_get(se::State& s)
 {
     CC_UNUSED bool ok = true;
     cc::cspine::Skeleton2DMesh *arg1 = (cc::cspine::Skeleton2DMesh *) NULL ;
+    std::vector< float > *result = 0 ;
     
     arg1 = SE_THIS_OBJECT<cc::cspine::Skeleton2DMesh>(s);
     if (nullptr == arg1) return true;
+    result = (std::vector< float > *) &cc_cspine_Skeleton2DMesh_vertices_get(arg1);
     
-    ok &= nativevalue_to_se(arg1->vertices, s.rval(), s.thisObject());
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
     SE_PRECONDITION2(ok, false, "Error processing arguments");
-    SE_HOLD_RETURN_VALUE(arg1->vertices, s.thisObject(), s.rval()); 
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
     
     
     return true;
 }
 SE_BIND_PROP_GET(js_cc_cspine_Skeleton2DMesh_vertices_get) 
 
-static bool js_cc_cspine_Skeleton2DMesh_indices_set(se::State& s)
-{
-    CC_UNUSED bool ok = true;
-    const auto& args = s.args();
-    size_t argc = args.size();
-    cc::cspine::Skeleton2DMesh *arg1 = (cc::cspine::Skeleton2DMesh *) NULL ;
-    
-    arg1 = SE_THIS_OBJECT<cc::cspine::Skeleton2DMesh>(s);
-    if (nullptr == arg1) return true;
-    
-    ok &= sevalue_to_native(args[0], &arg1->indices, s.thisObject());
-    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
-    
-    
-    return true;
-}
-SE_BIND_PROP_SET(js_cc_cspine_Skeleton2DMesh_indices_set) 
-
 static bool js_cc_cspine_Skeleton2DMesh_indices_get(se::State& s)
 {
     CC_UNUSED bool ok = true;
     cc::cspine::Skeleton2DMesh *arg1 = (cc::cspine::Skeleton2DMesh *) NULL ;
+    std::vector< uint16_t > *result = 0 ;
     
     arg1 = SE_THIS_OBJECT<cc::cspine::Skeleton2DMesh>(s);
     if (nullptr == arg1) return true;
+    result = (std::vector< uint16_t > *) &cc_cspine_Skeleton2DMesh_indices_get(arg1);
     
-    ok &= nativevalue_to_se(arg1->indices, s.rval(), s.thisObject());
+    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
     SE_PRECONDITION2(ok, false, "Error processing arguments");
-    SE_HOLD_RETURN_VALUE(arg1->indices, s.thisObject(), s.rval()); 
+    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
     
     
     return true;
 }
 SE_BIND_PROP_GET(js_cc_cspine_Skeleton2DMesh_indices_get) 
 
-static bool js_cc_cspine_Skeleton2DMesh_byteStride_set(se::State& s)
-{
-    CC_UNUSED bool ok = true;
-    const auto& args = s.args();
-    size_t argc = args.size();
-    cc::cspine::Skeleton2DMesh *arg1 = (cc::cspine::Skeleton2DMesh *) NULL ;
-    
-    arg1 = SE_THIS_OBJECT<cc::cspine::Skeleton2DMesh>(s);
-    if (nullptr == arg1) return true;
-    
-    ok &= sevalue_to_native(args[0], &arg1->byteStride, s.thisObject());
-    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
-    
-    
-    return true;
-}
-SE_BIND_PROP_SET(js_cc_cspine_Skeleton2DMesh_byteStride_set) 
-
 static bool js_cc_cspine_Skeleton2DMesh_byteStride_get(se::State& s)
 {
     CC_UNUSED bool ok = true;
     cc::cspine::Skeleton2DMesh *arg1 = (cc::cspine::Skeleton2DMesh *) NULL ;
+    int result;
     
     arg1 = SE_THIS_OBJECT<cc::cspine::Skeleton2DMesh>(s);
     if (nullptr == arg1) return true;
+    result = (int)cc_cspine_Skeleton2DMesh_byteStride_get(arg1);
     
-    ok &= nativevalue_to_se(arg1->byteStride, s.rval(), s.thisObject()); 
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
     
     
     return true;
 }
 SE_BIND_PROP_GET(js_cc_cspine_Skeleton2DMesh_byteStride_get) 
 
-static bool js_cc_cspine_Skeleton2DMesh_vCount_set(se::State& s)
-{
-    CC_UNUSED bool ok = true;
-    const auto& args = s.args();
-    size_t argc = args.size();
-    cc::cspine::Skeleton2DMesh *arg1 = (cc::cspine::Skeleton2DMesh *) NULL ;
-    
-    arg1 = SE_THIS_OBJECT<cc::cspine::Skeleton2DMesh>(s);
-    if (nullptr == arg1) return true;
-    
-    ok &= sevalue_to_native(args[0], &arg1->vCount, s.thisObject());
-    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
-    
-    
-    return true;
-}
-SE_BIND_PROP_SET(js_cc_cspine_Skeleton2DMesh_vCount_set) 
-
 static bool js_cc_cspine_Skeleton2DMesh_vCount_get(se::State& s)
 {
     CC_UNUSED bool ok = true;
     cc::cspine::Skeleton2DMesh *arg1 = (cc::cspine::Skeleton2DMesh *) NULL ;
+    int result;
     
     arg1 = SE_THIS_OBJECT<cc::cspine::Skeleton2DMesh>(s);
     if (nullptr == arg1) return true;
+    result = (int)cc_cspine_Skeleton2DMesh_vCount_get(arg1);
     
-    ok &= nativevalue_to_se(arg1->vCount, s.rval(), s.thisObject()); 
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
     
     
     return true;
 }
 SE_BIND_PROP_GET(js_cc_cspine_Skeleton2DMesh_vCount_get) 
 
-static bool js_cc_cspine_Skeleton2DMesh_iCount_set(se::State& s)
-{
-    CC_UNUSED bool ok = true;
-    const auto& args = s.args();
-    size_t argc = args.size();
-    cc::cspine::Skeleton2DMesh *arg1 = (cc::cspine::Skeleton2DMesh *) NULL ;
-    
-    arg1 = SE_THIS_OBJECT<cc::cspine::Skeleton2DMesh>(s);
-    if (nullptr == arg1) return true;
-    
-    ok &= sevalue_to_native(args[0], &arg1->iCount, s.thisObject());
-    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
-    
-    
-    return true;
-}
-SE_BIND_PROP_SET(js_cc_cspine_Skeleton2DMesh_iCount_set) 
-
 static bool js_cc_cspine_Skeleton2DMesh_iCount_get(se::State& s)
 {
     CC_UNUSED bool ok = true;
     cc::cspine::Skeleton2DMesh *arg1 = (cc::cspine::Skeleton2DMesh *) NULL ;
+    int result;
     
     arg1 = SE_THIS_OBJECT<cc::cspine::Skeleton2DMesh>(s);
     if (nullptr == arg1) return true;
+    result = (int)cc_cspine_Skeleton2DMesh_iCount_get(arg1);
     
-    ok &= nativevalue_to_se(arg1->iCount, s.rval(), s.thisObject()); 
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
     
     
     return true;
@@ -306,11 +241,11 @@ bool js_register_cc_cspine_Skeleton2DMesh(se::Object* obj) {
     auto* cls = se::Class::create("Skeleton2DMesh", obj, nullptr, _SE(js_new_Skeleton2DMesh)); 
     
     cls->defineStaticProperty("__isJSB", se::Value(true), se::PropertyAttribute::READ_ONLY | se::PropertyAttribute::DONT_ENUM | se::PropertyAttribute::DONT_DELETE);
-    cls->defineProperty("vertices", _SE(js_cc_cspine_Skeleton2DMesh_vertices_get), _SE(js_cc_cspine_Skeleton2DMesh_vertices_set)); 
-    cls->defineProperty("indices", _SE(js_cc_cspine_Skeleton2DMesh_indices_get), _SE(js_cc_cspine_Skeleton2DMesh_indices_set)); 
-    cls->defineProperty("byteStride", _SE(js_cc_cspine_Skeleton2DMesh_byteStride_get), _SE(js_cc_cspine_Skeleton2DMesh_byteStride_set)); 
-    cls->defineProperty("vCount", _SE(js_cc_cspine_Skeleton2DMesh_vCount_get), _SE(js_cc_cspine_Skeleton2DMesh_vCount_set)); 
-    cls->defineProperty("iCount", _SE(js_cc_cspine_Skeleton2DMesh_iCount_get), _SE(js_cc_cspine_Skeleton2DMesh_iCount_set)); 
+    cls->defineProperty("vertices", _SE(js_cc_cspine_Skeleton2DMesh_vertices_get), nullptr); 
+    cls->defineProperty("indices", _SE(js_cc_cspine_Skeleton2DMesh_indices_get), nullptr); 
+    cls->defineProperty("byteStride", _SE(js_cc_cspine_Skeleton2DMesh_byteStride_get), nullptr); 
+    cls->defineProperty("vCount", _SE(js_cc_cspine_Skeleton2DMesh_vCount_get), nullptr); 
+    cls->defineProperty("iCount", _SE(js_cc_cspine_Skeleton2DMesh_iCount_get), nullptr); 
     
     
     

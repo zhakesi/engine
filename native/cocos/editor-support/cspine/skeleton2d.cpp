@@ -71,7 +71,7 @@ std::vector<Skeleton2DMesh *> &Skeleton2D::updateRenderData() {
 }
 
 void Skeleton2D::realTimeTraverse() {
-    unsigned byteStride = sizeof(middleware::V3F_T2F_C4B);
+    unsigned byteStride = sizeof(middleware::V3F_T2F_C4F);
     int startSlotIndex = -1;
     int endSlotIndex = -1;
     bool inRange = true;
@@ -109,9 +109,9 @@ void Skeleton2D::realTimeTraverse() {
             auto indexCount = attachmentVertices->_triangles->indexCount;
             auto ibSize = indexCount * sizeof(uint16_t);
             Skeleton2DMesh *mesh = currMesh = new Skeleton2DMesh(vertCount, indexCount, byteStride);
-            memcpy(mesh->vertices, static_cast<void *>(attachmentVertices->_triangles->verts), vbSize);
-            attachment->computeWorldVertices(slot->getBone(), (float *)mesh->vertices, 0, byteStride / sizeof(float));
-            memcpy(mesh->indices, attachmentVertices->_triangles->indices, ibSize);
+            memcpy(mesh->getVertices().data(), static_cast<void *>(attachmentVertices->_triangles->verts), vbSize);
+            attachment->computeWorldVertices(slot->getBone(), mesh->getVertices().data(), 0, byteStride / sizeof(float));
+            memcpy(mesh->getIndices().data(), attachmentVertices->_triangles->indices, ibSize);
             _meshes.push_back(mesh);
 
             color.r = attachment->getColor().r;
@@ -127,9 +127,9 @@ void Skeleton2D::realTimeTraverse() {
             auto indexCount = attachmentVertices->_triangles->indexCount;
             auto ibSize = indexCount * sizeof(uint16_t);
             Skeleton2DMesh *mesh = currMesh = new Skeleton2DMesh(vertCount, indexCount, byteStride);
-            memcpy(mesh->vertices, static_cast<void *>(attachmentVertices->_triangles->verts), vbSize);
-            attachment->computeWorldVertices(*slot, 0, attachment->getWorldVerticesLength(), (float *)mesh->vertices, 0, byteStride / sizeof(float));
-            memcpy(mesh->indices, attachmentVertices->_triangles->indices, ibSize);
+            memcpy(mesh->getVertices().data(), static_cast<void *>(attachmentVertices->_triangles->verts), vbSize);
+            attachment->computeWorldVertices(*slot, 0, attachment->getWorldVerticesLength(), mesh->getVertices().data(), 0, byteStride / sizeof(float));
+            memcpy(mesh->getIndices().data(), attachmentVertices->_triangles->indices, ibSize);
             _meshes.push_back(mesh);
 
             color.r = attachment->getColor().r;
@@ -155,8 +155,8 @@ void Skeleton2D::realTimeTraverse() {
         if (_clipper->isClipping()) {
 
         } else {
-            int vCount = currMesh->vCount;
-            middleware::V3F_T2F_C4B *vertex = reinterpret_cast<middleware::V3F_T2F_C4B *>(currMesh->vertices);
+            int vCount = currMesh->getVCount();
+            auto* vertex = reinterpret_cast<middleware::V3F_T2F_C4F *>(currMesh->getVertices().data());
             for (int v = 0; v < vCount; ++v) {
                 vertex[v].color.r = color.r;
                 vertex[v].color.g = color.g;
@@ -170,14 +170,14 @@ void Skeleton2D::realTimeTraverse() {
 }
 
 void Skeleton2D::processVertices() {
-    unsigned byteStride = sizeof(middleware::V3F_T2F_C4B);
+    unsigned byteStride = sizeof(middleware::V3F_T2F_C4F);
     int count = _meshes.size();
     float zoffset = 0.1f;
     for (int i = 0; i < count; i++) {
         auto mesh = _meshes[i];
-        float *ptr = (float *)mesh->vertices;
-        for (int m = 0; m < mesh->vCount; m++) {
-            float *vert = ptr + m * mesh->byteStride / sizeof(float);
+        float *ptr = (float *)mesh->getVertices().data();
+        for (int m = 0; m < mesh->getVCount(); m++) {
+            float *vert = ptr + m * mesh->getByteStride() / sizeof(float);
             vert[0] *= 0.01f;
             vert[1] *= 0.01f;
             vert[2] = zoffset;

@@ -84,6 +84,17 @@ struct V3F_T2F_C4B { //NOLINT
     Color4B color;
 };
 
+struct V3F_T2F_C4F { //NOLINT
+    // vertices (3F)
+    cc::Vec3 vertex;
+
+    // tex coords (2F)
+    Tex2F texCoord;
+
+    // colors (4F)
+    Color4F color;
+};
+
 /**
  *  Vertex Format with x y u v color1 color2.
  */

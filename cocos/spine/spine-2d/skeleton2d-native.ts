@@ -6,7 +6,7 @@ export class Skeleton2DMesh {
         this.vCount = vc;
         this.iCount = ic;
         this.byteStride = stride;
-        const floatNum = this.byteStride / 4;
+        const floatNum = vc * this.byteStride / 4;
         this.vertices = new Float32Array(floatNum);
         this.indices = new Uint16Array(ic);
     }
