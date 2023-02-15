@@ -10,17 +10,17 @@ public:
     Skeleton2DMesh();
     Skeleton2DMesh(int vNum, int iNum, int stride);
     ~Skeleton2DMesh();
-    inline std::vector<float>& getVertices() { return _vertices; }
-    inline std::vector<uint16_t>& getIndices() { return _indices; }
-    inline int getByteStride() { return _byteStride;}
-    inline int getVCount() { return _vCount;}
-    inline int getICount() { return _iCount;}
-private:
-    std::vector<float> _vertices;
-    std::vector<uint16_t> _indices;
-    int    _byteStride;
-    int    _vCount;
-    int    _iCount;
+    inline std::vector<float>& getVertices() {return vertices;}
+    inline std::vector<uint16_t>&getIndices() {return indices;}
+    inline int getByteStride() {return byteStride;}
+    inline int getVCount() {return vCount;}
+    inline int getICount() {return iCount;}
+public:
+    std::vector<float> vertices;
+    std::vector<uint16_t> indices;
+    int    byteStride;
+    int    vCount;
+    int    iCount;
 };
 
 }

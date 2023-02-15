@@ -47,7 +47,7 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
             const indices = new Uint16Array(heap32.buffer, startI, ic);
 
             const mesh = new Skeleton2DMesh();
-            mesh.intialize(vc, ic, 36);
+            mesh.initialize(vc, ic, 4 * floatStride);
             mesh.vertices.set(vertices);
             mesh.indices.set(indices);
             this._meshArray.push(mesh);

@@ -81,7 +81,6 @@ CCProgram sprite-fs %{
       o.rgb = ((texColor.a - 1.0) * v_dark.a + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb;
     #else
       o *= texture(cc_spriteTexture, uv0);
-      o *= v_light;
     #endif
 
     ALPHA_TEST(o);

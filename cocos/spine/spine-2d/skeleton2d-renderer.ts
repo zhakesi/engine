@@ -28,7 +28,7 @@ import { editable } from '../../core/data/decorators';
 import { errorID } from '../../core/platform/debug';
 import { SkeletonData } from '../skeleton-data';
 import { ModelLocalBindings } from '../../rendering/define';
-import { vfmtPosUvColor, getAttributeStride } from '../../2d/renderer/vertex-format';
+import { vfmtPosUvColor, getAttributeStride, vfmtPosUvColor4B } from '../../2d/renderer/vertex-format';
 import { Model } from '../../render-scene/scene';
 import { Root } from '../../root';
 import { legacyCC } from '../../core/global-exports';
@@ -285,8 +285,8 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     public setAnimation (name: string) {
-        // if (!this._imply) return;
-        // this._imply.setAnimation(name);
+        if (!this._imply) return;
+        this._imply.setAnimation(name);
     }
 
     protected _onUpdateLocalDescriptorSet () {
@@ -330,7 +330,10 @@ export class Skeleton2DRenderer extends ModelRenderer {
         if (this._models.length < 1) {
             return;
         }
-        const attrs = vfmtPosUvColor;
+        let attrs = vfmtPosUvColor;
+        if (JSB) {
+            attrs = vfmtPosUvColor4B;
+        }
         const stride = getAttributeStride(attrs);
 
         if (this._models[0].subModels.length <= idx) {
@@ -366,6 +369,7 @@ export class Skeleton2DRenderer extends ModelRenderer {
             const ia = subModel.inputAssembler;
             const vb = new Float32Array(mesh.vertices);
             ia.vertexBuffers[0].update(vb);
+            //ia.vertexBuffers[0].update(mesh.vertices);
             ia.vertexCount = mesh.vCount;
             const ib = new Uint16Array(mesh.indices);
             ia.indexBuffer!.update(ib);

@@ -2,7 +2,7 @@ export class Skeleton2DMesh {
     constructor () {
 
     }
-    public intialize (vc: number, ic: number, stride: number) {
+    public initialize (vc: number, ic: number, stride: number) {
         this.vCount = vc;
         this.iCount = ic;
         this.byteStride = stride;
