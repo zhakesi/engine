@@ -13,22 +13,40 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
         this._objID = this._wasmUtil.createSkeletonObject();
     }
     public initSkeletonData (data: SkeletonData): boolean {
-        const name = data.name;
-        const altasName = `${name}.atlas`;
-        const jsonName = `${name}.json`;
-        const fileInst = FileResourceInstance();
-        fileInst.AddToFileList(altasName, data.atlasText);
-        fileInst.AddToFileList(jsonName, data.skeletonJsonStr);
+        if (data.skeletonJson) {
+            const name = data.name;
+            const altasName = `${name}.atlas`;
+            const jsonName = `${name}.json`;
+            const fileInst = FileResourceInstance();
+            fileInst.addTextRes(altasName, data.atlasText);
+            fileInst.addTextRes(jsonName, data.skeletonJsonStr);
+            const encoder = new TextEncoder();
+            const encoded = encoder.encode(name);
+            const length = encoded.length;
 
-        const encoder = new TextEncoder();
-        const encoded = encoder.encode(name);
-        const length = encoded.length;
+            const local = this._wasmUtil.queryMemory(length);
+            const array = this._wasmHEAPU8.subarray(local, local + length);
+            array.set(encoded);
 
-        const local = this._wasmUtil.queryMemory(length);
-        const array = this._wasmHEAPU8.subarray(local, local + length);
-        array.set(encoded);
+            this._wasmUtil.setSkeletonData(this._objID, true, local, length);
+        } else {
+            const name = data.name;
+            const altasName = `${name}.atlas`;
+            const binName = `${name}.bin`;
+            const fileInst = FileResourceInstance();
+            fileInst.addTextRes(altasName, data.atlasText);
+            fileInst.addRawRes(binName, new Uint8Array(data._nativeAsset));
+            const encoder = new TextEncoder();
+            const encoded = encoder.encode(name);
+            const length = encoded.length;
 
-        this._wasmUtil.setSkeletonData(this._objID, local, length);
+            const local = this._wasmUtil.queryMemory(length);
+            const array = this._wasmHEAPU8.subarray(local, local + length);
+            array.set(encoded);
+
+            this._wasmUtil.setSkeletonData(this._objID, false, local, length);
+        }
+
         return true;
     }
 

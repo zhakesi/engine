@@ -108,6 +108,11 @@ export class Skeleton2DRenderer extends ModelRenderer {
             console.log('need release');
         }
         this._skeletonData = value;
+        if (this._skeletonData) {
+            if (this._skeletonData.textures.length > 0) {
+                this._texture = this._skeletonData.textures[0];
+            }
+        }
 
         this._updateSkinEnum();
         this._updateAnimEnum();
@@ -369,7 +374,6 @@ export class Skeleton2DRenderer extends ModelRenderer {
             const ia = subModel.inputAssembler;
             const vb = new Float32Array(mesh.vertices);
             ia.vertexBuffers[0].update(vb);
-            //ia.vertexBuffers[0].update(mesh.vertices);
             ia.vertexCount = mesh.vCount;
             const ib = new Uint16Array(mesh.indices);
             ia.indexBuffer!.update(ib);
