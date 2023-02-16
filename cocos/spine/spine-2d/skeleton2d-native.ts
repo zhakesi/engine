@@ -20,6 +20,7 @@ export class Skeleton2DMesh {
 
 export declare class NativeSkeleton2D {
     initSkeletonData(jsonStr: string, atlasText: string);
+    initSkeletonDataBinary(dataPath: string, atlasText: string);
     setSkin(name: string);
     setAnimation (name: string);
     updateAnimation(dltTime: number);

@@ -324,6 +324,40 @@ static bool js_cc_cspine_Skeleton2D_initSkeletonData(se::State& s)
 }
 SE_BIND_FUNC(js_cc_cspine_Skeleton2D_initSkeletonData) 
 
+static bool js_cc_cspine_Skeleton2D_initSkeletonDataBinary(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cspine::Skeleton2D *arg1 = (cc::cspine::Skeleton2D *) NULL ;
+    ccstd::string *arg2 = 0 ;
+    ccstd::string *arg3 = 0 ;
+    ccstd::string temp2 ;
+    ccstd::string temp3 ;
+    
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::cspine::Skeleton2D>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg2 = &temp2;
+    
+    
+    ok &= sevalue_to_native(args[1], &temp3, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = &temp3;
+    
+    (arg1)->initSkeletonDataBinary(*arg2,*arg3);
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_cspine_Skeleton2D_initSkeletonDataBinary) 
+
 static bool js_cc_cspine_Skeleton2D_setSkin(se::State& s)
 {
     CC_UNUSED bool ok = true;
@@ -433,6 +467,7 @@ bool js_register_cc_cspine_Skeleton2D(se::Object* obj) {
     cls->defineStaticProperty("__isJSB", se::Value(true), se::PropertyAttribute::READ_ONLY | se::PropertyAttribute::DONT_ENUM | se::PropertyAttribute::DONT_DELETE);
     
     cls->defineFunction("initSkeletonData", _SE(js_cc_cspine_Skeleton2D_initSkeletonData)); 
+    cls->defineFunction("initSkeletonDataBinary", _SE(js_cc_cspine_Skeleton2D_initSkeletonDataBinary)); 
     cls->defineFunction("setSkin", _SE(js_cc_cspine_Skeleton2D_setSkin)); 
     cls->defineFunction("setAnimation", _SE(js_cc_cspine_Skeleton2D_setAnimation)); 
     cls->defineFunction("updateAnimation", _SE(js_cc_cspine_Skeleton2D_updateAnimation)); 

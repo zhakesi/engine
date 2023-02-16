@@ -16,6 +16,7 @@ public:
     Skeleton2D();
     ~Skeleton2D();
     void initSkeletonData(ccstd::string &jsonStr, ccstd::string &atlasText);
+    void initSkeletonDataBinary(ccstd::string &datPath, ccstd::string &atlasText);
     void setSkin(ccstd::string &name);
     void setAnimation (ccstd::string &name);
     void updateAnimation(float dltTime);

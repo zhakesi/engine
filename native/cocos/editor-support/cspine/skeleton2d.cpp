@@ -1,5 +1,6 @@
 #include "skeleton2d.h"
 #include "core/platform/Debug.h"
+#include "platform/FileUtils.h"
 #include "cocos/editor-support/spine/spine.h"
 #include "cocos/editor-support/spine-creator-support/spine-cocos2dx.h"
 #include "cocos/editor-support/spine-creator-support/AttachmentVertices.h"
@@ -21,6 +22,35 @@ void Skeleton2D::initSkeletonData(ccstd::string &jsonStr, ccstd::string &atlasTe
     spine::SkeletonJson json(attachmentLoader);
     json.setScale(1.0F);
     _skelData = json.readSkeletonData(jsonStr.c_str());
+
+    _skeleton = new spine::Skeleton(_skelData);
+
+    _animStateData = new spine::AnimationStateData(_skelData);
+
+    _animState = new spine::AnimationState(_animStateData);
+
+    _clipper = new spine::SkeletonClipping();
+
+    _skeleton->setToSetupPose();
+    _skeleton->updateWorldTransform();
+}
+
+void Skeleton2D::initSkeletonDataBinary(ccstd::string &dataPath, ccstd::string &atlasText) {
+    spine::Atlas *atlas = new spine::Atlas(atlasText.c_str(), (int)atlasText.size(), "", nullptr, false);
+    spine::AttachmentLoader *attachmentLoader = new spine::Cocos2dAtlasAttachmentLoader(atlas);
+
+    auto fileUtils = cc::FileUtils::getInstance();
+    if (!fileUtils->isFileExist(dataPath)) {
+        CC_LOG_ERROR("file: %s not exist!!!", dataPath.c_str());
+        return;
+    }
+    cc::Data dataBuffer;
+    const auto fullpath = fileUtils->fullPathForFilename(dataPath);
+    fileUtils->getContents(fullpath, &dataBuffer);
+
+    spine::SkeletonBinary binary(attachmentLoader);
+    binary.setScale(1.0F);
+    _skelData = binary.readSkeletonData(dataBuffer.getBytes(), (int)dataBuffer.getSize());
 
     _skeleton = new spine::Skeleton(_skelData);
 
@@ -172,7 +202,7 @@ void Skeleton2D::realTimeTraverse() {
 void Skeleton2D::processVertices() {
     unsigned byteStride = sizeof(middleware::V3F_T2F_C4B);
     int count = _meshes.size();
-    float zoffset = 0.1f;
+    float z_offset = 0.1f;
     for (int i = 0; i < count; i++) {
         auto mesh = _meshes[i];
         float *ptr = mesh->vertices.data();
@@ -180,9 +210,9 @@ void Skeleton2D::processVertices() {
             float *vert = ptr + m * mesh->byteStride / sizeof(float);
             vert[0] *= 0.01f;
             vert[1] *= 0.01f;
-            vert[2] = zoffset;
+            vert[2] = z_offset;
         }
-        zoffset += 0.01f;
+        z_offset += 0.01f;
     }
 }
 

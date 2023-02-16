@@ -11,8 +11,13 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
     }
 
     initSkeletonData (data: SkeletonData): boolean {
-        if (data.skeletonJsonStr && data.atlasText) {
+        if (!data.atlasText) return false;
+        if (data.skeletonJsonStr) {
             this._nativeObj.initSkeletonData(data.skeletonJsonStr, data.atlasText);
+        } else if (data.nativeUrl.length > 0) {
+            this._nativeObj.initSkeletonDataBinary(data.nativeUrl, data.atlasText);
+        } else {
+            return false;
         }
 
         return true;
