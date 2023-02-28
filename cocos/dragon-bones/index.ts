@@ -38,8 +38,8 @@ export enum ExtensionType {
 }
 
 /**
- * @internal since v3.7.2, this is an engine private enum type.
- * @deprecated since v3.7.2, will be removed in the future.
+ * @en Event type in dragonbones animation.
+ * @zh 龙骨动画中的事件类型。
  */
 export enum EventType {
     Frame = 0,
@@ -47,14 +47,34 @@ export enum EventType {
 }
 
 /**
- * @internal since v3.7.2, this is an engine private enum type.
- * @deprecated since v3.7.2, will be removed in the future.
+ * @en Animation fade out mode.
+ * @zh 动画淡出模式。
  */
 export enum AnimationFadeOutMode {
     None = 0,
+
+    /**
+     * @en Fade out the animation states of the same layer.
+     * @zh 淡出同层的动画状态。
+     */
     SameLayer = 1,
+
+    /**
+     * @en Fade out the animation states of the same group.
+     * @zh 淡出同组的动画状态。
+     */
     SameGroup = 2,
+
+    /**
+     * @en Fade out the animation states of the same layer and group.
+     * @zh 淡出同层并且同组的动画状态。
+     */
     SameLayerAndGroup = 3,
+
+    /**
+     * @en Fade out of all animation states.
+     * @zh 淡出所有的动画状态。
+     */
     All = 4
 }
 
@@ -67,7 +87,6 @@ export * from './ArmatureCache';
 export * from './DragonBonesAsset';
 export * from './DragonBonesAtlasAsset';
 export * from './ArmatureDisplay';
-export * from './AttachUtil';
 export * from './assembler';
 
 export * from '@cocos/dragonbones-js';

@@ -67,7 +67,7 @@ export let timeScale = 1;
 
 /**
  * @en Enum for cache mode type.
- * @zh Dragonbones渲染类型
+ * @zh Dragonbones渲染类型。
  * @enum ArmatureDisplay.AnimationCacheMode
  */
 export enum AnimationCacheMode {
@@ -99,10 +99,26 @@ function setEnumAttr (obj, propName, enumDef) {
     CCClass.Attr.setClassAttr(obj, propName, 'enumList', Enum.getList(enumDef));
 }
 
+/**
+ * @en Struct that can store rendering data-related information.
+ * @zh 用于存储渲染数据相关信息的结构体。
+ */
 export interface ArmatureDisplayDrawData {
+    /**
+     * @en Material. @zh 材质。
+     */
     material: Material | null;
+    /**
+     * @en Texture. @zh 纹理。
+     */
     texture: Texture2D | null;
+    /**
+     * @en Vertex index offset. @zh 顶点索引偏移。
+     */
     indexOffset: number;
+    /**
+     * @en Vertex index count. @zh 顶点索引数量。
+     */
     indexCount: number;
 }
 

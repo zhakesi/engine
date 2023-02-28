@@ -84,7 +84,7 @@ export class AttachUtil {
         const sockets = this._armatureDisplay!.sockets;
         const socketNodes = this._armatureDisplay!.socketNodes;
 
-        const matrixHandle = (node: NodeExt, boneMat: Matrix) => {
+        const matrixHandle = (node: Node, boneMat: Matrix) => {
             const tm = _tempMat4;
             tm.m00 = boneMat.a;
             tm.m01 = boneMat.b;
@@ -122,8 +122,4 @@ export class AttachUtil {
             matrixHandle(boneNode, bone.globalTransformMatrix);
         }
     }
-}
-
-interface NodeExt extends Node{
-    _oldScale?: Vec3;
 }
