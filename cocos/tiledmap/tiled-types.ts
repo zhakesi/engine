@@ -427,7 +427,7 @@ export class TMXObjectGroupInfo {
     tintColor: Color | null = null;
     /**
      * Gets the Properties.
-     * @return {Array}
+     * @returns {Array}
      */
     getProperties () {
         return this.properties;
@@ -497,7 +497,7 @@ export class TMXLayerInfo {
 
     /**
      * Gets the Properties.
-     * @return {Object}
+     * @returns {Object}
      */
     getProperties () {
         return this.properties;

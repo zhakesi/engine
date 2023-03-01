@@ -245,7 +245,7 @@ export class TMXMapInfo {
     /**
      * @en Gets Map orientation.
      * @zh 获取地图方向。
-     * @return {Number}
+     * @returns {Number}
      */
     getOrientation () {
         return this.orientation;
@@ -262,7 +262,7 @@ export class TMXMapInfo {
     /**
      * @en Gets the staggerAxis of map.
      * @zh 获取栅格轴向为X或Y。
-     * @return {TiledMap.StaggerAxis}
+     * @returns {TiledMap.StaggerAxis}
      */
     getStaggerAxis () {
         return this._staggerAxis;
@@ -280,7 +280,7 @@ export class TMXMapInfo {
     /**
      * @en Gets stagger index
      * @zh 获取栅格类型为奇数或偶数。
-     * @return {TiledMap.StaggerIndex}
+     * @returns {TiledMap.StaggerIndex}
      */
     getStaggerIndex () {
         return this._staggerIndex;
@@ -298,7 +298,7 @@ export class TMXMapInfo {
     /**
      * @en Gets Hex side length. Unit is pixel.
      * @zh 获取hex模式边长。单位为像素。
-     * @return {Number}
+     * @returns {Number}
      */
     getHexSideLength () {
         return this._hexSideLength;
@@ -316,7 +316,7 @@ export class TMXMapInfo {
     /**
      * @en Gets map width & height. Unit is pixel.
      * @zh 获取地图宽度和高度。单位为像素。
-     * @return {Size}
+     * @returns {Size}
      */
     getMapSize () {
         return new Size(this._mapSize.width, this._mapSize.height);
@@ -356,7 +356,7 @@ export class TMXMapInfo {
     /**
      * @en Gets tiles width & height. Unit is pixel.
      * @zh 获取瓦片尺寸。单位为像素。
-     * @return {Size}
+     * @returns {Size}
      */
     getTileSize () {
         return new Size(this._tileSize.width, this._tileSize.height);
@@ -399,7 +399,7 @@ export class TMXMapInfo {
     /**
      * @en Gets Layers.
      * @zh 获取 Layers。
-     * @return {Array}
+     * @returns {Array}
      */
     getLayers () {
         return this._layers;
@@ -418,7 +418,7 @@ export class TMXMapInfo {
     /**
      * @en Gets ImageLayers.
      * @zh 获取 ImageLayers。
-     * @return {Array}
+     * @returns {Array}
      */
     getImageLayers () {
         return this._imageLayers;
@@ -437,7 +437,7 @@ export class TMXMapInfo {
     /**
      * @en Gets tilesets.
      * @zh 获取 tilesets。
-     * @return {Array}
+     * @returns {Array}
      */
     getTilesets () {
         return this._tilesets;
@@ -455,7 +455,7 @@ export class TMXMapInfo {
     /**
      * @en Gets ObjectGroups.
      * @zh 获取 ObjectGroups。
-     * @return {Array}
+     * @returns {Array}
      */
     getObjectGroups () {
         return this._objectGroups;
@@ -481,7 +481,7 @@ export class TMXMapInfo {
     /**
      * @en Gets parent element.
      * @zh 获取父元素。
-     * @return {Object}
+     * @returns {Object}
      */
     getParentElement () {
         return this.parentElement;
@@ -499,7 +499,7 @@ export class TMXMapInfo {
     /**
      * @en Gets parent GID.
      * @zh 获取 parent GID。
-     * @return {Number}
+     * @returns {Number}
      */
     getParentGID () {
         return this.parentGID;
@@ -517,7 +517,7 @@ export class TMXMapInfo {
     /**
      * @en Gets layer attribute.
      * @zh 获取图层属性。
-     * @return {Object}
+     * @returns {Object}
      */
     getLayerAttribs () {
         return this.layerAttrs;
@@ -535,7 +535,7 @@ export class TMXMapInfo {
     /**
      * @en Sets whether reading storing characters stream.
      * @zh 获取是否存储字符流。
-     * @return {Boolean}
+     * @returns {Boolean}
      */
     getStoringCharacters () {
         return this.storingCharacters;
@@ -553,7 +553,7 @@ export class TMXMapInfo {
     /**
      * @en Gets properties.
      * @zh 获取属性。
-     * @return {Array}
+     * @returns {Array}
      */
     getProperties () {
         return this.properties;
@@ -576,7 +576,7 @@ export class TMXMapInfo {
      * @param {Object} spfTextureMap @en Textures map set. @zh 图集信息。
      * @param {Object} textureSizes @en Size information of textures in spfTextureMap . @zh 纹理尺寸信息。
      * @param {Object} imageLayerTextures @en Textures used in imageLayers. @zh 图像图层的纹理。
-     * @return {Boolean}
+     * @returns {Boolean}
      */
     initWithXML (tmxString: string, tsxMap: { [key: string]: string }, spfTextureMap: { [key: string]: SpriteFrame },
         textureSizes: { [key: string]: Size }, imageLayerTextures: { [key: string]: SpriteFrame }) {
@@ -609,7 +609,7 @@ export class TMXMapInfo {
      * @zh 转换xml格式字符串或tmx字符或tsx文件描述字符串。
      * @param {String} xmlString
      * @param {Number} tilesetFirstGid
-     * @return {Element} @en Return the map information.  @zh 返回地图信息。
+     * @returns {Element} @en Return the map information.  @zh 返回地图信息。
      */
     parseXMLString (xmlStr: string, tilesetFirstGid?: number) {
         const parser = new SAXParser();
@@ -1096,7 +1096,7 @@ export class TMXMapInfo {
     /**
      * @en Sets the tile animations.
      * @zh 设置瓦片动画。
-     * @return {Object}
+     * @returns {Object}
      */
     setTileAnimations (animations: TiledAnimationType) {
         this._tileAnimations = animations;
@@ -1105,7 +1105,7 @@ export class TMXMapInfo {
     /**
      * @en Gets the tile animations.
      * @zh 获取瓦片动画。
-     * @return {Object}
+     * @returns {Object}
      */
     getTileAnimations (): TiledAnimationType {
         return this._tileAnimations;
@@ -1114,7 +1114,7 @@ export class TMXMapInfo {
     /**
      * @en Gets the tile properties.
      * @zh 获取瓦片属性
-     * @return {Object}
+     * @returns {Object}
      */
     getTileProperties () {
         return this._tileProperties;
@@ -1132,7 +1132,7 @@ export class TMXMapInfo {
     /**
      * @en Gets the currentString.
      * @zh 获取当前字符串。
-     * @return {String}
+     * @returns {String}
      */
     getCurrentString () {
         return this.currentString;

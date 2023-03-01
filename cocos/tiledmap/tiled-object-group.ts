@@ -61,7 +61,7 @@ export class TiledObjectGroup extends Component {
      * @en Offset position of child objects.
      * @zh 获取子对象的偏移位置。
      * @method getPositionOffset
-     * @return {Vec2}
+     * @returns {Vec2}
      * @example
      * let offset = tMXObjectGroup.getPositionOffset();
      */
@@ -73,7 +73,7 @@ export class TiledObjectGroup extends Component {
      * @en List of properties stored in a dictionary.
      * @zh 以映射的形式获取属性列表。
      * @method getProperties
-     * @return {Object}
+     * @returns {Object}
      * @example
      * let offset = tMXObjectGroup.getProperties();
      */
@@ -85,7 +85,7 @@ export class TiledObjectGroup extends Component {
      * @en Gets the Group name.
      * @zh 获取组名称。
      * @method getGroupName
-     * @return {String}
+     * @returns {String}
      * @example
      * let groupName = tMXObjectGroup.getGroupName;
      */
@@ -97,7 +97,7 @@ export class TiledObjectGroup extends Component {
      * @en Return the value for the specific property name.
      * @zh 根据属性名称获取属性。
      * @param {String} propertyName
-     * @return {Object}
+     * @returns {Object}
      */
     public getProperty (propertyName: { toString (): string } | string) {
         return this._properties![propertyName.toString()];
@@ -110,7 +110,7 @@ export class TiledObjectGroup extends Component {
      * @zh 获取指定的对象。
      * @method getObject
      * @param {String} objectName
-     * @return {Object|Null}
+     * @returns {Object|Null}
      * @example
      * let object = tMXObjectGroup.getObject("Group");
      */
@@ -129,7 +129,7 @@ export class TiledObjectGroup extends Component {
      * @en Gets the objects.
      * @zh 获取对象数组。
      * @method getObjects
-     * @return {Array}
+     * @returns {Array}
      * @example
      * let objects = tMXObjectGroup.getObjects();
      */
