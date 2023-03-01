@@ -57,7 +57,7 @@ const _tempRowCol = { row: 0, col: 0 };
  * @en
  * User node data，used for adding user node on tiled layer.
  * @zh
- * 用户节点数据，可用于在layer上添加用户节点。
+ * 用户节点数据，可用于在 layer 上添加用户节点。
  */
 @ccclass('cc.TiledUserNodeData')
 export class TiledUserNodeData extends Component {
@@ -88,7 +88,7 @@ export class TiledUserNodeData extends Component {
 
 /**
  * @en Base unit element of render data used in tiledmap component, include a Texture2D object.
- * @zh Tiledmap组件中使用的渲染数据单元，包括一个 Texture2D 对象。
+ * @zh Tiledmap 组件中使用的渲染数据单元，包括一个 Texture2D 对象。
  */
 export interface TiledRenderData {
     renderData: RenderData | null;
@@ -115,7 +115,7 @@ export class TiledLayer extends UIRenderer {
     protected _userNodeDirty = false;
 
     /**
-     * @en stores the layer tiles node, index is caculated by 'x + width * y', format likes '[0]=tileNode0,[1]=tileNode1, ...'.
+     * @en Stores the layer tiles node, index is caculated by 'x + width * y', format likes '[0]=tileNode0,[1]=tileNode1, ...'.
      * @zh 存储图层上的瓦片节点，序号计算方式为 'x + width * y'。
     */
     public tiledTiles: (TiledTile | null)[] = [];
@@ -130,6 +130,10 @@ export class TiledLayer extends UIRenderer {
         leftDown: { row: -1, col: -1 },
         rightTop: { row: -1, col: -1 },
     };
+    /**
+     * @en Stores the layer tiles node, index is caculated by 'x + width * y', format likes '[0]=tileNode0,[1]=tileNode1, ...'.
+     * @zh 裁切矩形范围，超出范围的内容将不进行绘制。
+    */
     get cullingRect () { return this._cullingRect; }
 
     protected _cullingDirty = true;
@@ -147,13 +151,13 @@ export class TiledLayer extends UIRenderer {
     protected _rightOffset = 0;
 
     /**
-     * @en store the layer tiles, index is caculated by 'x + width * y', format likes '[0]=gid0,[1]=gid1, ...'.
+     * @en Store the layer tiles, index is caculated by 'x + width * y', format likes '[0]=gid0,[1]=gid1, ...'.
      * @zh 存储图层上的瓦片，序号计算方式为 'x + width * y'。
     */
     public tiles: MixedGID[] = [];
 
     /**
-     * @en vertex array.
+     * @en Vertex array.
      * @zh 顶点数组。
     */
     public vertices: { minCol: number, maxCol: number, [key: number]: { left: number, bottom: number, index: number } }[] = [];
@@ -173,7 +177,7 @@ export class TiledLayer extends UIRenderer {
     protected _tintColor?: Color;
 
     /**
-     * @en store all layer grid corresponding texture info, index is gid, format likes '[gid0]=tex-info,[gid1]=tex-info, ...'
+     * @en Store all layer grid corresponding texture info, index is gid, format likes '[gid0]=tex-info,[gid1]=tex-info, ...'
      * @zh 根据纹理信息存储所有图块数据，序号为gid。
     */
     public texGrids: TiledTextureGrids | null = null;
@@ -192,7 +196,7 @@ export class TiledLayer extends UIRenderer {
     protected _enableCulling?: boolean;
     /**
      * @internal
-     * @deprecated since v3.7, will be removed in the future.
+     * @deprecated Since v3.7, will be removed in the future.
      */
     public colorChanged = false;
 
@@ -1467,7 +1471,7 @@ export class TiledLayer extends UIRenderer {
         this._updateAllUserNode();
     }
     /**
-     * @internal since v3.7.2. This is an engine private function.
+     * @internal Since v3.7.2. This is an engine private function.
      */
     public requestTiledRenderData () {
         const arr = this._tiledDataArray as any[];
@@ -1485,7 +1489,7 @@ export class TiledLayer extends UIRenderer {
         return (comb as TiledRenderData);
     }
     /**
-     * @internal since v3.7.2. This is an engine private function.
+     * @internal Since v3.7.2. This is an engine private function.
      */
     public requestSubNodesData () {
         const arr = this._tiledDataArray as any[];
@@ -1552,7 +1556,7 @@ export class TiledLayer extends UIRenderer {
         this.node._static = true;
     }
     /**
-     * @internal since v3.7.2. This is an engine private function.
+     * @internal Since v3.7.2. This is an engine private function.
      */
     protected createRenderEntity () {
         return new RenderEntity(RenderEntityType.CROSSED);
@@ -1579,7 +1583,7 @@ export class TiledLayer extends UIRenderer {
         drawInfo.setIBCount(quadCount * 6);
     }
     /**
-     * @internal since v3.7.2. This is an engine private function.
+     * @internal Since v3.7.2. This is an engine private function.
      */
     public prepareDrawData () {
         this._drawInfoList.length = 0;

@@ -94,7 +94,8 @@ export class TiledObjectGroup extends Component {
     }
 
     /**
-     * Return the value for the specific property name
+     * @en Return the value for the specific property name.
+     * @zh 根据属性名称获取属性。
      * @param {String} propertyName
      * @return {Object}
      */

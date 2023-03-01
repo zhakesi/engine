@@ -34,7 +34,7 @@ import { Color, errorID, logID, Size, Vec2 } from '../core';
 import { SpriteFrame } from '../2d/assets';
 
 /**
- * @internal since v3.7.2 this is an engine private function.
+ * @internal Since v3.7.2 this is an engine private function.
  */
 function uint8ArrayToUint32Array (uint8Arr: Uint8Array): null | Uint32Array | number[] {
     if (uint8Arr.length % 4 !== 0) return null;
@@ -48,7 +48,7 @@ function uint8ArrayToUint32Array (uint8Arr: Uint8Array): null | Uint32Array | nu
 }
 
 /**
- * @internal since v3.7.2 this is an engine private function.
+ * @internal Since v3.7.2 this is an engine private function.
  */
 function strToHAlign (value): HorizontalTextAlignment {
     const hAlign = Label.HorizontalAlign;
@@ -63,7 +63,7 @@ function strToHAlign (value): HorizontalTextAlignment {
 }
 
 /**
- * @internal since v3.7.2 this is an engine private function.
+ * @internal Since v3.7.2 this is an engine private function.
  */
 function strToVAlign (value): VerticalTextAlignment {
     const vAlign = Label.VerticalAlign;
@@ -78,7 +78,7 @@ function strToVAlign (value): VerticalTextAlignment {
 }
 
 /**
- * @internal since v3.7.2 this is an engine private function.
+ * @internal Since v3.7.2 this is an engine private function.
  */
 function strToColor (value: string): Color {
     if (!value) {
@@ -100,7 +100,7 @@ function strToColor (value: string): Color {
 }
 
 /**
- * @internal since v3.7.2 this is an engine private function.
+ * @internal Since v3.7.2 this is an engine private function.
  */
 function getPropertyList (node: Element, map?: PropertiesInfo): PropertiesInfo {
     const res: any[] = [];
@@ -1148,7 +1148,7 @@ export class TMXMapInfo {
     }
 
     /**
-     * @internal since v3.7.2 this is an engine private function.
+     * @internal Since v3.7.2 this is an engine private function.
     */
     static getNameWithPostfix (name: string) {
         name = name.replace(/\\/g, '/');
@@ -1158,7 +1158,7 @@ export class TMXMapInfo {
     }
 
     /**
-     * @internal since v3.7.2 this is an engine private function.
+     * @internal Since v3.7.2 this is an engine private function.
     */
     static getShortName (name: string) {
         name = name.replace(/\\/g, '/');

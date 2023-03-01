@@ -27,7 +27,7 @@ import { TiledLayer } from '../tiled-layer';
 import { simple } from './simple';
 
 /**
- * @internal since v3.7 this is an engine private object.
+ * @internal Since v3.7.2 this is an engine private object.
  */
 const tiledLayerAssembler: IAssemblerManager = {
     getAssembler () {

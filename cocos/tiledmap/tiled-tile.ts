@@ -148,10 +148,8 @@ export class TiledTile extends Component {
         }
     }
     /**
-     * @en
-     * update information of tiled tile.
-     * @zh
-     * 更新图块信息。
+     * @en Update information of tiled tile.
+     * @zh 更新图块信息。
      */
     public updateInfo () {
         if (!this._layer) return;
