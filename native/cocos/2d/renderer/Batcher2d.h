@@ -127,10 +127,10 @@ private:
         uint32_t offset = 0;
         for (int i = 0; i < size; i += stride) {
             offset = i + 5;
-            vbBuffer[offset++] = static_cast<float>(temp.r) / 255.0F;
-            vbBuffer[offset++] = static_cast<float>(temp.g) / 255.0F;
-            vbBuffer[offset++] = static_cast<float>(temp.b) / 255.0F;
-            vbBuffer[offset++] = entity->getOpacity();
+            vbBuffer[offset++] *= static_cast<float>(temp.r) / 255.0F;
+            vbBuffer[offset++] *= static_cast<float>(temp.g) / 255.0F;
+            vbBuffer[offset++] *= static_cast<float>(temp.b) / 255.0F;
+            vbBuffer[offset++] *= entity->getOpacity();
         }
     }
 
