@@ -44,16 +44,20 @@ bakedSkinningModelProto._ctor = function () {
     this._jointsMedium = { buffer: null, jointTextureInfo, animInfo, texture: null, boundsInfo: null };
     this._skeleton = null;
     this._mesh = null;
+    this._registerOnDestroy();
 };
 
 const oldDestroy = bakedSkinningModelProto.destroy;
 bakedSkinningModelProto.destroy = function () {
     this.uploadedAnim = undefined; // uninitialized
     this._jointsMedium.boundsInfo = null;
-    this._applyJointTexture();
-
     oldDestroy.call(this);
 };
+
+// tips:for native platform need call jointTexturePool.releaseHandle(oldTex)
+bakedSkinningModelProto._onDestroy = function () {
+    this._applyJointTexture();
+}
 
 const oldBindSkeleton = bakedSkinningModelProto.bindSkeleton;
 bakedSkinningModelProto.bindSkeleton = function (skeleton: Skeleton | null = null, skinningRoot: Node | null = null, mesh: Mesh | null = null) {
