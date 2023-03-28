@@ -45,8 +45,9 @@ export enum SkelSkinsEnum {
 ccenum(SkelSkinsEnum);
 
 export enum SkelAnimsEnum {
-    '<None>' = 0
+    '<None>' = 0,
 }
+ccenum(SkelAnimsEnum);
 
 function setEnumAttr (obj, propName, enumDef) {
     CCClass.Attr.setClassAttr(obj, propName, 'type', 'Enum');
