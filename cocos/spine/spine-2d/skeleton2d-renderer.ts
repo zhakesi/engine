@@ -96,6 +96,11 @@ export class Skeleton2DRenderer extends ModelRenderer {
         super();
         setEnumAttr(this, 'defaultSkinIndex', Enum({}));
         setEnumAttr(this, 'animationIndex', Enum({}));
+        if (JSB) {
+            this._imply = new Skeleton2DImplyNative();
+        } else if (!EDITOR) {
+            this._imply = new Skeleton2DImplyWasm();
+        }
     }
 
     @editable
@@ -277,14 +282,7 @@ export class Skeleton2DRenderer extends ModelRenderer {
     }
 
     protected _updateSkeletonData () {
-        if (this._skeletonData === null || EDITOR) return;
-        if (this._imply === null) {
-            if (JSB) {
-                this._imply = new Skeleton2DImplyNative();
-            } else {
-                this._imply = new Skeleton2DImplyWasm();
-            }
-        }
+        if (this._skeletonData === null || this._imply === null) return;
         this._imply.initSkeletonData(this._skeletonData);
         this.setSkin(this._defaultSkinName);
         this.setAnimation(this._defaultAnimationName);
