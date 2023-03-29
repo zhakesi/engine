@@ -98,7 +98,7 @@ export class Skeleton2DRenderer extends ModelRenderer {
         setEnumAttr(this, 'animationIndex', Enum({}));
         if (JSB) {
             this._imply = new Skeleton2DImplyNative();
-        } else if (!EDITOR) {
+        } else {
             this._imply = new Skeleton2DImplyWasm();
         }
     }

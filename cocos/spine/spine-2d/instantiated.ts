@@ -21,11 +21,10 @@
  THE SOFTWARE.
  */
 
-//import spineWasmUrl from 'url:native/external/emscripten/spine/spine2d.wasm';
 import { EDITOR, JSB } from 'internal:constants';
-import { JsReadFile } from './jsfile.js';
 import { SpineWasmUtil } from './spine-wasm-util';
 import { FileResourceInstance } from './file-resource';
+import { JsReadFile } from './jsfile.js';
 
 let wasmUtil: SpineWasmUtil;
 let HEAPU8: Uint8Array;
@@ -108,6 +107,7 @@ function receiveInstance (instance) {
     assert(wasmMemory, 'memory not found in wasm exports');
     HEAPU8 = new Uint8Array(wasmMemory.buffer);
     wasmUtil = exports as unknown as SpineWasmUtil;
+    console.log('xxx receiveInstance');
 }
 
 function receiveInstantiationResult (result) {
@@ -115,44 +115,47 @@ function receiveInstantiationResult (result) {
     wasmUtil.spineWasmUtilInit();
 }
 
-async function promiseLoadSpineWasmRuntime () {
-    const spineWasmUrl = 'scripting/engine/cocos/spine/spine-2d/spine2d.wasm';
-    const info = {
-        env: asmLibraryArg,
-        wasi_snapshot_preview1: asmLibraryArg,
-    };
-
-    const promise = new Promise<boolean>((resolve, reject) => {
-        WebAssembly.instantiateStreaming(fetch(spineWasmUrl), info).then(
-            (results) => {
-                receiveInstantiationResult(results);
-                resolve(true);
-            },
-        );
-    });
-
-    const result = await promise;
-}
-
-function promiseLoadSpineWasmEditor () {
-    const spineWasmUrl = 'spine2d.wasm';
-    const info = {
-        env: asmLibraryArg,
-        wasi_snapshot_preview1: asmLibraryArg,
-    };
-    JsReadFile(spineWasmUrl);
-    //const response = await fetch(spineWasmUrl);
-    console.log('xxx promiseLoadSpineWasmEditor');
-}
-
 export function getSpineSpineWasmUtil () {
     return wasmUtil;
 }
 
+let promiseLoadSpineWasm;
+
+if (EDITOR) {
+    promiseLoadSpineWasm = async function promiseLoadSpineWasmEditor () {
+        const spineWasmUrl = 'spine2d.wasm';
+        const importObject = {
+            env: asmLibraryArg,
+            wasi_snapshot_preview1: asmLibraryArg,
+        };
+        const rawData = JsReadFile(spineWasmUrl);
+        const promise = WebAssembly.instantiate(rawData, importObject).then(
+            (results) => {
+                receiveInstantiationResult(results);
+            },
+        );
+        const result = await promise;
+    };
+} else {
+    promiseLoadSpineWasm = async function promiseLoadSpineWasmRuntime () {
+        const spineWasmUrl = 'scripting/engine/cocos/spine/spine-2d/spine2d.wasm';
+        const importObject = {
+            env: asmLibraryArg,
+            wasi_snapshot_preview1: asmLibraryArg,
+        };
+
+        const promise = new Promise<boolean>((resolve, reject) => {
+            WebAssembly.instantiateStreaming(fetch(spineWasmUrl), importObject).then(
+                (results) => {
+                    receiveInstantiationResult(results);
+                    resolve(true);
+                },
+            );
+        });
+        const result = await promise;
+    };
+}
+
 if (!JSB) {
-    if (EDITOR) {
-        promiseLoadSpineWasmEditor();
-    } else {
-        promiseLoadSpineWasmRuntime();
-    }
+    promiseLoadSpineWasm();
 }

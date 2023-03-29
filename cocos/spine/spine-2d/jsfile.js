@@ -1,19 +1,12 @@
-const fs = require('fs');
+let fs = null;
 export function JsReadFile (path) {
-    const filePath = 'D:/v3.7.2-win-022401/spine2d.wasm';
-    let rawData;
-    fs.readFile(filePath, (err, data) => {
-        if (err) {
-            rawData = null;
-            console.log(err);
-        } else {
-            rawData = data;
-        }
-    });
-
-    if (rawData) {
-        console.log('xxx-' + rawData.byteLength);
-    } else {
-        console.log('xxx-' + 0);
+    if (!fs) fs = require('fs');
+    const filePath = `D:/v3.7.2-win-022401/${path}`;
+    try {
+        const rawData = fs.readFileSync(filePath, null);
+        return rawData;
+    } catch (err) {
+        console.error(err);
+        return null;
     }
 }
