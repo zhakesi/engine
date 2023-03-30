@@ -19,7 +19,7 @@
  THE SOFTWARE.
 */
 import { EDITOR, JSB } from 'internal:constants';
-import { ccclass, executeInEditMode, executionOrder, help, menu, serializable, type, displayName } from 'cc.decorator';
+import { ccclass, executeInEditMode, executionOrder, help, menu, serializable, type, displayName, range, slide, tooltip } from 'cc.decorator';
 import { builtinResMgr } from '../../asset/asset-manager/builtin-res-mgr';
 import { PrimitiveMode, Device, BufferUsageBit, BufferInfo, MemoryUsageBit, deviceManager } from '../../gfx';
 import { Material, Texture2D, RenderingSubMesh } from '../../asset/assets';
@@ -38,6 +38,9 @@ import { Skeleton2DImply } from './skeleton2d-imply';
 import { Skeleton2DImplyWasm } from './skeleton2d-imply-wasm';
 import { Skeleton2DImplyNative } from './skeleton2d-imply-native';
 import { Skeleton2DMesh } from './skeleton2d-native';
+import { CCInteger } from '../../core';
+import { Node } from '../../scene-graph';
+import { Sprite } from '../../2d';
 
 export enum SkelSkinsEnum {
     default = 0,
@@ -88,6 +91,8 @@ export class Skeleton2DRenderer extends ModelRenderer {
     private _defaultAnimationName = '<None>';
     @serializable
     private _texture: Texture2D | null = null;
+    @serializable
+    private _separatorsNum = 0;
 
     private _imply: Skeleton2DImply | null = null;
     private _meshArray: Skeleton2DMesh[] = [];
@@ -194,6 +199,34 @@ export class Skeleton2DRenderer extends ModelRenderer {
         }
     }
 
+    @type(Texture2D)
+    @displayName('Texture2D')
+    get texture () {
+        return this._texture;
+    }
+    set texture (tex: Texture2D| null) {
+        this._texture = tex;
+    }
+
+    @editable
+    @range([0, 64, 1])
+    @type(CCInteger)
+    @tooltip('i18n:separators number')
+    @displayName('Separators Number')
+    get separatorsNumber (): number {
+        return this._separatorsNum;
+    }
+    set separatorsNumber (val: number) {
+        this._separatorsNum = val;
+        this.node.removeAllChildren();
+        let i = 0;
+        for (i = 0; i < this._separatorsNum; i++) {
+            const node  = new Node(i.toString());
+            node.addComponent(Sprite);
+            node.parent = this.node;
+        }
+    }
+
     public setSkin (skinName: string) {
         if (!this._imply) return;
 
@@ -231,14 +264,6 @@ export class Skeleton2DRenderer extends ModelRenderer {
         setEnumAttr(this, 'animationIndex', enumAnimations);
     }
 
-    @type(Texture2D)
-    get texture () {
-        return this._texture;
-    }
-    set texture (tex: Texture2D| null) {
-        this._texture = tex;
-    }
-
     public __preload () {
         if (EDITOR) {
             this._updateSkinEnum();
@@ -259,7 +284,7 @@ export class Skeleton2DRenderer extends ModelRenderer {
 
     public update (dt: number) {
         if (!this._imply) return;
-        this._imply.updateAnimation(dt);
+        if (!EDITOR) this._imply.updateAnimation(dt);
         this._meshArray = this._imply.updateRenderData();
 
         this.realTimeTraverse();
