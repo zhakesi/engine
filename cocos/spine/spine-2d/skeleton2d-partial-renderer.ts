@@ -6,15 +6,41 @@ import { Model } from '../../render-scene/scene';
 import { ModelLocalBindings } from '../../rendering/define';
 import { vfmtPosUvColor, getAttributeStride, vfmtPosUvColor4B } from '../../2d/renderer/vertex-format';
 import { Root } from '../../root';
+import { Skeleton2DMesh } from './skeleton2d-native';
 import { BufferInfo, BufferUsageBit, Device, MemoryUsageBit, PrimitiveMode, deviceManager } from '../../gfx';
 import { builtinResMgr } from '../../asset/asset-manager';
+import { ccclass, executeInEditMode, executionOrder, help } from '../../core/data/decorators';
 
+@ccclass('cc.Skeleton2DSoltItem')
+@executeInEditMode
+export class Skeleton2DSoltItem {
+    // constructor (index: number, slotName: string, itype: number) {
+    //     this.idx = index;
+    //     this.name = slotName;
+    //     this.indexType = itype;
+    // }
+    public idx = 0;
+    public name = '';
+    public indexType = 1; // 0->first, 1->normal, 2->end
+}
+
+@ccclass('cc.Skeleton2DPartialRenderer')
+@help('i18n:cc.Skeleton2DPartialRenderer')
+@executionOrder(101)
+@executeInEditMode
 export class Skeleton2DPartialRenderer extends ModelRenderer {
     private _texture: Texture2D | null = null;
+    private _meshArray: Skeleton2DMesh[] = [];
+    private _slotStart = new Skeleton2DSoltItem();
+    private _slotEnd = new Skeleton2DSoltItem();
 
     constructor () {
         super();
         this.material = builtinResMgr.get<Material>('default-spine-material');
+    }
+
+    set meshArray (meshes: Skeleton2DMesh[]) {
+        this._meshArray = meshes;
     }
 
     public onLoad () {
@@ -28,8 +54,14 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
     }
 
     public update (dt: number) {
-        console.log('Skeleton2DPartialRenderer:update');
-        //this._onUpdateLocalDescriptorSet();
+        this._assembleModel();
+        this._onUpdateLocalDescriptorSet();
+        //console.log('Skeleton2DPartialRenderer:update');
+    }
+
+    public onDestroy () {
+        this._detachFromScene();
+        this._destroyModel();
     }
 
     protected _createModel () {
@@ -37,6 +69,10 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
         this._models[0] = model;
         model.visFlags = this.visibility;
         model.node = model.transform = this.node;
+    }
+    protected _destroyModel () {
+        (legacyCC.director.root as Root).destroyModel(this._models[0]);
+        this._models.length = 0;
     }
 
     protected _attachToScene () {
@@ -69,7 +105,12 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
         }
     }
 
-    public _activeSubModel (idx: number) {
+    public resetData (tex: Texture2D| null) {
+        this.material = builtinResMgr.get<Material>('default-spine-material');
+        this._texture = tex;
+    }
+
+    private _activeSubModel (idx: number) {
         if (this._models.length < 1) {
             return;
         }
@@ -99,6 +140,23 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
 
             this._models[0].initSubModel(idx, renderMesh, this.material!);
             this._models[0].enabled = true;
+        }
+    }
+
+    private _assembleModel () {
+        const count = this._meshArray.length;
+        for (let idx = 0;  idx < count; idx++) {
+            const mesh = this._meshArray[idx];
+
+            this._activeSubModel(idx);
+            const subModel = this._models[0].subModels[idx];
+            const ia = subModel.inputAssembler;
+            const vb = new Float32Array(mesh.vertices);
+            ia.vertexBuffers[0].update(vb);
+            ia.vertexCount = mesh.vCount;
+            const ib = new Uint16Array(mesh.indices);
+            ia.indexBuffer!.update(ib);
+            ia.indexCount = ib.length;
         }
     }
 }

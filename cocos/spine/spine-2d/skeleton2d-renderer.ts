@@ -89,6 +89,7 @@ export class Skeleton2DRenderer extends Component {
     private _texture: Texture2D | null = null;
     @serializable
     private _separatorsNum = 0;
+
     private _parts: Skeleton2DPartialRenderer[] = [];
 
     private _imply: Skeleton2DImply | null = null;
@@ -216,25 +217,7 @@ export class Skeleton2DRenderer extends Component {
     }
     set separatorsNumber (val: number) {
         this._separatorsNum = val;
-        // const children = this.node.children;
-        // let count = children.length;
-        // let i = 0;
-        // for (; i < count; i++) {
-        //     const child = children[i];
-        //     const part = child.getComponent(Skeleton2DPartialRenderer);
-        //     if (part) {
-        //         child.parent = null;
-        //         child.destroy();
-        //         i--;
-        //         count--;
-        //     }
-        // }
-        // i = 0;
-        // for (i = 0; i <= this._separatorsNum; i++) {
-        //     const node = new Node(`${i.toString()}-part`);
-        //     node.addComponent(Skeleton2DPartialRenderer);
-        //     node.parent = this.node;
-        // }
+        this._resetPartialSetting();
     }
 
     public setSkin (skinName: string) {
@@ -290,9 +273,7 @@ export class Skeleton2DRenderer extends Component {
         if (!this._imply) return;
         if (!EDITOR) this._imply.updateAnimation(dt);
         this._meshArray = this._imply.updateRenderData();
-        console.log('Skeleton2DRenderer:update');
-
-        //this.realTimeTraverse();
+        this._updatePartsRenderData();
     }
 
     public onEnable () {
@@ -327,27 +308,20 @@ export class Skeleton2DRenderer extends Component {
             this._parts.length = 0;
             let part = this.node.getComponent(Skeleton2DPartialRenderer);
             if (part) {
-                this.node.removeComponent(Skeleton2DPartialRenderer);
+                part.resetData(this._texture);
+                this._parts.push(part);
+            } else {
+                part = this.node.addComponent(Skeleton2DPartialRenderer);
+                part.resetData(this._texture);
+                this._parts.push(part);
             }
-            part = this.node.addComponent(Skeleton2DPartialRenderer);
-            this._parts.push(part);
         }
     }
 
-    // public realTimeTraverse () {
-    //     const count = this._meshArray.length;
-    //     for (let idx = 0;  idx < count; idx++) {
-    //         const mesh = this._meshArray[idx];
-
-    //         this._activeSubModel(idx);
-    //         const subModel = this._models[0].subModels[idx];
-    //         const ia = subModel.inputAssembler;
-    //         const vb = new Float32Array(mesh.vertices);
-    //         ia.vertexBuffers[0].update(vb);
-    //         ia.vertexCount = mesh.vCount;
-    //         const ib = new Uint16Array(mesh.indices);
-    //         ia.indexBuffer!.update(ib);
-    //         ia.indexCount = ib.length;
-    //     }
-    // }
+    private _updatePartsRenderData () {
+        for (let i = 0; i < this._parts.length; i++) {
+            const part = this._parts[i];
+            part.meshArray = this._meshArray;
+        }
+    }
 }
