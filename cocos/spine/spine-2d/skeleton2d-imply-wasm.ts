@@ -101,6 +101,26 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
         this._wasmUtil.updateAnimation(this._objID, dltTime);
     }
 
+    public getSlots (): string[] {
+        const slots: string[] = [];
+        const count = this._wasmUtil.getDrawOrderSize(this._objID);
+        console.log(`slot size:${count}`);
+        let i = 0;
+        const decoder = new TextDecoder();
+        for (i = 0; i < count; i++) {
+            const address = this._wasmUtil.getSlotNameByOrder(this._objID, i);
+            const heap32 = new Uint32Array(this._wasmHEAPU8.buffer);
+            const length = heap32[address / 4];
+            if (length < 1) continue;
+
+            const source = this._wasmHEAPU8.subarray(address + 4, address + 4 + length);
+            const name = decoder.decode(source);
+            console.log(`slot:${name}`);
+            slots.push(name);
+        }
+        return slots;
+    }
+
     private _objID: number;
     private _wasmUtil: SpineWasmUtil;
     private _wasmHEAPU8: Uint8Array = new Uint8Array(0);

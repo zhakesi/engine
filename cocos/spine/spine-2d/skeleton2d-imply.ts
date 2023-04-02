@@ -7,4 +7,5 @@ export interface Skeleton2DImply {
     setAnimation (name: string): boolean;
     updateAnimation (dltTime: number);
     updateRenderData (): Skeleton2DMesh[];
+    getSlots(): string[];
 }

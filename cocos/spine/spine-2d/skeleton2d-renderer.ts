@@ -38,15 +38,15 @@ import { Node } from '../../scene-graph/node';
 import { Skeleton2DPartialRenderer } from './skeleton2d-partial-renderer';
 import { Component } from '../../scene-graph';
 
-export enum SkelSkinsEnum {
+export enum Skel2DSkinsEnum {
     default = 0,
 }
-ccenum(SkelSkinsEnum);
+ccenum(Skel2DSkinsEnum);
 
-export enum SkelAnimsEnum {
+export enum Skel2DAnimsEnum {
     '<None>' = 0,
 }
-ccenum(SkelAnimsEnum);
+ccenum(Skel2DAnimsEnum);
 
 function setEnumAttr (obj, propName, enumDef) {
     CCClass.Attr.setClassAttr(obj, propName, 'type', 'Enum');
@@ -94,6 +94,7 @@ export class Skeleton2DRenderer extends Component {
 
     private _imply: Skeleton2DImply | null = null;
     private _meshArray: Skeleton2DMesh[] = [];
+    private _slotList: string[] = [];
 
     constructor () {
         super();
@@ -123,7 +124,6 @@ export class Skeleton2DRenderer extends Component {
                 this._texture = this._skeletonData.textures[0];
             }
         }
-
         this._updateSkinEnum();
         this._updateAnimEnum();
         this._updateSkeletonData();
@@ -133,7 +133,7 @@ export class Skeleton2DRenderer extends Component {
      * @internal
      */
     @displayName('Default Skin')
-    @type(SkelSkinsEnum)
+    @type(Skel2DSkinsEnum)
     get defaultSkinIndex (): number {
         if (!this.skeletonData) return 0;
         const skinsEnum = this.skeletonData.getSkinsEnum();
@@ -171,7 +171,7 @@ export class Skeleton2DRenderer extends Component {
      * @internal
      */
     @displayName('Animation')
-    @type(SkelAnimsEnum)
+    @type(Skel2DAnimsEnum)
     get animationIndex () {
         if (!this.skeletonData) return 0;
         const animsEnum = this.skeletonData.getAnimsEnum();
@@ -233,7 +233,7 @@ export class Skeleton2DRenderer extends Component {
         if (this.skeletonData) {
             skinEnum = this.skeletonData.getSkinsEnum();
         } else {
-            skinEnum = SkelSkinsEnum;
+            skinEnum = Skel2DSkinsEnum;
         }
 
         const enumSkins = Enum({});
@@ -248,7 +248,7 @@ export class Skeleton2DRenderer extends Component {
         if (this.skeletonData) {
             animEnum = this.skeletonData.getAnimsEnum();
         } else {
-            animEnum = SkelAnimsEnum;
+            animEnum = Skel2DAnimsEnum;
         }
         // reset enum type
         const enumAnimations = Enum({});
@@ -278,7 +278,6 @@ export class Skeleton2DRenderer extends Component {
 
     public onEnable () {
         this._updateSkeletonData();
-        this._resetPartialSetting();
     }
 
     public onDisable () {
@@ -287,6 +286,8 @@ export class Skeleton2DRenderer extends Component {
     }
 
     public onDestroy () {
+        console.log('Skeleton2DRenderer onDestroy');
+        this._parts.length = 0;
         // if (!this._wasmObj) return;
         // console.log('onDestroy');
     }
@@ -296,6 +297,9 @@ export class Skeleton2DRenderer extends Component {
         this._imply.initSkeletonData(this._skeletonData);
         this.setSkin(this._defaultSkinName);
         this.setAnimation(this._defaultAnimationName);
+
+        this._slotList = this._imply.getSlots();
+        this._resetPartialSetting();
     }
 
     public setAnimation (name: string) {
@@ -304,17 +308,32 @@ export class Skeleton2DRenderer extends Component {
     }
 
     private _resetPartialSetting () {
-        if (this._separatorsNum < 1) {
-            this._parts.length = 0;
-            let part = this.node.getComponent(Skeleton2DPartialRenderer);
-            if (part) {
-                part.resetData(this._texture);
-                this._parts.push(part);
-            } else {
-                part = this.node.addComponent(Skeleton2DPartialRenderer);
-                part.resetData(this._texture);
-                this._parts.push(part);
-            }
+        if (!this._imply) return;
+
+        const slots = this._slotList;
+        this._parts.length = 0;
+        let part = this.node.getComponent(Skeleton2DPartialRenderer);
+        if (part) {
+            part.initializeConfig(0, this._texture, slots);
+            this._parts.push(part);
+        } else {
+            part = this.node.addComponent(Skeleton2DPartialRenderer);
+            part.initializeConfig(0, this._texture, slots);
+            this._parts.push(part);
+        }
+        const chilren = this.node.children;
+        chilren.forEach((node) => {
+            part = node.getComponent(Skeleton2DPartialRenderer);
+            if (part) node.destroy();
+        });
+
+        let i = 1;
+        for (i = 1; i <= this._separatorsNum; i++) {
+            const node = new Node(`${i.toString()}-part`);
+            node.parent = this.node;
+            part = node.addComponent(Skeleton2DPartialRenderer);
+            part.initializeConfig(i, this._texture, slots);
+            this._parts.push(part);
         }
     }
 

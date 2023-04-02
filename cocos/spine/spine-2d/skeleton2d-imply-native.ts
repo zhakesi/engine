@@ -38,4 +38,9 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
         this._nativeMeshArray = this._nativeObj.updateRenderData();
         return this._nativeMeshArray;
     }
+
+    getSlots (): string[] {
+        const slots = ['body', 'head'];
+        return slots;
+    }
 }

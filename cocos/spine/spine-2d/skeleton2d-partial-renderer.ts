@@ -1,4 +1,4 @@
-import { JSB } from 'internal:constants';
+import { EDITOR, JSB } from 'internal:constants';
 import { Material, RenderingSubMesh, Texture2D } from '../../asset/assets';
 import { legacyCC } from '../../core/global-exports';
 import { ModelRenderer } from '../../misc/model-renderer';
@@ -9,16 +9,22 @@ import { Root } from '../../root';
 import { Skeleton2DMesh } from './skeleton2d-native';
 import { BufferInfo, BufferUsageBit, Device, MemoryUsageBit, PrimitiveMode, deviceManager } from '../../gfx';
 import { builtinResMgr } from '../../asset/asset-manager';
-import { ccclass, executeInEditMode, executionOrder, help } from '../../core/data/decorators';
+import { ccclass, displayName, executeInEditMode, executionOrder, help, type } from '../../core/data/decorators';
+import { CCClass, Enum, ccenum } from '../../core';
+
+export enum Skeleton2DSlotEnum {
+    default = 0,
+}
+ccenum(Skeleton2DSlotEnum);
+
+function setEnumAttr (obj, propName, enumDef) {
+    CCClass.Attr.setClassAttr(obj, propName, 'type', 'Enum');
+    CCClass.Attr.setClassAttr(obj, propName, 'enumList', Enum.getList(enumDef));
+}
 
 @ccclass('cc.Skeleton2DSoltItem')
 @executeInEditMode
 export class Skeleton2DSoltItem {
-    // constructor (index: number, slotName: string, itype: number) {
-    //     this.idx = index;
-    //     this.name = slotName;
-    //     this.indexType = itype;
-    // }
     public idx = 0;
     public name = '';
     public indexType = 1; // 0->first, 1->normal, 2->end
@@ -29,14 +35,22 @@ export class Skeleton2DSoltItem {
 @executionOrder(101)
 @executeInEditMode
 export class Skeleton2DPartialRenderer extends ModelRenderer {
+    private _index = 0;
     private _texture: Texture2D | null = null;
     private _meshArray: Skeleton2DMesh[] = [];
-    private _slotStart = new Skeleton2DSoltItem();
-    private _slotEnd = new Skeleton2DSoltItem();
+    private _slotStart = 0;
+
+    private _slotList: string[] = [];
 
     constructor () {
         super();
-        this.material = builtinResMgr.get<Material>('default-spine-material');
+    }
+
+    public initializeConfig (idx: number, tex: Texture2D | null, slotList: string[]) {
+        this._index = idx;
+        this._texture = tex;
+        this._slotList = slotList;
+        this._updateSlotEnum();
     }
 
     set meshArray (meshes: Skeleton2DMesh[]) {
@@ -44,6 +58,8 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
     }
 
     public onLoad () {
+        this.material = builtinResMgr.get<Material>('default-spine-material');
+
         if (this._models.length < 1) {
             this._createModel();
         }
@@ -51,6 +67,7 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
 
     public onEnable () {
         this._attachToScene();
+        this._updateSlotEnum();
     }
 
     public update (dt: number) {
@@ -62,6 +79,40 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
     public onDestroy () {
         this._detachFromScene();
         this._destroyModel();
+        console.log('Skeleton2DPartialRenderer destroy');
+    }
+
+    /**
+     * @internal
+     */
+    @displayName('Slot Start')
+    @type(Skeleton2DSlotEnum)
+    get slotStart () {
+        return this._slotStart;
+    }
+    set slotStart (value: number) {
+        this._slotStart = value;
+        if (EDITOR) this._updateSlotEnum();
+    }
+
+    private _updateSlotEnum () {
+        // reset enum type
+        const enumSlots = Enum({});
+        let slotEnum;
+        if (this._slotList.length < 1) {
+            slotEnum = Skeleton2DSlotEnum;
+        } else {
+            const enumDef: {[key: string]: number} = {};
+            for (let i = 0; i < this._slotList.length; i++) {
+                const name = this._slotList[i];
+                enumDef[name] = i;
+            }
+            slotEnum = Enum(enumDef);
+        }
+
+        Object.assign(enumSlots, slotEnum);
+        Enum.update(enumSlots);
+        setEnumAttr(this, 'slotStart', enumSlots);
     }
 
     protected _createModel () {
@@ -103,11 +154,6 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
             descriptorSet.bindSampler(binding, texture.getGFXSampler()!);
             descriptorSet.update();
         }
-    }
-
-    public resetData (tex: Texture2D| null) {
-        this.material = builtinResMgr.get<Material>('default-spine-material');
-        this._texture = tex;
     }
 
     private _activeSubModel (idx: number) {
