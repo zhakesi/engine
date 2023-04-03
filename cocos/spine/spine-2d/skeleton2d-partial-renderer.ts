@@ -9,7 +9,7 @@ import { Root } from '../../root';
 import { Skeleton2DMesh } from './skeleton2d-native';
 import { BufferInfo, BufferUsageBit, Device, MemoryUsageBit, PrimitiveMode, deviceManager } from '../../gfx';
 import { builtinResMgr } from '../../asset/asset-manager';
-import { ccclass, displayName, executeInEditMode, executionOrder, help, type } from '../../core/data/decorators';
+import { ccclass, displayName, executeInEditMode, executionOrder, help, serializable, type } from '../../core/data/decorators';
 import { CCClass, Enum, ccenum } from '../../core';
 
 export enum Skeleton2DSlotEnum {
@@ -35,27 +35,24 @@ export class Skeleton2DSoltItem {
 @executionOrder(101)
 @executeInEditMode
 export class Skeleton2DPartialRenderer extends ModelRenderer {
+    @serializable
     public index = 0;
-    private _texture: Texture2D | null = null;
-    private _meshArray: Skeleton2DMesh[] = [];
+    @serializable
     private _slotStart = 0;
 
-    private _slotList: string[] = [];
-    private _partSlotTable: Map<number, number> | null = null;
-    private _meshStart = 0;
-    private _meshEnd = 0;
+    private _texture: Texture2D | null = null;
+    private _meshArray: Skeleton2DMesh[] = [];
+    public slotList: string[] = [];
 
     constructor () {
         super();
     }
 
-    public initializeConfig (idx: number, tex: Texture2D | null,
-        slotList: string[], table: Map<number, number>) {
-        this.index = idx;
+    public resetProperties (tex: Texture2D | null, slotList: string[]) {
+        //this.index = idx;
         this._texture = tex;
-        this._slotList = slotList;
-        this._partSlotTable = table;
-
+        this.slotList = slotList;
+        console.log(`resetConfig:${slotList.length}`);
         this._updateSlotEnum();
     }
 
@@ -98,7 +95,6 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
     }
     set slotStart (value: number) {
         this._slotStart = value;
-        this._partSlotTable!.set(this.index, value);
         if (EDITOR) this._updateSlotEnum();
     }
 
@@ -106,12 +102,13 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
         // reset enum type
         const enumSlots = Enum({});
         let slotEnum;
-        if (this._slotList.length < 1) {
+        console.log(this.slotList.length);
+        if (this.slotList.length < 1) {
             slotEnum = Skeleton2DSlotEnum;
         } else {
             const enumDef: {[key: string]: number} = {};
-            for (let i = 0; i < this._slotList.length; i++) {
-                const name = this._slotList[i];
+            for (let i = 0; i < this.slotList.length; i++) {
+                const name = this.slotList[i];
                 enumDef[name] = i;
             }
             slotEnum = Enum(enumDef);
@@ -198,7 +195,7 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
 
     private _assembleModel () {
         const count = this._meshArray.length;
-        for (let idx = this._meshStart;  idx < this._meshEnd; idx++) {
+        for (let idx = 0;  idx < count; idx++) {
             const mesh = this._meshArray[idx];
 
             this._activeSubModel(idx);
@@ -211,11 +208,5 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
             ia.indexBuffer!.update(ib);
             ia.indexCount = ib.length;
         }
-    }
-
-    public setMeshRange (meshes: Skeleton2DMesh[], start: number, end: number) {
-        this._meshArray = meshes;
-        this._meshStart = start;
-        this._meshEnd = end;
     }
 }

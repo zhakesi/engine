@@ -33,7 +33,7 @@ import { Skeleton2DImply } from './skeleton2d-imply';
 import { Skeleton2DImplyWasm } from './skeleton2d-imply-wasm';
 import { Skeleton2DImplyNative } from './skeleton2d-imply-native';
 import { Skeleton2DMesh } from './skeleton2d-native';
-import { CCInteger } from '../../core';
+import { CCInteger, path } from '../../core';
 import { Node } from '../../scene-graph/node';
 import { Skeleton2DPartialRenderer } from './skeleton2d-partial-renderer';
 import { Component } from '../../scene-graph';
@@ -88,9 +88,9 @@ export class Skeleton2DRenderer extends Component {
     @serializable
     private _texture: Texture2D | null = null;
     @serializable
-    private _separatorsNum = 0;
-    @serializable
-    private _partSlotTable = new Map<number, number>();
+    private _seperatorNumber = 0;
+    // @serializable
+    // private _partSlotTable = new Map<number, number>();
 
     private _parts: Skeleton2DPartialRenderer[] = [];
 
@@ -129,6 +129,8 @@ export class Skeleton2DRenderer extends Component {
         this._updateSkinEnum();
         this._updateAnimEnum();
         this._updateSkeletonData();
+
+        this._clearPartialRenderers();
     }
 
     /**
@@ -212,15 +214,20 @@ export class Skeleton2DRenderer extends Component {
     @editable
     @range([0, 64, 1])
     @type(CCInteger)
-    @tooltip('i18n:separators number')
-    @displayName('Separators Number')
-    get separatorsNumber (): number {
-        return this._separatorsNum;
+    @tooltip('i18n:Seperator Number')
+    @displayName('Seperator Number')
+    get seperatorNumber (): number {
+        return this._seperatorNumber;
     }
-    set separatorsNumber (val: number) {
-        this._separatorsNum = val;
-        this._partSlotTable.clear();
-        this._resetPartialSetting();
+    set seperatorNumber (val: number) {
+        this._seperatorNumber = val;
+        this._clearPartialRenderers();
+        let i = 1;
+        for (; i <= val; i++) {
+            const node = new Node(`part-${i.toString()}`);
+            this._addPatialRenderer(node, i);
+            node.parent = this.node;
+        }
     }
 
     public setSkin (skinName: string) {
@@ -281,6 +288,7 @@ export class Skeleton2DRenderer extends Component {
 
     public onEnable () {
         this._updateSkeletonData();
+        this._initPartsRenderers();
     }
 
     public onDisable () {
@@ -301,7 +309,6 @@ export class Skeleton2DRenderer extends Component {
         this.setSkin(this._defaultSkinName);
         this.setAnimation(this._defaultAnimationName);
         this._slotList = this._imply.getSlots();
-        //this._resetPartialSetting();
     }
 
     public setAnimation (name: string) {
@@ -309,49 +316,62 @@ export class Skeleton2DRenderer extends Component {
         this._imply.setAnimation(name);
     }
 
-    private _resetPartialSetting () {
-        if (!this._imply) return;
-
-        const slots = this._slotList;
-        const table = this._partSlotTable;
-        let part = this.node.getComponent(Skeleton2DPartialRenderer);
-        if (part) {
-            part.initializeConfig(0, this._texture, slots, table);
-            this._parts.push(part);
-            table.set(0, 0);
-        } else {
-            part = this.node.addComponent(Skeleton2DPartialRenderer);
-            part.initializeConfig(0, this._texture, slots, table);
-            this._parts.push(part);
-            table.set(0, 0);
-        }
+    private _clearPartialRenderers () {
         const children = this.node.children;
         children.forEach((node) => {
-            part = node.getComponent(Skeleton2DPartialRenderer);
+            const part = node.getComponent(Skeleton2DPartialRenderer);
             if (part) node.destroy();
         });
+        this._parts.length = 0;
+        this._addPatialRenderer(this.node, 0);
+    }
 
-        let i = 1;
-        for (i = 1; i <= this._separatorsNum; i++) {
-            const node = new Node(`${i.toString()}-part`);
-            node.parent = this.node;
+    private _addPatialRenderer (node: Node, idx: number) {
+        const slotList = this._slotList;
+        let part = node.getComponent(Skeleton2DPartialRenderer);
+        if (part) {
+            this.fillPartialRenderProperties(part);
+        } else {
             part = node.addComponent(Skeleton2DPartialRenderer);
-            part.initializeConfig(i, this._texture, slots, table);
-            this._parts.push(part);
-            table.set(i, 0);
+            this.fillPartialRenderProperties(part);
         }
+        this._parts[idx] = part;
     }
 
     private _updatePartsRenderData () {
         for (let i = 0; i < this._parts.length; i++) {
             const part = this._parts[i];
-            const partIdx = part.index;
-            const start = this._partSlotTable.get(partIdx);
-            let end = this._partSlotTable.get(partIdx + 1);
-            if (!end) {
-                end = this._slotList.length - 1;
-            }
-            part.setMeshRange(this._meshArray, start!, end);
+            const next = this._parts[i + 1];
+            const slotStart = part.slotStart;
+            let slotEnd = this._slotList.length;
+            if (next) slotEnd = next.slotStart;
+            // todo get mesh idex by slot
+
+            const meshes = this._meshArray.slice(slotStart, slotEnd);
+            part.meshArray = meshes;
         }
+    }
+
+    private _initPartsRenderers () {
+        this._parts.length = 0;
+        let part = this.node.getComponent(Skeleton2DPartialRenderer);
+        if (!part) {
+            this._addPatialRenderer(this.node, 0);
+        } else {
+            this.fillPartialRenderProperties(part);
+            this._parts.push(part);
+        }
+        const children = this.node.children;
+        children.forEach((node) => {
+            part = node.getComponent(Skeleton2DPartialRenderer);
+            if (part) {
+                this.fillPartialRenderProperties(part);
+                this._parts.push(part);
+            }
+        });
+    }
+
+    private fillPartialRenderProperties (part: Skeleton2DPartialRenderer) {
+        part.resetProperties(this._texture, this._slotList);
     }
 }
