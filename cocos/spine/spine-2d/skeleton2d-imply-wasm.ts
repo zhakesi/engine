@@ -115,7 +115,7 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
 
             const source = this._wasmHEAPU8.subarray(address + 4, address + 4 + length);
             const name = decoder.decode(source);
-            console.log(`slot:${name}`);
+            //console.log(`slot:${name}`);
             slots.push(name);
         }
         return slots;

@@ -89,6 +89,8 @@ export class Skeleton2DRenderer extends Component {
     private _texture: Texture2D | null = null;
     @serializable
     private _separatorsNum = 0;
+    @serializable
+    private _partSlotTable = new Map<number, number>();
 
     private _parts: Skeleton2DPartialRenderer[] = [];
 
@@ -217,6 +219,7 @@ export class Skeleton2DRenderer extends Component {
     }
     set separatorsNumber (val: number) {
         this._separatorsNum = val;
+        this._partSlotTable.clear();
         this._resetPartialSetting();
     }
 
@@ -297,9 +300,8 @@ export class Skeleton2DRenderer extends Component {
         this._imply.initSkeletonData(this._skeletonData);
         this.setSkin(this._defaultSkinName);
         this.setAnimation(this._defaultAnimationName);
-
         this._slotList = this._imply.getSlots();
-        this._resetPartialSetting();
+        //this._resetPartialSetting();
     }
 
     public setAnimation (name: string) {
@@ -311,18 +313,20 @@ export class Skeleton2DRenderer extends Component {
         if (!this._imply) return;
 
         const slots = this._slotList;
-        this._parts.length = 0;
+        const table = this._partSlotTable;
         let part = this.node.getComponent(Skeleton2DPartialRenderer);
         if (part) {
-            part.initializeConfig(0, this._texture, slots);
+            part.initializeConfig(0, this._texture, slots, table);
             this._parts.push(part);
+            table.set(0, 0);
         } else {
             part = this.node.addComponent(Skeleton2DPartialRenderer);
-            part.initializeConfig(0, this._texture, slots);
+            part.initializeConfig(0, this._texture, slots, table);
             this._parts.push(part);
+            table.set(0, 0);
         }
-        const chilren = this.node.children;
-        chilren.forEach((node) => {
+        const children = this.node.children;
+        children.forEach((node) => {
             part = node.getComponent(Skeleton2DPartialRenderer);
             if (part) node.destroy();
         });
@@ -332,15 +336,22 @@ export class Skeleton2DRenderer extends Component {
             const node = new Node(`${i.toString()}-part`);
             node.parent = this.node;
             part = node.addComponent(Skeleton2DPartialRenderer);
-            part.initializeConfig(i, this._texture, slots);
+            part.initializeConfig(i, this._texture, slots, table);
             this._parts.push(part);
+            table.set(i, 0);
         }
     }
 
     private _updatePartsRenderData () {
         for (let i = 0; i < this._parts.length; i++) {
             const part = this._parts[i];
-            part.meshArray = this._meshArray;
+            const partIdx = part.index;
+            const start = this._partSlotTable.get(partIdx);
+            let end = this._partSlotTable.get(partIdx + 1);
+            if (!end) {
+                end = this._slotList.length - 1;
+            }
+            part.setMeshRange(this._meshArray, start!, end);
         }
     }
 }

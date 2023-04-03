@@ -35,21 +35,27 @@ export class Skeleton2DSoltItem {
 @executionOrder(101)
 @executeInEditMode
 export class Skeleton2DPartialRenderer extends ModelRenderer {
-    private _index = 0;
+    public index = 0;
     private _texture: Texture2D | null = null;
     private _meshArray: Skeleton2DMesh[] = [];
     private _slotStart = 0;
 
     private _slotList: string[] = [];
+    private _partSlotTable: Map<number, number> | null = null;
+    private _meshStart = 0;
+    private _meshEnd = 0;
 
     constructor () {
         super();
     }
 
-    public initializeConfig (idx: number, tex: Texture2D | null, slotList: string[]) {
-        this._index = idx;
+    public initializeConfig (idx: number, tex: Texture2D | null,
+        slotList: string[], table: Map<number, number>) {
+        this.index = idx;
         this._texture = tex;
         this._slotList = slotList;
+        this._partSlotTable = table;
+
         this._updateSlotEnum();
     }
 
@@ -92,6 +98,7 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
     }
     set slotStart (value: number) {
         this._slotStart = value;
+        this._partSlotTable!.set(this.index, value);
         if (EDITOR) this._updateSlotEnum();
     }
 
@@ -191,7 +198,7 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
 
     private _assembleModel () {
         const count = this._meshArray.length;
-        for (let idx = 0;  idx < count; idx++) {
+        for (let idx = this._meshStart;  idx < this._meshEnd; idx++) {
             const mesh = this._meshArray[idx];
 
             this._activeSubModel(idx);
@@ -204,5 +211,11 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
             ia.indexBuffer!.update(ib);
             ia.indexCount = ib.length;
         }
+    }
+
+    public setMeshRange (meshes: Skeleton2DMesh[], start: number, end: number) {
+        this._meshArray = meshes;
+        this._meshStart = start;
+        this._meshEnd = end;
     }
 }
