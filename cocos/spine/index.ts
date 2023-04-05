@@ -49,6 +49,7 @@ export * from './skeleton-texture';
 export * from './vertex-effect-delegate';
 export * from './assembler';
 export * from './spine-2d/skeleton2d-renderer';
+export * from './spine-2d/skeleton2d-ui';
 
 export { spine };
 
