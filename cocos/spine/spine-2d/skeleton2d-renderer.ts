@@ -75,7 +75,7 @@ SkeletonData.prototype['init'] = function () {
 
 @ccclass('cc.Skeleton2DRenderer')
 @help('i18n:cc.Skeleton2DRenderer')
-@executionOrder(100)
+@executionOrder(99)
 @menu('2D/Skeleton2DRenderer')
 @executeInEditMode
 export class Skeleton2DRenderer extends Component {
@@ -89,13 +89,12 @@ export class Skeleton2DRenderer extends Component {
     private _texture: Texture2D | null = null;
     @serializable
     private _seperatorNumber = 0;
-    // @serializable
-    // private _partSlotTable = new Map<number, number>();
 
     private _parts: Skeleton2DPartialRenderer[] = [];
 
     private _imply: Skeleton2DImply | null = null;
     private _meshArray: Skeleton2DMesh[] = [];
+    declare private _slotTable: Map<number, string | null>;
     private _slotList: string[] = [];
 
     constructor () {
@@ -308,7 +307,8 @@ export class Skeleton2DRenderer extends Component {
         this._imply.initSkeletonData(this._skeletonData);
         this.setSkin(this._defaultSkinName);
         this.setAnimation(this._defaultAnimationName);
-        this._slotList = this._imply.getSlots();
+        this._slotTable = this._imply.getSlotsTable();
+        this._updateSlotEnumList();
     }
 
     public setAnimation (name: string) {
@@ -343,11 +343,15 @@ export class Skeleton2DRenderer extends Component {
             const part = this._parts[i];
             const next = this._parts[i + 1];
             const slotStart = part.slotStart;
-            let slotEnd = this._slotList.length;
+            let slotEnd = this._slotList.length - 1;
             if (next) slotEnd = next.slotStart;
-            // todo get mesh idex by slot
 
-            const meshes = this._meshArray.slice(slotStart, slotEnd);
+            const meshStart = this._findMeshBySlot(slotStart);
+            const meshEnd = this._findMeshBySlot(slotEnd);
+            // console.log(`mesh start:${meshStart}`);
+            // console.log(`mesh end:${meshEnd}`);
+
+            const meshes = this._meshArray.slice(meshStart, meshEnd + 1);
             part.meshArray = meshes;
         }
     }
@@ -373,5 +377,34 @@ export class Skeleton2DRenderer extends Component {
 
     private fillPartialRenderProperties (part: Skeleton2DPartialRenderer) {
         part.resetProperties(this._texture, this._slotList);
+    }
+
+    private _findMeshBySlot (slotIndex: number): number {
+        const name = this._slotList[slotIndex];
+        let realIndex = 0;
+        this._slotTable.forEach((value, key) => {
+            if (value === name) {
+                realIndex = key;
+            }
+        });
+        const meshArray = this._meshArray;
+        const length = meshArray.length;
+        let meshIndex = 0;
+        for (let i = 0; i < length; i++) {
+            if (meshArray[i].slotIndex === realIndex) {
+                meshIndex = i;
+                break;
+            }
+        }
+        return meshIndex;
+    }
+
+    private _updateSlotEnumList () {
+        this._slotList.length = 0;
+        this._slotTable.forEach((value, key) => {
+            if (value) {
+                this._slotList.push(value);
+            }
+        });
     }
 }

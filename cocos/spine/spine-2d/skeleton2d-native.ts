@@ -2,7 +2,8 @@ export class Skeleton2DMesh {
     constructor () {
 
     }
-    public initialize (vc: number, ic: number, stride: number) {
+    public initialize (slot: number, vc: number, ic: number, stride: number) {
+        this.slotIndex = slot;
         this.vCount = vc;
         this.iCount = ic;
         this.byteStride = stride;
@@ -11,6 +12,7 @@ export class Skeleton2DMesh {
         this.indices = new Uint16Array(ic);
     }
 
+    public declare slotIndex: number;
     public declare vCount: number;
     public declare iCount: number;
     public declare byteStride: number;

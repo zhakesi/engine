@@ -32,7 +32,7 @@ export class Skeleton2DSoltItem {
 
 @ccclass('cc.Skeleton2DPartialRenderer')
 @help('i18n:cc.Skeleton2DPartialRenderer')
-@executionOrder(101)
+@executionOrder(100)
 @executeInEditMode
 export class Skeleton2DPartialRenderer extends ModelRenderer {
     @serializable
@@ -49,10 +49,8 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
     }
 
     public resetProperties (tex: Texture2D | null, slotList: string[]) {
-        //this.index = idx;
         this._texture = tex;
         this.slotList = slotList;
-        console.log(`resetConfig:${slotList.length}`);
         this._updateSlotEnum();
     }
 
@@ -61,7 +59,8 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
     }
 
     public onLoad () {
-        this.material = builtinResMgr.get<Material>('default-spine-material');
+        const material = builtinResMgr.get<Material>('default-spine-material');
+        this.setMaterial(material, 0);
 
         if (this._models.length < 1) {
             this._createModel();
@@ -102,7 +101,7 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
         // reset enum type
         const enumSlots = Enum({});
         let slotEnum;
-        console.log(this.slotList.length);
+        //console.log(this.slotList.length);
         if (this.slotList.length < 1) {
             slotEnum = Skeleton2DSlotEnum;
         } else {

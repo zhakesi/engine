@@ -39,8 +39,10 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
         return this._nativeMeshArray;
     }
 
-    getSlots (): string[] {
-        const slots = ['body', 'head'];
-        return slots;
+    getSlotsTable (): Map<number, string | null> {
+        const table = new Map<number, string>();
+        table.set(0, 'body');
+        table.set(1, 'head');
+        return table;
     }
 }
