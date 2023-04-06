@@ -45,7 +45,7 @@ import { BaseRenderData, MeshRenderData } from './render-data';
 import { UIMeshRenderer } from '../components/ui-mesh-renderer';
 import { NativeBatcher2d, NativeUIMeshBuffer } from './native-2d';
 import { MeshBuffer } from './mesh-buffer';
-import { scene } from '../../render-scene';
+import { IMacroPatch, scene } from '../../render-scene';
 import { builtinResMgr } from '../../asset/asset-manager';
 import { RenderingSubMesh } from '../../asset/assets';
 
@@ -707,7 +707,8 @@ export class Batcher2D implements IBatcher {
         curDrawBatch.sampler = this._currSampler;
         curDrawBatch.textureHash = this._currTextureHash;
         curDrawBatch.samplerHash = this._currSamplerHash;
-        curDrawBatch.fillPasses(this._currMaterial || null, depthStencil, dssHash, null);
+        const patches: IMacroPatch[] = [{ name: 'USE_LOCAL', value: true }];
+        curDrawBatch.fillPasses(this._currMaterial || null, depthStencil, dssHash, patches);
         this._batches.push(curDrawBatch);
 
         this._currIsMiddleware = false;
