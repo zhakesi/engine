@@ -48,35 +48,21 @@ export class PartialRendererUI extends UIRenderable {
 
     public onLoad () {
         super.onLoad();
-        const material = builtinResMgr.get<Material>('default-spine-material');
-
-        const matInfo = {
-            parent: material,
-            subModelIdx: 0,
-            owner: this,
-        };
-        const inst = new MaterialInstance(matInfo);
-        inst.overridePipelineStates({
-            blendState: {
-                blendColor: Color.WHITE,
-                targets: [{
-                    blendEq: BlendOp.ADD,
-                    blendAlphaEq: BlendOp.ADD,
-                    blendSrc: BlendFactor.SRC_ALPHA,
-                    blendDst: BlendFactor.ONE_MINUS_SRC_ALPHA,
-                    blendSrcAlpha: BlendFactor.SRC_ALPHA,
-                    blendDstAlpha: BlendFactor.ONE_MINUS_SRC_ALPHA,
-                }],
-            },
-        });
-        inst.recompileShaders({ USE_LOCAL: true });
-
-        this.material = inst;
     }
 
     public onEnable () {
         super.onEnable();
         this.createRenderData();
+    }
+    protected updateMaterial () {
+        if (this._customMaterial) {
+            if (this.getMaterial(0) !== this._customMaterial) {
+                this.setMaterial(this._customMaterial, 0);
+            }
+            return;
+        }
+        const mat = builtinResMgr.get<Material>('default-spine-material');
+        this.setMaterial(mat, 0);
     }
 
     public updateRenderer () {
@@ -86,7 +72,7 @@ export class PartialRendererUI extends UIRenderable {
     }
 
     protected _render (batcher: Batcher2D): void {
-        //if (this._meshArray.length < 1) return;
+        if (this._meshArray.length < 1) return;
         if (!this._texture) return;
         if (!this._renderData) return;
 
@@ -106,44 +92,36 @@ export class PartialRendererUI extends UIRenderable {
         console.log('Skeleton2DPartialRenderer destroy');
     }
 
-    // private _assembleRenderData () {
-    //     const count = this._meshArray.length;
-    //     let vc = 0;
-    //     let ic = 0;
-    //     for (let idx = 0;  idx < count; idx++) {
-    //         const mesh = this._meshArray[idx];
-    //         vc += mesh.vCount;
-    //         ic += mesh.iCount;
-    //     }
-    //     const renderData = this._renderData!;
-    //     renderData.resize(vc, ic);
-    //     const vb = renderData.chunk.vb;
-    //     const ib = renderData.chunk.ib;
-    //     let vbOffset = 0;
-    //     let ibOffset = 0;
-    //     for (let idx = 0;  idx < count; idx++) {
-    //         const mesh = this._meshArray[idx];
-    //         const srcVB = mesh.vertices;
-    //         const srcIB = mesh.indices;
-    //         vb.set(srcVB, vbOffset);
-    //         ib.set(srcIB, ibOffset);
-    //         vbOffset += srcVB.length;
-    //         ibOffset += srcIB.length;
-    //     }
-    // }
-
     private _assembleRenderData () {
+        const count = this._meshArray.length;
+        let vc = 0;
+        let ic = 0;
+        for (let idx = 0;  idx < count; idx++) {
+            const mesh = this._meshArray[idx];
+            vc += mesh.vCount;
+            ic += mesh.iCount;
+        }
         const renderData = this._renderData!;
-        renderData.resize(3, 3);
-        const srcVB = [0, 0, 0, 0, 0, 1, 1, 1, 1,
-            100, 100, 0, 1, 0.5, 1, 1, 1, 1,
-            200, 100, 0, 0.5, 0.5, 1, 1, 1, 1];
-
-        const srcIB = [0, 1, 2];
-        const vbuffer = renderData.chunk.vb;
-        vbuffer.set(srcVB, 0);
-        const ibuffer = renderData.chunk.ib;
-        ibuffer.set(srcIB, 0);
+        renderData.resize(vc, ic);
+        const vb = renderData.chunk.vb;
+        const ib = renderData.chunk.ib;
+        let vbOffset = 0;
+        let ibOffset = 0;
+        let vCount = 0;
+        for (let idx = 0;  idx < count; idx++) {
+            const mesh = this._meshArray[idx];
+            const srcVB = mesh.vertices;
+            const srcIB = mesh.indices;
+            const length = srcIB.length;
+            for (let ii = 0; ii < length; ii++) {
+                srcIB[ii] += vCount;
+            }
+            vb.set(srcVB, vbOffset);
+            ib.set(srcIB, ibOffset);
+            vbOffset += srcVB.length;
+            ibOffset += srcIB.length;
+            vCount += mesh.vCount;
+        }
     }
 
     private createRenderData () {
