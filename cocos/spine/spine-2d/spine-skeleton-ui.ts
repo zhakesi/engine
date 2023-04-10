@@ -35,23 +35,9 @@ import { Skeleton2DImplyNative } from './skeleton2d-imply-native';
 import { Skeleton2DMesh } from './skeleton2d-native';
 import { CCInteger, path } from '../../core';
 import { Node } from '../../scene-graph/node';
-import { Skeleton2DPartialRenderer } from './skeleton2d-partial-renderer';
+import { PartialRendererUI } from './partial-renderer-ui';
 import { Component } from '../../scene-graph';
-
-export enum Skel2DSkinsEnum {
-    default = 0,
-}
-ccenum(Skel2DSkinsEnum);
-
-export enum Skel2DAnimsEnum {
-    '<None>' = 0,
-}
-ccenum(Skel2DAnimsEnum);
-
-function setEnumAttr (obj, propName, enumDef) {
-    CCClass.Attr.setClassAttr(obj, propName, 'type', 'Enum');
-    CCClass.Attr.setClassAttr(obj, propName, 'enumList', Enum.getList(enumDef));
-}
+import { SpineSkinEnum, SpineAnimationEnum, setEnumAttr } from './spine-define';
 
 // eslint-disable-next-line dot-notation
 SkeletonData.prototype['init'] = function () {
@@ -73,12 +59,12 @@ SkeletonData.prototype['init'] = function () {
     }
 };
 
-@ccclass('cc.Skeleton2DRenderer')
-@help('i18n:cc.Skeleton2DRenderer')
+@ccclass('cc.SpineSkeletonUI')
+@help('i18n:cc.SpineSkeletonUI')
 @executionOrder(99)
-@menu('2D/Skeleton2DRenderer')
+@menu('Spine/SpineSkeletonUI')
 @executeInEditMode
-export class Skeleton2DRenderer extends Component {
+export class SpineSkeletonUI extends Component {
     @serializable
     protected _skeletonData: SkeletonData | null = null;
     @serializable
@@ -90,7 +76,7 @@ export class Skeleton2DRenderer extends Component {
     @serializable
     private _seperatorNumber = 0;
 
-    private _parts: Skeleton2DPartialRenderer[] = [];
+    private _renderer: PartialRendererUI | null = null;
 
     private _imply: Skeleton2DImply | null = null;
     private _meshArray: Skeleton2DMesh[] = [];
@@ -108,7 +94,6 @@ export class Skeleton2DRenderer extends Component {
         }
     }
 
-    @editable
     @type(SkeletonData)
     @displayName('SkeletonData')
     get skeletonData () {
@@ -128,15 +113,13 @@ export class Skeleton2DRenderer extends Component {
         this._updateSkinEnum();
         this._updateAnimEnum();
         this._updateSkeletonData();
-
-        this._clearPartialRenderers();
     }
 
     /**
      * @internal
      */
     @displayName('Default Skin')
-    @type(Skel2DSkinsEnum)
+    @type(SpineSkinEnum)
     get defaultSkinIndex (): number {
         if (!this.skeletonData) return 0;
         const skinsEnum = this.skeletonData.getSkinsEnum();
@@ -174,7 +157,7 @@ export class Skeleton2DRenderer extends Component {
      * @internal
      */
     @displayName('Animation')
-    @type(Skel2DAnimsEnum)
+    @type(SpineAnimationEnum)
     get animationIndex () {
         if (!this.skeletonData) return 0;
         const animsEnum = this.skeletonData.getAnimsEnum();
@@ -210,25 +193,6 @@ export class Skeleton2DRenderer extends Component {
         this._texture = tex;
     }
 
-    @editable
-    @range([0, 64, 1])
-    @type(CCInteger)
-    @tooltip('i18n:Seperator Number')
-    @displayName('Seperator Number')
-    get seperatorNumber (): number {
-        return this._seperatorNumber;
-    }
-    set seperatorNumber (val: number) {
-        this._seperatorNumber = val;
-        this._clearPartialRenderers();
-        let i = 1;
-        for (; i <= val; i++) {
-            const node = new Node(`part-${i.toString()}`);
-            this._addPatialRenderer(node, i);
-            node.parent = this.node;
-        }
-    }
-
     public setSkin (skinName: string) {
         if (!this._imply) return;
 
@@ -242,7 +206,7 @@ export class Skeleton2DRenderer extends Component {
         if (this.skeletonData) {
             skinEnum = this.skeletonData.getSkinsEnum();
         } else {
-            skinEnum = Skel2DSkinsEnum;
+            skinEnum = SpineSkinEnum;
         }
 
         const enumSkins = Enum({});
@@ -257,7 +221,7 @@ export class Skeleton2DRenderer extends Component {
         if (this.skeletonData) {
             animEnum = this.skeletonData.getAnimsEnum();
         } else {
-            animEnum = Skel2DAnimsEnum;
+            animEnum = SpineAnimationEnum;
         }
         // reset enum type
         const enumAnimations = Enum({});
@@ -282,12 +246,12 @@ export class Skeleton2DRenderer extends Component {
         if (!this._imply) return;
         if (!EDITOR) this._imply.updateAnimation(dt);
         this._meshArray = this._imply.updateRenderData();
-        this._updatePartsRenderData();
+        this._updateRenderData();
     }
 
     public onEnable () {
         this._updateSkeletonData();
-        this._initPartsRenderers();
+        this._initRenderer();
     }
 
     public onDisable () {
@@ -296,8 +260,7 @@ export class Skeleton2DRenderer extends Component {
     }
 
     public onDestroy () {
-        console.log('Skeleton2DRenderer onDestroy');
-        this._parts.length = 0;
+        // console.log('Skeleton2DRenderer onDestroy');
         // if (!this._wasmObj) return;
         // console.log('onDestroy');
     }
@@ -308,7 +271,6 @@ export class Skeleton2DRenderer extends Component {
         this.setSkin(this._defaultSkinName);
         this.setAnimation(this._defaultAnimationName);
         this._slotTable = this._imply.getSlotsTable();
-        this._updateSlotEnumList();
     }
 
     public setAnimation (name: string) {
@@ -316,95 +278,19 @@ export class Skeleton2DRenderer extends Component {
         this._imply.setAnimation(name);
     }
 
-    private _clearPartialRenderers () {
-        const children = this.node.children;
-        children.forEach((node) => {
-            const part = node.getComponent(Skeleton2DPartialRenderer);
-            if (part) node.destroy();
-        });
-        this._parts.length = 0;
-        this._addPatialRenderer(this.node, 0);
+    private _updateRenderData () {
+        this._renderer!.meshArray = this._meshArray;
+        this._renderer!.markForUpdateRenderData();
     }
 
-    private _addPatialRenderer (node: Node, idx: number) {
-        const slotList = this._slotList;
-        let part = node.getComponent(Skeleton2DPartialRenderer);
-        if (part) {
-            this.fillPartialRenderProperties(part);
+    private _initRenderer () {
+        let render = this.node.getComponent(PartialRendererUI);
+        if (!render) {
+            render = this.node.addComponent(PartialRendererUI);
+            render.resetProperties(this._texture);
         } else {
-            part = node.addComponent(Skeleton2DPartialRenderer);
-            this.fillPartialRenderProperties(part);
+            render.resetProperties(this._texture);
         }
-        this._parts[idx] = part;
-    }
-
-    private _updatePartsRenderData () {
-        for (let i = 0; i < this._parts.length; i++) {
-            const part = this._parts[i];
-            const next = this._parts[i + 1];
-            const slotStart = part.slotStart;
-            let slotEnd = this._slotList.length - 1;
-            if (next) slotEnd = next.slotStart;
-
-            const meshStart = this._findMeshBySlot(slotStart);
-            const meshEnd = this._findMeshBySlot(slotEnd);
-            // console.log(`mesh start:${meshStart}`);
-            // console.log(`mesh end:${meshEnd}`);
-
-            const meshes = this._meshArray.slice(meshStart, meshEnd + 1);
-            part.meshArray = meshes;
-        }
-    }
-
-    private _initPartsRenderers () {
-        this._parts.length = 0;
-        let part = this.node.getComponent(Skeleton2DPartialRenderer);
-        if (!part) {
-            this._addPatialRenderer(this.node, 0);
-        } else {
-            this.fillPartialRenderProperties(part);
-            this._parts.push(part);
-        }
-        const children = this.node.children;
-        children.forEach((node) => {
-            part = node.getComponent(Skeleton2DPartialRenderer);
-            if (part) {
-                this.fillPartialRenderProperties(part);
-                this._parts.push(part);
-            }
-        });
-    }
-
-    private fillPartialRenderProperties (part: Skeleton2DPartialRenderer) {
-        part.resetProperties(this._texture, this._slotList);
-    }
-
-    private _findMeshBySlot (slotIndex: number): number {
-        const name = this._slotList[slotIndex];
-        let realIndex = 0;
-        this._slotTable.forEach((value, key) => {
-            if (value === name) {
-                realIndex = key;
-            }
-        });
-        const meshArray = this._meshArray;
-        const length = meshArray.length;
-        let meshIndex = 0;
-        for (let i = 0; i < length; i++) {
-            if (meshArray[i].slotIndex === realIndex) {
-                meshIndex = i;
-                break;
-            }
-        }
-        return meshIndex;
-    }
-
-    private _updateSlotEnumList () {
-        this._slotList.length = 0;
-        this._slotTable.forEach((value, key) => {
-            if (value) {
-                this._slotList.push(value);
-            }
-        });
+        this._renderer = render;
     }
 }

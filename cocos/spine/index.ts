@@ -48,8 +48,8 @@ export * from './skeleton-data';
 export * from './skeleton-texture';
 export * from './vertex-effect-delegate';
 export * from './assembler';
-export * from './spine-2d/skeleton2d-renderer';
-export * from './spine-2d/skeleton2d-ui';
+export * from './spine-2d/spine-skeleton-animation';
+export * from './spine-2d/spine-skeleton-ui';
 
 export { spine };
 
