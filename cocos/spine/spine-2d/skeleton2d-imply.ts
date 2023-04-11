@@ -5,6 +5,7 @@ export interface Skeleton2DImply {
     initSkeletonData (data: SkeletonData): boolean;
     setSkin (name: string): boolean;
     setAnimation (name: string): boolean;
+    setTimeScale(timeScale: number): boolean;
     updateAnimation (dltTime: number);
     updateRenderData (): Skeleton2DMesh[];
     getSlotsTable (): Map<number, string | null>;

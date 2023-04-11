@@ -30,6 +30,10 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
         this._nativeObj.setAnimation(name);
         return true;
     }
+    public setTimeScale (timeScale: number): boolean {
+        return true;
+    }
+
     updateAnimation (dltTime: number) {
         this._nativeObj.updateAnimation(dltTime);
         return true;

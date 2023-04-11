@@ -22,14 +22,6 @@ function setEnumAttr (obj, propName, enumDef) {
     CCClass.Attr.setClassAttr(obj, propName, 'enumList', Enum.getList(enumDef));
 }
 
-@ccclass('cc.Skeleton2DSoltItem')
-@executeInEditMode
-export class Skeleton2DSoltItem {
-    public idx = 0;
-    public name = '';
-    public indexType = 1; // 0->first, 1->normal, 2->end
-}
-
 @ccclass('cc.Skeleton2DPartialRenderer')
 @help('i18n:cc.Skeleton2DPartialRenderer')
 @executionOrder(100)

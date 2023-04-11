@@ -19,25 +19,20 @@
  THE SOFTWARE.
 */
 import { EDITOR, JSB } from 'internal:constants';
-import { ccclass, executeInEditMode, executionOrder, help, menu, serializable, type, displayName, range, slide, tooltip } from 'cc.decorator';
-import { builtinResMgr } from '../../asset/asset-manager/builtin-res-mgr';
-import { PrimitiveMode, Device, BufferUsageBit, BufferInfo, MemoryUsageBit, deviceManager } from '../../gfx';
-import { Material, Texture2D, RenderingSubMesh } from '../../asset/assets';
-import { editable } from '../../core/data/decorators';
+import { ccclass, executeInEditMode, executionOrder, help, menu, serializable, type, displayName, range, tooltip, editable } from 'cc.decorator';
+import { Texture2D } from '../../asset/assets';
 import { errorID } from '../../core/platform/debug';
 import { SkeletonData } from '../skeleton-data';
 
-import { ccenum, Enum } from '../../core/value-types/enum';
-import { CCClass } from '../../core/data/class';
+import { Enum } from '../../core/value-types/enum';
 import { Skeleton2DImply } from './skeleton2d-imply';
 import { Skeleton2DImplyWasm } from './skeleton2d-imply-wasm';
 import { Skeleton2DImplyNative } from './skeleton2d-imply-native';
 import { Skeleton2DMesh } from './skeleton2d-native';
-import { CCInteger, path } from '../../core';
-import { Node } from '../../scene-graph/node';
 import { PartialRendererUI } from './partial-renderer-ui';
 import { Component } from '../../scene-graph';
-import { SpineSkinEnum, SpineAnimationEnum, setEnumAttr } from './spine-define';
+import { SpineSkinEnum, SpineAnimationEnum, setEnumAttr, SpineBoneSocket } from './spine-define';
+import { CCFloat } from '../../core';
 
 // eslint-disable-next-line dot-notation
 SkeletonData.prototype['init'] = function () {
@@ -74,7 +69,9 @@ export class SpineSkeletonUI extends Component {
     @serializable
     private _texture: Texture2D | null = null;
     @serializable
-    private _seperatorNumber = 0;
+    private _timeScale = 1.0;
+    @serializable
+    protected _sockets: SpineBoneSocket[] = [];
 
     private _renderer: PartialRendererUI | null = null;
 
@@ -193,10 +190,39 @@ export class SpineSkeletonUI extends Component {
         this._texture = tex;
     }
 
+    @editable
+    @range([0, 10.0])
+    @type(CCFloat)
+    @tooltip('i18n:Animation Speed')
+    @displayName('Time Scale')
+    get timeScale (): number {
+        return this._timeScale;
+    }
+    set timeScale (val: number) {
+        this._timeScale = val;
+        this.updateTimeScale(val);
+    }
+
+    @type([SpineBoneSocket])
+    @tooltip('i18n:SpineBone.sockets')
+    get sockets (): SpineBoneSocket[] {
+        return this._sockets;
+    }
+
+    set sockets (val: SpineBoneSocket[]) {
+        if (EDITOR) {
+            //this._verifySockets(val);
+        }
+        this._sockets = val;
+        // this._updateSocketBindings();
+        // this.attachUtil._syncAttachedNode();
+    }
+
     public setSkin (skinName: string) {
         if (!this._imply) return;
 
         this._imply.setSkin(skinName);
+        this._updateRenderData();
     }
 
     // update skin list for editor
@@ -245,7 +271,6 @@ export class SpineSkeletonUI extends Component {
     public update (dt: number) {
         if (!this._imply) return;
         if (!EDITOR) this._imply.updateAnimation(dt);
-        this._meshArray = this._imply.updateRenderData();
         this._updateRenderData();
     }
 
@@ -271,16 +296,27 @@ export class SpineSkeletonUI extends Component {
         this.setSkin(this._defaultSkinName);
         this.setAnimation(this._defaultAnimationName);
         this._slotTable = this._imply.getSlotsTable();
+        this._updateRenderData();
     }
 
     public setAnimation (name: string) {
         if (!this._imply) return;
         this._imply.setAnimation(name);
+        this._imply.setTimeScale(this._timeScale);
+        this._updateRenderData();
+    }
+
+    public updateTimeScale (val: number) {
+        if (!this._imply) return;
+        this._imply.setTimeScale(val);
     }
 
     private _updateRenderData () {
-        this._renderer!.meshArray = this._meshArray;
-        this._renderer!.markForUpdateRenderData();
+        if (!this._renderer || !this._imply) return;
+        this._meshArray = this._imply.updateRenderData();
+        this._renderer.meshArray = this._meshArray;
+        this._renderer.resetProperties(this._texture);
+        this._renderer.markForUpdateRenderData();
     }
 
     private _initRenderer () {

@@ -22,11 +22,11 @@
  */
 
 import { EDITOR, JSB } from 'internal:constants';
-import { SpineWasmUtil } from './spine-wasm-util';
+import { SpineWasmInterface } from './spine-wasm-util';
 import { FileResourceInstance } from './file-resource';
 import { JsReadFile } from './jsfile.js';
 
-let wasmUtil: SpineWasmUtil;
+let wasmUtil: SpineWasmInterface;
 let HEAPU8: Uint8Array;
 
 function assert (condition, text) {
@@ -106,16 +106,16 @@ function receiveInstance (instance) {
     const exports = instance.exports;
     assert(wasmMemory, 'memory not found in wasm exports');
     HEAPU8 = new Uint8Array(wasmMemory.buffer);
-    wasmUtil = exports as unknown as SpineWasmUtil;
-    console.log('xxx receiveInstance');
+    wasmUtil = exports as unknown as SpineWasmInterface;
+    //console.log('xxx receiveInstance');
 }
 
 function receiveInstantiationResult (result) {
     receiveInstance(result.instance);
-    wasmUtil.spineWasmUtilInit();
+    wasmUtil.spineWasmInstanceInit();
 }
 
-export function getSpineSpineWasmUtil () {
+export function getSpineSpineWasmInstance () {
     return wasmUtil;
 }
 
