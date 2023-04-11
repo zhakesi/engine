@@ -11,6 +11,7 @@ export interface SpineWasmInterface {
     updateRenderData(objID: number): number;
     getDrawOrderSize(objID: number): number;
     getSlotNameByOrder(objID: number, index: number): number;
+    getBoneMatrix(objID: number, index: number): number;
     queryMemory(size: number): number;
     freeMemory(data: Uint8Array);
     testFunction(objID: number, start: number, length: number): number;

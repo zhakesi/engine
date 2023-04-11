@@ -30,9 +30,12 @@ import { Skeleton2DImplyWasm } from './skeleton2d-imply-wasm';
 import { Skeleton2DImplyNative } from './skeleton2d-imply-native';
 import { Skeleton2DMesh } from './skeleton2d-native';
 import { PartialRendererUI } from './partial-renderer-ui';
-import { Component } from '../../scene-graph';
-import { SpineSkinEnum, SpineAnimationEnum, setEnumAttr, SpineBoneSocket } from './spine-define';
-import { CCFloat } from '../../core';
+import { Component, Node } from '../../scene-graph';
+import { SpineSkinEnum, SpineAnimationEnum, setEnumAttr } from './spine-define';
+import { CCFloat, Mat4 } from '../../core';
+import { SpineSocket } from '../skeleton';
+
+const attachMat4 = new Mat4();
 
 // eslint-disable-next-line dot-notation
 SkeletonData.prototype['init'] = function () {
@@ -71,14 +74,15 @@ export class SpineSkeletonUI extends Component {
     @serializable
     private _timeScale = 1.0;
     @serializable
-    protected _sockets: SpineBoneSocket[] = [];
+    protected _sockets: SpineSocket[] = [];
 
     private _renderer: PartialRendererUI | null = null;
 
     private _imply: Skeleton2DImply | null = null;
     private _meshArray: Skeleton2DMesh[] = [];
     declare private _slotTable: Map<number, string | null>;
-    private _slotList: string[] = [];
+    protected _cachedSockets: Map<string, number> = new Map<string, number>();
+    protected _socketNodes: Map<number, Node> = new Map();
 
     constructor () {
         super();
@@ -203,19 +207,16 @@ export class SpineSkeletonUI extends Component {
         this.updateTimeScale(val);
     }
 
-    @type([SpineBoneSocket])
+    @type([SpineSocket])
     @tooltip('i18n:SpineBone.sockets')
-    get sockets (): SpineBoneSocket[] {
+    get sockets (): SpineSocket[] {
         return this._sockets;
     }
 
-    set sockets (val: SpineBoneSocket[]) {
-        if (EDITOR) {
-            //this._verifySockets(val);
-        }
+    set sockets (val: SpineSocket[]) {
         this._sockets = val;
-        // this._updateSocketBindings();
-        // this.attachUtil._syncAttachedNode();
+        this._updateSocketBindings();
+        this._syncAttachedNode();
     }
 
     public setSkin (skinName: string) {
@@ -270,7 +271,9 @@ export class SpineSkeletonUI extends Component {
 
     public update (dt: number) {
         if (!this._imply) return;
-        if (!EDITOR) this._imply.updateAnimation(dt);
+        //if (!EDITOR)
+        this._imply.updateAnimation(dt);
+        this._syncAttachedNode();
         this._updateRenderData();
     }
 
@@ -296,6 +299,8 @@ export class SpineSkeletonUI extends Component {
         this.setSkin(this._defaultSkinName);
         this.setAnimation(this._defaultAnimationName);
         this._slotTable = this._imply.getSlotsTable();
+        this._indexBoneSockets();
+        this._updateSocketBindings();
         this._updateRenderData();
     }
 
@@ -328,5 +333,53 @@ export class SpineSkeletonUI extends Component {
             render.resetProperties(this._texture);
         }
         this._renderer = render;
+    }
+
+    private _updateSocketBindings () {
+        if (!this._skeletonData) return;
+        this._socketNodes.clear();
+        for (let i = 0, l = this._sockets.length; i < l; i++) {
+            const socket = this._sockets[i];
+            if (socket.path && socket.target) {
+                const boneIdx = this._cachedSockets.get(socket.path);
+                if (!boneIdx) {
+                    console.error(`Skeleton data does not contain path ${socket.path}`);
+                    continue;
+                }
+                this._socketNodes.set(boneIdx, socket.target);
+            }
+        }
+    }
+
+    private _indexBoneSockets () {
+        if (!this._skeletonData) return;
+        this._cachedSockets.clear();
+        const sd = this._skeletonData.getRuntimeData();
+        const bones = sd!.bones;
+
+        const getBoneName = (bone: any): any => {
+            if (bone.parent == null) return bone.name || '<Unamed>';
+            return `${getBoneName(bones[bone.parent.index])}/${bone.name}`;
+        };
+
+        for (let i = 0, l = bones.length; i < l; i++) {
+            const bd = bones[i];
+            const boneName = getBoneName(bd);
+            this._cachedSockets.set(boneName, bd.index);
+        }
+    }
+    public querySockets () {
+        this._indexBoneSockets();
+        return Array.from(this._cachedSockets.keys());
+    }
+
+    private _syncAttachedNode () {
+        const socketNodes = this._socketNodes;
+        for (const boneIdx of socketNodes.keys()) {
+            const boneNode = socketNodes.get(boneIdx);
+            if (!boneNode) continue;
+            this._imply!.getBoneMatrix(boneIdx, attachMat4);
+            boneNode.matrix = attachMat4;
+        }
     }
 }

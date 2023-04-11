@@ -4,6 +4,9 @@ import { SpineWasmInterface } from './spine-wasm-util';
 import { FileResourceInstance } from './file-resource';
 import { Skeleton2DMesh } from './skeleton2d-native';
 import { Skeleton2DImply } from './skeleton2d-imply';
+import { Mat4 } from '../../core';
+
+const tempBoneMat = new Mat4();
 
 const floatStride = 9;
 export class Skeleton2DImplyWasm implements Skeleton2DImply {
@@ -127,6 +130,18 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
             table.set(i, name);
         }
         return table;
+    }
+
+    public getBoneMatrix (index: number, mat: Mat4) {
+        const address = this._wasmInstance.getBoneMatrix(this._objID, index);
+        const start = address / 4;
+        const floatArray = new Float32Array(this._wasmHEAPU8.buffer);
+        mat.m00 = floatArray[start];
+        mat.m01 = floatArray[start + 1];
+        mat.m04 = floatArray[start + 2];
+        mat.m05 = floatArray[start + 3];
+        mat.m12 = floatArray[start + 4];
+        mat.m13 = floatArray[start + 5];
     }
 
     private _objID: number;

@@ -1,3 +1,4 @@
+import { Mat4 } from '../../core';
 import { SkeletonData } from '../skeleton-data';
 import { Skeleton2DImply } from './skeleton2d-imply';
 import { NativeSkeleton2D, Skeleton2DMesh } from './skeleton2d-native';
@@ -48,5 +49,9 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
         table.set(0, 'body');
         table.set(1, 'head');
         return table;
+    }
+
+    getBoneMatrix (idx: number, matrix: Mat4) {
+
     }
 }
