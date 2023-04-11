@@ -14,6 +14,7 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
         this._wasmInstance = getSpineSpineWasmInstance();
         this._wasmHEAPU8 = new Uint8Array(this._wasmInstance.memory.buffer);
         this._objID = this._wasmInstance.createSkeletonObject();
+        this._wasmInstance.setDefaultScale(this._objID, 0.01);
     }
     public initSkeletonData (data: SkeletonData): boolean {
         if (data.skeletonJson) {

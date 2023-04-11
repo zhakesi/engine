@@ -30,13 +30,15 @@ import { Skeleton2DImply } from './skeleton2d-imply';
 import { Skeleton2DImplyWasm } from './skeleton2d-imply-wasm';
 import { Skeleton2DImplyNative } from './skeleton2d-imply-native';
 import { Skeleton2DMesh } from './skeleton2d-native';
-import { CCInteger, path } from '../../core';
+import { CCFloat, CCInteger, Mat4, path } from '../../core';
 import { Node } from '../../scene-graph/node';
 import { Skeleton2DPartialRenderer } from './skeleton2d-partial-renderer';
 import { Component } from '../../scene-graph';
 import { Enum } from '../../core/value-types/enum';
 import { SpineSkinEnum, SpineAnimationEnum, setEnumAttr } from './spine-define';
+import { SpineSocket } from '../skeleton';
 
+const attachMat4 = new Mat4();
 // eslint-disable-next-line dot-notation
 SkeletonData.prototype['init'] = function () {
     console.log('SkeletonData.prototype init');
@@ -72,7 +74,11 @@ export class SpineSkeletonAnimation extends Component {
     @serializable
     private _texture: Texture2D | null = null;
     @serializable
+    private _timeScale = 1.0;
+    @serializable
     private _seperatorNumber = 0;
+    @serializable
+    protected _sockets: SpineSocket[] = [];
 
     private _parts: Skeleton2DPartialRenderer[] = [];
 
@@ -80,6 +86,8 @@ export class SpineSkeletonAnimation extends Component {
     private _meshArray: Skeleton2DMesh[] = [];
     declare private _slotTable: Map<number, string | null>;
     private _slotList: string[] = [];
+    protected _cachedSockets: Map<string, number> = new Map<string, number>();
+    protected _socketNodes: Map<number, Node> = new Map();
 
     constructor () {
         super();
@@ -195,6 +203,19 @@ export class SpineSkeletonAnimation extends Component {
     }
 
     @editable
+    @range([0, 10.0])
+    @type(CCFloat)
+    @tooltip('i18n:Animation Speed')
+    @displayName('Time Scale')
+    get timeScale (): number {
+        return this._timeScale;
+    }
+    set timeScale (val: number) {
+        this._timeScale = val;
+        this.updateTimeScale(val);
+    }
+
+    @editable
     @range([0, 64, 1])
     @type(CCInteger)
     @tooltip('i18n:Seperator Number')
@@ -213,10 +234,23 @@ export class SpineSkeletonAnimation extends Component {
         }
     }
 
+    @type([SpineSocket])
+    @tooltip('i18n:SpineBone.sockets')
+    get sockets (): SpineSocket[] {
+        return this._sockets;
+    }
+
+    set sockets (val: SpineSocket[]) {
+        this._sockets = val;
+        this._updateSocketBindings();
+        this._syncAttachedNode();
+    }
+
     public setSkin (skinName: string) {
         if (!this._imply) return;
 
         this._imply.setSkin(skinName);
+        //this._updateRenderData();
     }
 
     // update skin list for editor
@@ -264,9 +298,9 @@ export class SpineSkeletonAnimation extends Component {
 
     public update (dt: number) {
         if (!this._imply || !this._skeletonData) return;
-        if (!EDITOR) this._imply.updateAnimation(dt);
-        this._meshArray = this._imply.updateRenderData();
-        this._updatePartsRenderData();
+        this._imply.updateAnimation(dt);
+        this._syncAttachedNode();
+        this._updateRenderData();
     }
 
     public onEnable () {
@@ -293,11 +327,16 @@ export class SpineSkeletonAnimation extends Component {
         this.setAnimation(this._defaultAnimationName);
         this._slotTable = this._imply.getSlotsTable();
         this._updateSlotEnumList();
+        this._indexBoneSockets();
+        this._updateSocketBindings();
+        this._updateRenderData();
     }
 
     public setAnimation (name: string) {
         if (!this._imply) return;
         this._imply.setAnimation(name);
+        this._imply.setTimeScale(this._timeScale);
+        //this._updateRenderData();
     }
 
     private _clearPartialRenderers () {
@@ -322,7 +361,9 @@ export class SpineSkeletonAnimation extends Component {
         this._parts[idx] = part;
     }
 
-    private _updatePartsRenderData () {
+    private _updateRenderData () {
+        if (!this._imply || !this._skeletonData) return;
+        this._meshArray = this._imply.updateRenderData();
         for (let i = 0; i < this._parts.length; i++) {
             const part = this._parts[i];
             const next = this._parts[i + 1];
@@ -332,8 +373,6 @@ export class SpineSkeletonAnimation extends Component {
 
             const meshStart = this._findMeshBySlot(slotStart);
             const meshEnd = this._findMeshBySlot(slotEnd);
-            // console.log(`mesh start:${meshStart}`);
-            // console.log(`mesh end:${meshEnd}`);
 
             const meshes = this._meshArray.slice(meshStart, meshEnd + 1);
             part.meshArray = meshes;
@@ -390,5 +429,60 @@ export class SpineSkeletonAnimation extends Component {
                 this._slotList.push(value);
             }
         });
+    }
+
+    public updateTimeScale (val: number) {
+        if (!this._imply) return;
+        this._imply.setTimeScale(val);
+    }
+
+    private _updateSocketBindings () {
+        if (!this._skeletonData) return;
+        this._socketNodes.clear();
+        for (let i = 0, l = this._sockets.length; i < l; i++) {
+            const socket = this._sockets[i];
+            if (socket.path && socket.target) {
+                const boneIdx = this._cachedSockets.get(socket.path);
+                if (!boneIdx) {
+                    console.error(`Skeleton data does not contain path ${socket.path}`);
+                    continue;
+                }
+                this._socketNodes.set(boneIdx, socket.target);
+            }
+        }
+    }
+
+    private _indexBoneSockets () {
+        if (!this._skeletonData) return;
+        this._cachedSockets.clear();
+        const sd = this._skeletonData.getRuntimeData();
+        const bones = sd!.bones;
+
+        const getBoneName = (bone: any): any => {
+            if (bone.parent == null) return bone.name || '<Unamed>';
+            return `${getBoneName(bones[bone.parent.index])}/${bone.name}`;
+        };
+
+        for (let i = 0, l = bones.length; i < l; i++) {
+            const bd = bones[i];
+            const boneName = getBoneName(bd);
+            this._cachedSockets.set(boneName, bd.index);
+        }
+    }
+    public querySockets () {
+        this._indexBoneSockets();
+        return Array.from(this._cachedSockets.keys());
+    }
+
+    private _syncAttachedNode () {
+        const socketNodes = this._socketNodes;
+        for (const boneIdx of socketNodes.keys()) {
+            const boneNode = socketNodes.get(boneIdx);
+            if (!boneNode) continue;
+            this._imply!.getBoneMatrix(boneIdx, attachMat4);
+            attachMat4.m12 *= 0.01;
+            attachMat4.m13 *= 0.01;
+            boneNode.matrix = attachMat4;
+        }
     }
 }
