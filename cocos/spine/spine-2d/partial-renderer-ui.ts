@@ -48,12 +48,17 @@ export class PartialRendererUI extends UIRenderable {
 
     public onLoad () {
         super.onLoad();
+        this.createRenderData();
     }
 
     public onEnable () {
         super.onEnable();
-        this.createRenderData();
     }
+
+    public onDisable () {
+        super.onDisable();
+    }
+
     protected updateMaterial () {
         if (this._customMaterial) {
             if (this.getMaterial(0) !== this._customMaterial) {

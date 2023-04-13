@@ -54,4 +54,7 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
     getBoneMatrix (idx: number, matrix: Mat4) {
 
     }
+
+    public setDefaultScale (scale: number) {
+    }
 }

@@ -14,7 +14,6 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
         this._wasmInstance = getSpineSpineWasmInstance();
         this._wasmHEAPU8 = new Uint8Array(this._wasmInstance.memory.buffer);
         this._objID = this._wasmInstance.createSkeletonObject();
-        this._wasmInstance.setDefaultScale(this._objID, 0.01);
     }
     public initSkeletonData (data: SkeletonData): boolean {
         if (data.skeletonJson) {
@@ -143,6 +142,10 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
         mat.m05 = floatArray[start + 3];
         mat.m12 = floatArray[start + 4];
         mat.m13 = floatArray[start + 5];
+    }
+
+    public setDefaultScale (scale: number) {
+        this._wasmInstance.setDefaultScale(this._objID, scale);
     }
 
     private _objID: number;

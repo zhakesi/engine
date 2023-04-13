@@ -92,6 +92,7 @@ export class SpineSkeletonUI extends Component {
             this._imply = new Skeleton2DImplyNative();
         } else {
             this._imply = new Skeleton2DImplyWasm();
+            //this._imply.setDefaultScale(1);
         }
     }
 
@@ -262,6 +263,9 @@ export class SpineSkeletonUI extends Component {
             this._updateSkinEnum();
             this._updateAnimEnum();
         }
+        this._updateSkeletonData();
+        this._initRenderer();
+        console.log('xxx __preload');
     }
 
     public onRestore () {
@@ -278,13 +282,12 @@ export class SpineSkeletonUI extends Component {
     }
 
     public onEnable () {
-        this._updateSkeletonData();
-        this._initRenderer();
+        //console.log('xxx onEnable');
     }
 
     public onDisable () {
-        // if (!this._wasmObj) return;
-        // console.log('onDisable');
+        this._meshArray.length = 0;
+        this._updateRenderData();
     }
 
     public onDestroy () {

@@ -70,6 +70,11 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
         //console.log('Skeleton2DPartialRenderer:update');
     }
 
+    public onDisable () {
+        if (this._models.length > 0) {
+            this._detachFromScene();
+        }
+    }
     public onDestroy () {
         this._detachFromScene();
         this._destroyModel();

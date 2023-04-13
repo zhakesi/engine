@@ -11,4 +11,5 @@ export interface Skeleton2DImply {
     updateRenderData (): Skeleton2DMesh[];
     getSlotsTable (): Map<number, string | null>;
     getBoneMatrix(idx: number, matrix: Mat4);
+    setDefaultScale(scale: number);
 }

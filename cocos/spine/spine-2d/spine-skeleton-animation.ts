@@ -82,7 +82,7 @@ export class SpineSkeletonAnimation extends Component {
 
     private _parts: Skeleton2DPartialRenderer[] = [];
 
-    private _imply: Skeleton2DImply | null = null;
+    private _imply: Skeleton2DImply = null!;
     private _meshArray: Skeleton2DMesh[] = [];
     declare private _slotTable: Map<number, string | null>;
     private _slotList: string[] = [];
@@ -97,6 +97,7 @@ export class SpineSkeletonAnimation extends Component {
             this._imply = new Skeleton2DImplyNative();
         } else {
             this._imply = new Skeleton2DImplyWasm();
+            this._imply.setDefaultScale(0.01);
         }
     }
 
@@ -297,7 +298,7 @@ export class SpineSkeletonAnimation extends Component {
     }
 
     public update (dt: number) {
-        if (!this._imply || !this._skeletonData) return;
+        if (this._skeletonData) return;
         this._imply.updateAnimation(dt);
         this._syncAttachedNode();
         this._updateRenderData();
@@ -336,7 +337,6 @@ export class SpineSkeletonAnimation extends Component {
         if (!this._imply) return;
         this._imply.setAnimation(name);
         this._imply.setTimeScale(this._timeScale);
-        //this._updateRenderData();
     }
 
     private _clearPartialRenderers () {
@@ -479,7 +479,7 @@ export class SpineSkeletonAnimation extends Component {
         for (const boneIdx of socketNodes.keys()) {
             const boneNode = socketNodes.get(boneIdx);
             if (!boneNode) continue;
-            this._imply!.getBoneMatrix(boneIdx, attachMat4);
+            this._imply.getBoneMatrix(boneIdx, attachMat4);
             attachMat4.m12 *= 0.01;
             attachMat4.m13 *= 0.01;
             boneNode.matrix = attachMat4;
