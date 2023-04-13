@@ -27,7 +27,7 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
         this._nativeObj.setSkin(name);
         return true;
     }
-    setAnimation (name: string): boolean {
+    setAnimation (name: string, loop: boolean): boolean {
         this._nativeObj.setAnimation(name);
         return true;
     }

@@ -76,6 +76,8 @@ export class SpineSkeletonAnimation extends Component {
     @serializable
     private _timeScale = 1.0;
     @serializable
+    private _loop = true;
+    @serializable
     private _seperatorNumber = 0;
     @serializable
     protected _sockets: SpineSocket[] = [];
@@ -201,6 +203,18 @@ export class SpineSkeletonAnimation extends Component {
     }
     set texture (tex: Texture2D| null) {
         this._texture = tex;
+    }
+
+    /**
+     * @en Whether play animations in loop mode.
+     * @zh 是否循环播放当前骨骼动画。
+     */
+    @tooltip('i18n:COMPONENT.skeleton.loop')
+    get loop () {
+        return this._loop;
+    }
+    set loop (val) {
+        this._loop = this.loop;
     }
 
     @editable
@@ -333,9 +347,10 @@ export class SpineSkeletonAnimation extends Component {
         this._updateRenderData();
     }
 
-    public setAnimation (name: string) {
+    public setAnimation (name: string, loop?: boolean) {
         if (!this._imply) return;
-        this._imply.setAnimation(name);
+        if (loop) this._loop = loop;
+        this._imply.setAnimation(name, this._loop);
         this._imply.setTimeScale(this._timeScale);
     }
 

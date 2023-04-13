@@ -57,8 +57,8 @@ SkeletonData.prototype['init'] = function () {
     }
 };
 
-@ccclass('cc.SpineSkeletonUI')
-@help('i18n:cc.SpineSkeletonUI')
+@ccclass('sp.SpineSkeletonUI')
+@help('i18n:sp.SpineSkeletonUI')
 @executionOrder(99)
 @menu('Spine/SpineSkeletonUI')
 @executeInEditMode
@@ -75,6 +75,8 @@ export class SpineSkeletonUI extends Component {
     private _timeScale = 1.0;
     @serializable
     protected _sockets: SpineSocket[] = [];
+    @serializable
+    protected _loop = true;
 
     private _renderer: PartialRendererUI | null = null;
 
@@ -195,6 +197,18 @@ export class SpineSkeletonUI extends Component {
         this._texture = tex;
     }
 
+    /**
+     * @en Whether play animations in loop mode.
+     * @zh 是否循环播放当前骨骼动画。
+     */
+    @tooltip('i18n:COMPONENT.skeleton.loop')
+    get loop () {
+        return this._loop;
+    }
+    set loop (val) {
+        this._loop = this.loop;
+    }
+
     @editable
     @range([0, 10.0])
     @type(CCFloat)
@@ -307,9 +321,10 @@ export class SpineSkeletonUI extends Component {
         this._updateRenderData();
     }
 
-    public setAnimation (name: string) {
+    public setAnimation (name: string, loop?: boolean) {
         if (!this._imply) return;
-        this._imply.setAnimation(name);
+        if (loop) this._loop = loop;
+        this._imply.setAnimation(name, this._loop);
         this._imply.setTimeScale(this._timeScale);
         this._updateRenderData();
     }

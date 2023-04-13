@@ -25,8 +25,8 @@ const simple: IAssembler = {
     },
 };
 
-@ccclass('cc.PartialRendererUI')
-@help('i18n:cc.PartialRendererUI')
+@ccclass('sp.PartialRendererUI')
+@help('i18n:sp.PartialRendererUI')
 @executionOrder(100)
 @executeInEditMode
 export class PartialRendererUI extends UIRenderable {
