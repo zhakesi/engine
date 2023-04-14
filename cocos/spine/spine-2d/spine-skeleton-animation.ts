@@ -189,7 +189,7 @@ export class SpineSkeletonAnimation extends Component {
         const animName = animsEnum[value];
         if (animName !== undefined) {
             this._defaultAnimationName = animName.toString();
-            this.setAnimation(this._defaultAnimationName);
+            this.setAnimation(0, this._defaultAnimationName);
             if (EDITOR) this._updateAnimEnum();
         } else {
             console.error(`${this.name} animation enums are invalid`);
@@ -339,7 +339,7 @@ export class SpineSkeletonAnimation extends Component {
         if (this._skeletonData === null || this._imply === null) return;
         this._imply.initSkeletonData(this._skeletonData);
         this.setSkin(this._defaultSkinName);
-        this.setAnimation(this._defaultAnimationName);
+        this.setAnimation(0, this._defaultAnimationName);
         this._slotTable = this._imply.getSlotsTable();
         this._updateSlotEnumList();
         this._indexBoneSockets();
@@ -347,10 +347,10 @@ export class SpineSkeletonAnimation extends Component {
         this._updateRenderData();
     }
 
-    public setAnimation (name: string, loop?: boolean) {
+    public setAnimation (trackIdex: number, name: string, loop?: boolean) {
         if (!this._imply) return;
         if (loop) this._loop = loop;
-        this._imply.setAnimation(name, this._loop);
+        this._imply.setAnimation(trackIdex, name, this._loop);
         this._imply.setTimeScale(this._timeScale);
     }
 

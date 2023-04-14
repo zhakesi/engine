@@ -4,7 +4,9 @@ export interface SpineWasmInterface {
     getStoreMemory(): number;
     createSkeletonObject (): number;
     setSkeletonData(objID: number, isJosn: boolean, start: number, length: number): number;
-    setAnimation(objID: number, start: number, length: number, loop: boolean): number;
+    setAnimation(objID: number, start: number, length: number, trackIndex: number, loop: boolean): number;
+    clearTrack(objID: number, trackIndex: number): boolean;
+    clearTracks(objID: number): boolean;
     setTimeScale(objID: number, timeScale: number): number;
     setSkin(objID: number, start: number, length: number): number;
     updateAnimation(objID: number, dltTime: number): number;

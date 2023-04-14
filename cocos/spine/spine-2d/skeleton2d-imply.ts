@@ -3,13 +3,15 @@ import { SkeletonData } from '../skeleton-data';
 import { Skeleton2DMesh } from './skeleton2d-native';
 
 export interface Skeleton2DImply {
-    initSkeletonData (data: SkeletonData): boolean;
-    setSkin (name: string): boolean;
-    setAnimation (name: string, loop: boolean): boolean;
+    initSkeletonData(data: SkeletonData): boolean;
+    setSkin(name: string): boolean;
+    setAnimation(trackIndex: number, name: string, loop: boolean): boolean;
+    clearTrack(trackIndex: number);
+    clearTracks();
     setTimeScale(timeScale: number): boolean;
-    updateAnimation (dltTime: number);
-    updateRenderData (): Skeleton2DMesh[];
-    getSlotsTable (): Map<number, string | null>;
+    updateAnimation(dltTime: number);
+    updateRenderData(): Skeleton2DMesh[];
+    getSlotsTable(): Map<number, string | null>;
     getBoneMatrix(idx: number, matrix: Mat4);
     setDefaultScale(scale: number);
 }

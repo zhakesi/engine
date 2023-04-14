@@ -80,7 +80,7 @@ export class SpineSkeletonUI extends Component {
 
     private _renderer: PartialRendererUI | null = null;
 
-    private _imply: Skeleton2DImply | null = null;
+    declare private _imply: Skeleton2DImply;
     private _meshArray: Skeleton2DMesh[] = [];
     declare private _slotTable: Map<number, string | null>;
     protected _cachedSockets: Map<string, number> = new Map<string, number>();
@@ -94,7 +94,6 @@ export class SpineSkeletonUI extends Component {
             this._imply = new Skeleton2DImplyNative();
         } else {
             this._imply = new Skeleton2DImplyWasm();
-            //this._imply.setDefaultScale(1);
         }
     }
 
@@ -181,7 +180,7 @@ export class SpineSkeletonUI extends Component {
         const animName = animsEnum[value];
         if (animName !== undefined) {
             this._defaultAnimationName = animName.toString();
-            this.setAnimation(this._defaultAnimationName);
+            this.setAnimation(0, this._defaultAnimationName);
             if (EDITOR) this._updateAnimEnum();
         } else {
             console.error(`${this.name} animation enums are invalid`);
@@ -279,7 +278,6 @@ export class SpineSkeletonUI extends Component {
         }
         this._updateSkeletonData();
         this._initRenderer();
-        console.log('xxx __preload');
     }
 
     public onRestore () {
@@ -314,19 +312,26 @@ export class SpineSkeletonUI extends Component {
         if (this._skeletonData === null || this._imply === null) return;
         this._imply.initSkeletonData(this._skeletonData);
         this.setSkin(this._defaultSkinName);
-        this.setAnimation(this._defaultAnimationName);
+        this.setAnimation(0, this._defaultAnimationName);
         this._slotTable = this._imply.getSlotsTable();
         this._indexBoneSockets();
         this._updateSocketBindings();
         this._updateRenderData();
     }
 
-    public setAnimation (name: string, loop?: boolean) {
-        if (!this._imply) return;
+    public setAnimation (trackIndex: number, name: string, loop?: boolean) {
         if (loop) this._loop = loop;
-        this._imply.setAnimation(name, this._loop);
+        this._imply.setAnimation(trackIndex, name, this._loop);
         this._imply.setTimeScale(this._timeScale);
         this._updateRenderData();
+    }
+
+    public clearTrack (trackIndex: number) {
+        this._imply.clearTrack(trackIndex);
+    }
+
+    public clearTracks () {
+        this._imply.clearTracks();
     }
 
     public updateTimeScale (val: number) {
@@ -396,7 +401,7 @@ export class SpineSkeletonUI extends Component {
         for (const boneIdx of socketNodes.keys()) {
             const boneNode = socketNodes.get(boneIdx);
             if (!boneNode) continue;
-            this._imply!.getBoneMatrix(boneIdx, attachMat4);
+            this._imply.getBoneMatrix(boneIdx, attachMat4);
             boneNode.matrix = attachMat4;
         }
     }

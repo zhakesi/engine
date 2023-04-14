@@ -89,7 +89,7 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
         return true;
     }
 
-    public setAnimation (name: string, loop: boolean): boolean {
+    public setAnimation (trackIndex: number, name: string, loop: boolean): boolean {
         const encoder = new TextEncoder();
         const encoded = encoder.encode(name);
         const length = encoded.length;
@@ -97,8 +97,16 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
         const local = this._wasmInstance.queryMemory(length);
         const array = this._wasmHEAPU8.subarray(local, local + length);
         array.set(encoded);
-        this._wasmInstance.setAnimation(this._objID, local, length, loop);
+        this._wasmInstance.setAnimation(this._objID, local, length, trackIndex, loop);
         return true;
+    }
+
+    public clearTrack (trackIndex: number) {
+        this._wasmInstance.clearTrack(this._objID, trackIndex);
+    }
+
+    public clearTracks () {
+        this._wasmInstance.clearTracks(this._objID);
     }
 
     public setTimeScale (timeScale: number): boolean {
