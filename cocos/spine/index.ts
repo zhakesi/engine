@@ -50,6 +50,7 @@ export * from './vertex-effect-delegate';
 export * from './assembler';
 export * from './spine-2d/spine-skeleton-animation';
 export * from './spine-2d/spine-skeleton-ui';
+export * from './spine-2d/partial-renderer-ui';
 
 export { spine };
 

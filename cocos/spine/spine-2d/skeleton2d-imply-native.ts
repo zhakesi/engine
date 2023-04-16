@@ -65,4 +65,8 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
     public clearTracks () {
 
     }
+
+    public setToSetupPose () {
+
+    }
 }

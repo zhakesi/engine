@@ -7,6 +7,7 @@ export interface SpineWasmInterface {
     setAnimation(objID: number, start: number, length: number, trackIndex: number, loop: boolean): number;
     clearTrack(objID: number, trackIndex: number): boolean;
     clearTracks(objID: number): boolean;
+    setToSetupPose(objID: number): boolean;
     setTimeScale(objID: number, timeScale: number): number;
     setSkin(objID: number, start: number, length: number): number;
     updateAnimation(objID: number, dltTime: number): number;

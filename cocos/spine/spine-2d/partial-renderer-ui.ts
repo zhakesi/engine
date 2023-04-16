@@ -20,7 +20,10 @@ import { MaterialInstance } from '../../render-scene';
 let _accessor: StaticVBAccessor = null!;
 
 const simple: IAssembler = {
-    fillBuffers (sprite: PartialRendererUI, renderer: IBatcher) {
+    fillBuffers (render: PartialRendererUI, batcher: IBatcher) {
+
+    },
+    updateColor () {
 
     },
 };
@@ -81,6 +84,7 @@ export class PartialRendererUI extends UIRenderable {
         if (!this._texture) return;
         if (!this._renderData) return;
 
+        this._updateVertexColor();
         const rd = this._renderData;
         const chunk = rd.chunk;
         const accessor = chunk.vertexAccessor;
@@ -142,5 +146,29 @@ export class PartialRendererUI extends UIRenderable {
         const rd = RenderData.add(vfmtPosUvColor, accessor);
         rd.resize(0, 0);
         this._renderData = rd;
+    }
+
+    private _updateVertexColor () {
+        if (this.color.r === 255 && this.color.g === 255
+            && this.color.b === 255 && this.color.a === 255) {
+            return;
+        }
+
+        const floatStride = getAttributeStride(vfmtPosUvColor) / 4;
+        const renderData = this._renderData!;
+        const vb = renderData.chunk.vb;
+        const count = renderData.vertexCount;
+        const colorR = this.color.r / 255.0;
+        const colorG = this.color.g / 255.0;
+        const colorB = this.color.b / 255.0;
+        const colorA = this.color.a / 255.0;
+        let floatOffset = 5;
+        for (let i = 0; i < count; i++) {
+            vb[floatOffset] *= colorR;
+            vb[floatOffset + 1] *= colorG;
+            vb[floatOffset + 2] *= colorB;
+            vb[floatOffset + 3] *= colorA;
+            floatOffset += floatStride;
+        }
     }
 }

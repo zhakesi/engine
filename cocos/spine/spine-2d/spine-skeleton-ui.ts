@@ -32,7 +32,7 @@ import { Skeleton2DMesh } from './skeleton2d-native';
 import { PartialRendererUI } from './partial-renderer-ui';
 import { Component, Node } from '../../scene-graph';
 import { SpineSkinEnum, SpineAnimationEnum, setEnumAttr } from './spine-define';
-import { CCFloat, Mat4 } from '../../core';
+import { CCBoolean, CCFloat, Mat4 } from '../../core';
 import { SpineSocket } from '../skeleton';
 
 const attachMat4 = new Mat4();
@@ -72,14 +72,16 @@ export class SpineSkeletonUI extends Component {
     @serializable
     private _texture: Texture2D | null = null;
     @serializable
+    private _useTint = false;
+    @serializable
     private _timeScale = 1.0;
     @serializable
     protected _sockets: SpineSocket[] = [];
     @serializable
     protected _loop = true;
 
+    private _skinName = 'default';
     private _renderer: PartialRendererUI | null = null;
-
     declare private _imply: Skeleton2DImply;
     private _meshArray: Skeleton2DMesh[] = [];
     declare private _slotTable: Map<number, string | null>;
@@ -95,6 +97,8 @@ export class SpineSkeletonUI extends Component {
         } else {
             this._imply = new Skeleton2DImplyWasm();
         }
+
+        this._skinName = this._defaultSkinName;
     }
 
     @type(SkeletonData)
@@ -196,10 +200,23 @@ export class SpineSkeletonUI extends Component {
         this._texture = tex;
     }
 
+    @type(CCBoolean)
+    @tooltip('i18n:COMPONENT.skeleton.useTint')
+    get useTint () {
+        return this._useTint;
+    }
+    set useTint (val) {
+        if (this._useTint !== val) {
+            this._useTint = val;
+        }
+        this._updateUseTint();
+    }
+
     /**
      * @en Whether play animations in loop mode.
      * @zh 是否循环播放当前骨骼动画。
      */
+    @type(CCBoolean)
     @tooltip('i18n:COMPONENT.skeleton.loop')
     get loop () {
         return this._loop;
@@ -226,16 +243,19 @@ export class SpineSkeletonUI extends Component {
     get sockets (): SpineSocket[] {
         return this._sockets;
     }
-
     set sockets (val: SpineSocket[]) {
         this._sockets = val;
         this._updateSocketBindings();
         this._syncAttachedNode();
     }
 
+    get skinName () {
+        return this._skinName;
+    }
     public setSkin (skinName: string) {
         if (!this._imply) return;
 
+        this._skinName = skinName;
         this._imply.setSkin(skinName);
         this._updateRenderData();
     }
@@ -320,7 +340,7 @@ export class SpineSkeletonUI extends Component {
     }
 
     public setAnimation (trackIndex: number, name: string, loop?: boolean) {
-        if (loop) this._loop = loop;
+        if (loop !== undefined) this._loop = loop;
         this._imply.setAnimation(trackIndex, name, this._loop);
         this._imply.setTimeScale(this._timeScale);
         this._updateRenderData();
@@ -332,6 +352,10 @@ export class SpineSkeletonUI extends Component {
 
     public clearTracks () {
         this._imply.clearTracks();
+    }
+
+    public setToSetupPose () {
+        this._imply.setToSetupPose();
     }
 
     public updateTimeScale (val: number) {
@@ -404,5 +428,9 @@ export class SpineSkeletonUI extends Component {
             this._imply.getBoneMatrix(boneIdx, attachMat4);
             boneNode.matrix = attachMat4;
         }
+    }
+
+    private _updateUseTint () {
+        console.log('xxx- updateUseTint');
     }
 }

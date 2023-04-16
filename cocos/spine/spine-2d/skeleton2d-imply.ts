@@ -8,6 +8,7 @@ export interface Skeleton2DImply {
     setAnimation(trackIndex: number, name: string, loop: boolean): boolean;
     clearTrack(trackIndex: number);
     clearTracks();
+    setToSetupPose();
     setTimeScale(timeScale: number): boolean;
     updateAnimation(dltTime: number);
     updateRenderData(): Skeleton2DMesh[];

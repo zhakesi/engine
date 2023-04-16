@@ -109,6 +109,10 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
         this._wasmInstance.clearTracks(this._objID);
     }
 
+    public setToSetupPose () {
+        this._wasmInstance.setToSetupPose(this._objID);
+    }
+
     public setTimeScale (timeScale: number): boolean {
         this._wasmInstance.setTimeScale(this._objID, timeScale);
         return true;
