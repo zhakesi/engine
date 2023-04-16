@@ -34,6 +34,7 @@ import { Component, Node } from '../../scene-graph';
 import { SpineSkinEnum, SpineAnimationEnum, setEnumAttr } from './spine-define';
 import { CCBoolean, CCFloat, Mat4 } from '../../core';
 import { SpineSocket } from '../skeleton';
+import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-effect';
 
 const attachMat4 = new Mat4();
 
@@ -87,6 +88,7 @@ export class SpineSkeletonUI extends Component {
     declare private _slotTable: Map<number, string | null>;
     protected _cachedSockets: Map<string, number> = new Map<string, number>();
     protected _socketNodes: Map<number, Node> = new Map();
+    protected _effect: SpineJitterVertexEffect | SpineSwirlVertexEffect | null = null;
 
     constructor () {
         super();
@@ -356,6 +358,11 @@ export class SpineSkeletonUI extends Component {
 
     public setToSetupPose () {
         this._imply.setToSetupPose();
+    }
+
+    public setVertexEffectDelegate (effect) {
+        this._effect = effect;
+        this._imply.setVertexEffect(this._effect);
     }
 
     public updateTimeScale (val: number) {

@@ -18,6 +18,8 @@ export interface SpineWasmInterface {
     queryMemory(size: number): number;
     freeMemory(data: Uint8Array);
     setDefaultScale(objID: number, scale: number): boolean;
+    setVertexEffect(objID: number, effect: number);
+
     testFunction(objID: number, start: number, length: number): number;
     memory: any;
 }

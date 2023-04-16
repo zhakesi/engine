@@ -62,6 +62,10 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
 
     }
 
+    public setVertexEffect (effect: any) {
+
+    }
+
     public clearTracks () {
 
     }
