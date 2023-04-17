@@ -34,7 +34,7 @@ import { Component, Node } from '../../scene-graph';
 import { SpineSkinEnum, SpineAnimationEnum, setEnumAttr } from './spine-define';
 import { CCBoolean, CCFloat, Mat4 } from '../../core';
 import { SpineSocket } from '../skeleton';
-import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-effect';
+import { SpineJitterVertexEffect, SpineSwirlVertexEffect, SpineVertexEffectDelegate } from './spine-vertex-effect-wasm';
 
 const attachMat4 = new Mat4();
 
@@ -331,6 +331,7 @@ export class SpineSkeletonUI extends Component {
     }
 
     protected _updateSkeletonData () {
+        this._updateUITransform();
         if (this._skeletonData === null || this._imply === null) return;
         this._imply.initSkeletonData(this._skeletonData);
         this.setSkin(this._defaultSkinName);
@@ -360,7 +361,7 @@ export class SpineSkeletonUI extends Component {
         this._imply.setToSetupPose();
     }
 
-    public setVertexEffectDelegate (effect) {
+    public setVertexEffectDelegate (effect: SpineJitterVertexEffect | SpineSwirlVertexEffect | null) {
         this._effect = effect;
         this._imply.setVertexEffect(this._effect);
     }
@@ -439,5 +440,20 @@ export class SpineSkeletonUI extends Component {
 
     private _updateUseTint () {
         console.log('xxx- updateUseTint');
+    }
+
+    private _updateUITransform () {
+        if (!this._skeletonData) {
+            const uiTrans = this.node._uiProps.uiTransformComp!;
+            uiTrans.setContentSize(100, 100);
+            uiTrans.anchorX = 0.5;
+            uiTrans.anchorY = 0.5;
+            return;
+        }
+        const data = this._skeletonData.getRuntimeData()!;
+        const uiTrans = this.node._uiProps.uiTransformComp!;
+        if (data.width && data.height) { uiTrans.setContentSize(data.width, data.height); }
+        if (data.width !== 0) uiTrans.anchorX = Math.abs(data.x) / data.width;
+        if (data.height !== 0) uiTrans.anchorY = Math.abs(data.y) / data.height;
     }
 }

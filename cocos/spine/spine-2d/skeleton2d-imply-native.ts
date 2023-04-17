@@ -2,6 +2,7 @@ import { Mat4 } from '../../core';
 import { SkeletonData } from '../skeleton-data';
 import { Skeleton2DImply } from './skeleton2d-imply';
 import { NativeSkeleton2D, Skeleton2DMesh } from './skeleton2d-native';
+import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-effect-wasm';
 
 export class Skeleton2DImplyNative implements Skeleton2DImply {
     protected declare _nativeObj: NativeSkeleton2D;
@@ -62,15 +63,14 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
 
     }
 
-    public setVertexEffect (effect: any) {
-
-    }
-
     public clearTracks () {
 
     }
 
     public setToSetupPose () {
 
+    }
+
+    public setVertexEffect (effect: SpineJitterVertexEffect | SpineSwirlVertexEffect | null) {
     }
 }

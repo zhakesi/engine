@@ -18,7 +18,12 @@ export interface SpineWasmInterface {
     queryMemory(size: number): number;
     freeMemory(data: Uint8Array);
     setDefaultScale(objID: number, scale: number): boolean;
-    setVertexEffect(objID: number, effect: number);
+    setVertexEffect(objID: number, effect: number, effectType: number);
+
+    createJitterVertexEffect(x: number, y: number): number;
+    updateJitterParameters(handle: number, x: number, y: number);
+    createSwirlVertexEffect(radius: number, power: number, usePowerOut: boolean): number;
+    updateSwirlParameters(handle: number, centerX: number, centerY: number, radius: number, angle: number);
 
     testFunction(objID: number, start: number, length: number): number;
     memory: any;

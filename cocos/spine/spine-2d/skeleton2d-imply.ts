@@ -1,7 +1,7 @@
 import { Mat4 } from '../../core';
 import { SkeletonData } from '../skeleton-data';
 import { Skeleton2DMesh } from './skeleton2d-native';
-import { SpineJitterVertexEffect, SpineVertexEffectDelegate } from './spine-vertex-effect';
+import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-effect-wasm';
 
 export interface Skeleton2DImply {
     initSkeletonData(data: SkeletonData): boolean;
@@ -17,5 +17,5 @@ export interface Skeleton2DImply {
     getBoneMatrix(idx: number, matrix: Mat4);
     setDefaultScale(scale: number);
 
-    setVertexEffect(effect: SpineJitterVertexEffect | SpineVertexEffectDelegate | null);
+    setVertexEffect(effect: SpineJitterVertexEffect | SpineSwirlVertexEffect | null);
 }

@@ -5,7 +5,7 @@ import { FileResourceInstance } from './file-resource';
 import { Skeleton2DMesh } from './skeleton2d-native';
 import { Skeleton2DImply } from './skeleton2d-imply';
 import { Mat4 } from '../../core';
-import { SpineJitterVertexEffect, SpineVertexEffectDelegate } from './spine-vertex-effect';
+import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-effect-wasm';
 
 const tempBoneMat = new Mat4();
 
@@ -161,12 +161,12 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
         this._wasmInstance.setDefaultScale(this._objID, scale);
     }
 
-    public setVertexEffect (effect: SpineJitterVertexEffect | SpineVertexEffectDelegate| null)  {
+    public setVertexEffect (effect: SpineJitterVertexEffect | SpineSwirlVertexEffect | null) {
         let effectHandle = 0;
         if (effect) {
             effectHandle = effect.getHandle();
         }
-        this._wasmInstance.setVertexEffect(this._objID, effectHandle);
+        this._wasmInstance.setVertexEffect(this._objID, effectHandle, 0);
     }
 
     private _objID: number;
