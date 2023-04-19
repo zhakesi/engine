@@ -210,9 +210,9 @@ void Skeleton2D::processVertices() {
             float *vert = ptr + m * mesh->byteStride / sizeof(float);
             vert[0] *= 0.01f;
             vert[1] *= 0.01f;
-            vert[2] = z_offset;
+            vert[2] = 0;
         }
-        z_offset += 0.01f;
+        //z_offset += 0.01f;
     }
 }
 

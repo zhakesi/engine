@@ -312,7 +312,7 @@ export class SpineSkeletonAnimation extends Component {
     }
 
     public update (dt: number) {
-        if (this._skeletonData) return;
+        if (!this._skeletonData) return;
         this._imply.updateAnimation(dt);
         this._syncAttachedNode();
         this._updateRenderData();
@@ -386,8 +386,10 @@ export class SpineSkeletonAnimation extends Component {
             let slotEnd = this._slotList.length - 1;
             if (next) slotEnd = next.slotStart;
 
-            const meshStart = this._findMeshBySlot(slotStart);
-            const meshEnd = this._findMeshBySlot(slotEnd);
+            // const meshStart = this._findMeshBySlot(slotStart);
+            // const meshEnd = this._findMeshBySlot(slotEnd);
+            const meshStart = 0;
+            const meshEnd = this._meshArray.length;
 
             const meshes = this._meshArray.slice(meshStart, meshEnd + 1);
             part.meshArray = meshes;

@@ -46,7 +46,10 @@ import { legacyCC } from '../core/global-exports';
 export * from './skeleton';
 export * from './skeleton-data';
 export * from './assembler';
-export * from './spine-2d/skeleton2d-renderer';
+export * from './spine-2d/spine-skeleton-animation';
+export * from './spine-2d/spine-skeleton-ui';
+export * from './spine-2d/partial-renderer-ui';
+export * from './spine-2d/spine-vertex-effect-wasm';
 
 export const spine = globalThis.spine;
 export const VertexEffectDelegate = spine.VertexEffectDelegate;
