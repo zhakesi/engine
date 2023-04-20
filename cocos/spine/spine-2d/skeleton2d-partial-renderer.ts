@@ -11,6 +11,7 @@ import { BufferInfo, BufferUsageBit, Device, MemoryUsageBit, PrimitiveMode, devi
 import { builtinResMgr } from '../../asset/asset-manager';
 import { ccclass, displayName, executeInEditMode, executionOrder, help, serializable, type } from '../../core/data/decorators';
 import { CCClass, Enum, ccenum } from '../../core';
+import { RenderEntity, RenderEntityType } from '../../2d/renderer/render-entity';
 
 export enum Skeleton2DSlotEnum {
     default = 0,
@@ -79,6 +80,12 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
         this._detachFromScene();
         this._destroyModel();
         console.log('Skeleton2DPartialRenderer destroy');
+    }
+
+    protected createRenderEntity () {
+        const renderEntity = new RenderEntity(RenderEntityType.DYNAMIC);
+        renderEntity.setUseLocal(true);
+        return renderEntity;
     }
 
     /**
@@ -197,8 +204,18 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
             this._activeSubModel(idx);
             const subModel = this._models[0].subModels[idx];
             const ia = subModel.inputAssembler;
-            const vb = new Float32Array(mesh.vertices);
-            ia.vertexBuffers[0].update(vb);
+            const vb = new Float32Array(mesh.vCount * 6);
+            const uIntPtr = new Uint32Array(vb.buffer);
+            vb.set(mesh.vertices);
+            for (let i = 0; i < mesh.vCount; i++) {
+            //     vb[i * 6] = mesh.vertices[i * 6];
+            //     vb[i * 6 + 1] = mesh.vertices[i * 6 + 1];
+            //     vb[i * 6 + 2] = mesh.vertices[i * 6 + 2];
+            //     vb[i * 6 + 3] = mesh.vertices[i * 6 + 3];
+            //     vb[i * 6 + 4] = mesh.vertices[i * 6 + 4];
+                uIntPtr[i * 6 + 5] = ((255 << 24) >>> 0) + (255 << 16) + (255 << 8) + 255;
+            }
+            ia.vertexBuffers[0].update(vb.buffer);
             ia.vertexCount = mesh.vCount;
             const ib = new Uint16Array(mesh.indices);
             ia.indexBuffer!.update(ib);
