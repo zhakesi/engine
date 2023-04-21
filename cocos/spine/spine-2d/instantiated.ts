@@ -86,18 +86,34 @@ function _jsReadFile (start: number, length: number): number {
     return dataSize;
 }
 
+function ___syscall_fcntl64 (fd, cmd, varargs) {
+    console.log('___syscall_fcntl64 error');
+}
+
+function ___syscall_ioctl (fd, op, varargs) {
+    console.log('___syscall_ioctl error');
+}
+
+function ___syscall_openat (dirfd, path, flags, varargs) {
+    console.log('___syscall_openat error');
+}
+
 const asmLibraryArg = {
     __assert_fail: _reportError,
     consoleInfo: _consoleInfo,
     abortOnCannotGrowMemory: _abortOnCannotGrowMemory,
     __cxa_allocate_exception: _cxa_allocate_exception,
     __cxa_throw: _cxa_throw,
+    __syscall_fcntl64: ___syscall_fcntl64,
+    __syscall_ioctl: ___syscall_ioctl,
+    __syscall_openat: ___syscall_openat,
     abort: _abort,
     emscripten_memcpy_big: _emscripten_memcpy_big,
     emscripten_resize_heap: _emscripten_resize_heap,
     fd_close: _reportError,
     fd_seek: _reportError,
     fd_write: _reportError,
+    fd_read: _reportError,
     jsReadFile: _jsReadFile,
 };
 
