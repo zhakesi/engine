@@ -52,7 +52,7 @@
 #endif
 
 #if CC_USE_SPINE
-    #include "editor-support/spine-creator-support/SkeletonCacheMgr.h"
+    #include "editor-support/spine-legacy-support/SkeletonCacheMgr.h"
 #endif
 
 #include "application/ApplicationManager.h"

@@ -43,7 +43,7 @@
 #include "jsb_conversions_spec.h"
 
 #if CC_USE_SPINE
-    #include "cocos/editor-support/spine-creator-support/spine-cocos2dx.h"
+    #include "cocos/editor-support/spine-legacy-support/spine-cocos2dx.h"
 #endif
 
 #include "core/geometry/Geometry.h"

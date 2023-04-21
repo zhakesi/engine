@@ -49,7 +49,7 @@ private:
     // Prevent copying
     RTTI(const RTTI &obj);
 
-    RTTI &operator=(const RTTI &obj);
+    //RTTI &operator=(const RTTI &obj);
 
     const char *_className;
     const RTTI *_pBaseRTTI;
@@ -58,15 +58,22 @@ private:
 
 #define RTTI_DECL                  \
 public:                            \
-    static const spine::RTTI rtti; \
-    virtual const spine::RTTI &getRTTI() const;
+    static spine::RTTI rtti; \
+    virtual spine::RTTI &getRTTI() const;
 
 #define RTTI_IMPL_NOPARENT(name)         \
-    const spine::RTTI name::rtti(#name); \
-    const spine::RTTI &name::getRTTI() const { return rtti; }
+    spine::RTTI name::rtti(#name); \
+    spine::RTTI &name::getRTTI() const { return rtti; }
 
 #define RTTI_IMPL(name, parent)                        \
-    const spine::RTTI name::rtti(#name, parent::rtti); \
-    const spine::RTTI &name::getRTTI() const { return rtti; }
+    spine::RTTI name::rtti(#name, parent::rtti); \
+    spine::RTTI &name::getRTTI() const { return rtti; }
+
+#define RTTI_NOPARENT_HACK(name) \
+name::rtti = spine::RTTI(#name);
+
+#define RTTI_HACK(name, parent) \
+name::rtti = spine::RTTI(#name, parent::rtti);
+
 
 #endif /* Spine_RTTI_h */

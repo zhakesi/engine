@@ -27,11 +27,11 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "spine-creator-support/SkeletonAnimation.h"
+#include "spine-legacy-support/SkeletonAnimation.h"
 #include <algorithm>
 #include "base/DeferredReleasePool.h"
 #include "base/Log.h"
-#include "spine-creator-support/spine-cocos2dx.h"
+#include "spine-legacy-support/spine-cocos2dx.h"
 #include "spine/Extension.h"
 
 namespace spine {

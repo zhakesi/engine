@@ -28,7 +28,7 @@
  *****************************************************************************/
 
 #pragma once
-#include "spine-creator-support/SkeletonRenderer.h"
+#include "spine-legacy-support/SkeletonRenderer.h"
 #include "spine/spine.h"
 
 namespace spine {

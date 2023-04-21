@@ -2351,24 +2351,24 @@ if(USE_MIDDLEWARE)
             NO_WERROR                cocos/editor-support/spine/VertexEffect.cpp
                                      cocos/editor-support/spine/VertexEffect.h
                                      cocos/editor-support/spine/Vertices.h
-            NO_WERROR                cocos/editor-support/spine-creator-support/AttachmentVertices.cpp
-                                     cocos/editor-support/spine-creator-support/AttachmentVertices.h
-            NO_WERROR                cocos/editor-support/spine-creator-support/SkeletonAnimation.cpp
-                                     cocos/editor-support/spine-creator-support/SkeletonAnimation.h
-            NO_WERROR                cocos/editor-support/spine-creator-support/SkeletonCache.cpp
-                                     cocos/editor-support/spine-creator-support/SkeletonCache.h
-            NO_WERROR                cocos/editor-support/spine-creator-support/SkeletonCacheAnimation.cpp
-                                     cocos/editor-support/spine-creator-support/SkeletonCacheAnimation.h
-            NO_WERROR                cocos/editor-support/spine-creator-support/SkeletonCacheMgr.cpp
-                                     cocos/editor-support/spine-creator-support/SkeletonCacheMgr.h
-            NO_WERROR                cocos/editor-support/spine-creator-support/SkeletonDataMgr.cpp
-                                     cocos/editor-support/spine-creator-support/SkeletonDataMgr.h
-            NO_WERROR   NO_UBUILD    cocos/editor-support/spine-creator-support/SkeletonRenderer.cpp
-                                     cocos/editor-support/spine-creator-support/SkeletonRenderer.h
-            NO_WERROR                cocos/editor-support/spine-creator-support/spine-cocos2dx.cpp
-                                     cocos/editor-support/spine-creator-support/spine-cocos2dx.h
-            NO_WERROR                cocos/editor-support/spine-creator-support/VertexEffectDelegate.cpp
-                                     cocos/editor-support/spine-creator-support/VertexEffectDelegate.h
+            NO_WERROR                cocos/editor-support/spine-legacy-support/AttachmentVertices.cpp
+                                     cocos/editor-support/spine-legacy-support/AttachmentVertices.h
+            NO_WERROR                cocos/editor-support/spine-legacy-support/SkeletonAnimation.cpp
+                                     cocos/editor-support/spine-legacy-support/SkeletonAnimation.h
+            NO_WERROR                cocos/editor-support/spine-legacy-support/SkeletonCache.cpp
+                                     cocos/editor-support/spine-legacy-support/SkeletonCache.h
+            NO_WERROR                cocos/editor-support/spine-legacy-support/SkeletonCacheAnimation.cpp
+                                     cocos/editor-support/spine-legacy-support/SkeletonCacheAnimation.h
+            NO_WERROR                cocos/editor-support/spine-legacy-support/SkeletonCacheMgr.cpp
+                                     cocos/editor-support/spine-legacy-support/SkeletonCacheMgr.h
+            NO_WERROR                cocos/editor-support/spine-legacy-support/SkeletonDataMgr.cpp
+                                     cocos/editor-support/spine-legacy-support/SkeletonDataMgr.h
+            NO_WERROR   NO_UBUILD    cocos/editor-support/spine-legacy-support/SkeletonRenderer.cpp
+                                     cocos/editor-support/spine-legacy-support/SkeletonRenderer.h
+            NO_WERROR                cocos/editor-support/spine-legacy-support/spine-cocos2dx.cpp
+                                     cocos/editor-support/spine-legacy-support/spine-cocos2dx.h
+            NO_WERROR                cocos/editor-support/spine-legacy-support/VertexEffectDelegate.cpp
+                                     cocos/editor-support/spine-legacy-support/VertexEffectDelegate.h
 
         )
         cocos_source_files(

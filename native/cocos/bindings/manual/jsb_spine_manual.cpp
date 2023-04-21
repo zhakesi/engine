@@ -30,13 +30,13 @@
 #include "bindings/manual/jsb_conversions.h"
 #include "bindings/manual/jsb_global.h"
 #include "bindings/manual/jsb_helper.h"
-#include "editor-support/spine-creator-support/spine-cocos2dx.h"
+#include "editor-support/spine-legacy-support/spine-cocos2dx.h"
 #include "editor-support/spine/spine.h"
 #include "middleware-adapter.h"
 #include "platform/FileUtils.h"
-#include "spine-creator-support/SkeletonDataMgr.h"
-#include "spine-creator-support/SkeletonRenderer.h"
-#include "spine-creator-support/spine-cocos2dx.h"
+#include "spine-legacy-support/SkeletonDataMgr.h"
+#include "spine-legacy-support/SkeletonRenderer.h"
+#include "spine-legacy-support/spine-cocos2dx.h"
 
 using namespace cc;
 

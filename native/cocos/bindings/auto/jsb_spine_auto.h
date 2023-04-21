@@ -35,7 +35,7 @@
 #pragma once
 #include "bindings/jswrapper/SeApi.h"
 #include "bindings/manual/jsb_conversions.h"
-#include "editor-support/spine-creator-support/spine-cocos2dx.h"
+#include "editor-support/spine-legacy-support/spine-cocos2dx.h"
 
 
 

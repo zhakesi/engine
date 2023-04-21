@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "spine-creator-support/SkeletonRenderer.h"
+#include "spine-legacy-support/SkeletonRenderer.h"
 #include <algorithm>
 #include "2d/renderer/RenderDrawInfo.h"
 #include "2d/renderer/RenderEntity.h"
@@ -41,8 +41,8 @@
 #include "math/Math.h"
 #include "math/Vec3.h"
 #include "renderer/core/MaterialInstance.h"
-#include "spine-creator-support/AttachmentVertices.h"
-#include "spine-creator-support/spine-cocos2dx.h"
+#include "spine-legacy-support/AttachmentVertices.h"
+#include "spine-legacy-support/spine-cocos2dx.h"
 
 USING_NS_MW;             // NOLINT(google-build-using-namespace)
 using namespace spine;   // NOLINT(google-build-using-namespace)

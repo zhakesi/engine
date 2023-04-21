@@ -37,7 +37,7 @@
 #include "base/RefCounted.h"
 #include "base/RefMap.h"
 #include "middleware-adapter.h"
-#include "spine-creator-support/VertexEffectDelegate.h"
+#include "spine-legacy-support/VertexEffectDelegate.h"
 #include "spine/spine.h"
 
 namespace cc {

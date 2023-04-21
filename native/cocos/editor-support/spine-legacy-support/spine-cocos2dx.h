@@ -30,11 +30,11 @@
 #pragma once
 
 #include "middleware-adapter.h"
-#include "spine-creator-support/SkeletonAnimation.h"
-#include "spine-creator-support/SkeletonCacheAnimation.h"
-#include "spine-creator-support/SkeletonCacheMgr.h"
-#include "spine-creator-support/SkeletonDataMgr.h"
-#include "spine-creator-support/SkeletonRenderer.h"
+#include "spine-legacy-support/SkeletonAnimation.h"
+#include "spine-legacy-support/SkeletonCacheAnimation.h"
+#include "spine-legacy-support/SkeletonCacheMgr.h"
+#include "spine-legacy-support/SkeletonDataMgr.h"
+#include "spine-legacy-support/SkeletonRenderer.h"
 #include "spine/spine.h"
 
 namespace spine {

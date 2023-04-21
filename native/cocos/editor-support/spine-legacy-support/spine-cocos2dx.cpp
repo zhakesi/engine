@@ -27,11 +27,11 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "spine-creator-support/spine-cocos2dx.h"
+#include "spine-legacy-support/spine-cocos2dx.h"
 #include "base/Data.h"
 #include "middleware-adapter.h"
 #include "platform/FileUtils.h"
-#include "spine-creator-support/AttachmentVertices.h"
+#include "spine-legacy-support/AttachmentVertices.h"
 
 namespace spine {
 static CustomTextureLoader customTextureLoader = nullptr;

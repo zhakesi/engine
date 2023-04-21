@@ -27,7 +27,7 @@
  * THE SPINE RUNTIMES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
-#include "spine-creator-support/AttachmentVertices.h"
+#include "spine-legacy-support/AttachmentVertices.h"
 
 using namespace cc; // NOLINT(google-build-using-namespace)
 
