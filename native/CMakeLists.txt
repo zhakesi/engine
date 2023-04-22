@@ -2377,6 +2377,14 @@ if(USE_MIDDLEWARE)
         NO_WERROR       cocos/bindings/manual/jsb_spine_manual.cpp
                         cocos/bindings/manual/jsb_spine_manual.h
         )
+        cocos_source_files(
+            cocos/editor-support/spine-cocos-support/spine-mesh-data.cpp
+            cocos/editor-support/spine-cocos-support/spine-mesh-data.h
+            cocos/editor-support/spine-cocos-support/spine-skeleton-animation.cpp
+            cocos/editor-support/spine-cocos-support/spine-skeleton-animation.h
+            cocos/bindings/auto/jsb_cocos-spine_auto.cpp
+            cocos/bindings/auto/jsb_cocos-spine_auto.h
+        )
     endif()
 
     if(USE_DRAGONBONES)

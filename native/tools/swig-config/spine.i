@@ -9,7 +9,7 @@
 #pragma once
 #include "bindings/jswrapper/SeApi.h"
 #include "bindings/manual/jsb_conversions.h"
-#include "editor-support/spine-creator-support/spine-cocos2dx.h"
+#include "editor-support/spine-legacy-support/spine-cocos2dx.h"
 %}
 
 // Insert code at the beginning of generated source file (.cpp)
@@ -310,9 +310,9 @@ using namespace spine;
 %include "editor-support/spine/TransformConstraintTimeline.h"
 %include "editor-support/spine/VertexEffect.h"
 
-%include "editor-support/spine-creator-support/VertexEffectDelegate.h"
-%include "editor-support/spine-creator-support/SkeletonRenderer.h"
-%include "editor-support/spine-creator-support/SkeletonAnimation.h"
-%include "editor-support/spine-creator-support/SkeletonDataMgr.h"
-%include "editor-support/spine-creator-support/SkeletonCacheAnimation.h"
-%include "editor-support/spine-creator-support/SkeletonCacheMgr.h"
+%include "editor-support/spine-legacy-support/VertexEffectDelegate.h"
+%include "editor-support/spine-legacy-support/SkeletonRenderer.h"
+%include "editor-support/spine-legacy-support/SkeletonAnimation.h"
+%include "editor-support/spine-legacy-support/SkeletonDataMgr.h"
+%include "editor-support/spine-legacy-support/SkeletonCacheAnimation.h"
+%include "editor-support/spine-legacy-support/SkeletonCacheMgr.h"

@@ -12,6 +12,7 @@
     {
       "USE_TEXTURE": true,
       "CC_USE_EMBEDDED_ALPHA": false,
+      "USE_LOCAL": true,
       "IS_GRAY": false
     }
   ],
