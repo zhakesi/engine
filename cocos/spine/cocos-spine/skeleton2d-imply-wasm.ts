@@ -9,7 +9,7 @@ import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-
 
 const tempBoneMat = new Mat4();
 
-const floatStride = 9;
+const floatStride = 6;
 export class Skeleton2DImplyWasm implements Skeleton2DImply {
     constructor () {
         this._wasmInstance = getSpineSpineWasmInstance();

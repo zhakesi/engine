@@ -10,6 +10,8 @@
 using namespace spine;
 extern void consoleLog(uint32_t start, uint32_t length);
 
+const Color4B WHITE(255, 255, 255, 255);
+
 static std::map<uint32_t, SkeletonHandle> handleTable {};
 static uint32_t generateID() {
     static uint32_t id = 0;
@@ -81,10 +83,11 @@ uint32_t SkeletonObject::initWithSkeletonData(bool isJson, uint32_t start, uint3
 
 uint32_t SkeletonObject::updateRenderData()
 {
-    resetMeshArray();
+    SkMeshData currMesh;
+    std::vector<SkMeshData> meshes;
+    meshes.clear();
 
     unsigned int byteStride = sizeof(V3F_T2F_C4B);
-    SkMeshData* currMesh = nullptr;
     int startSlotIndex = -1;
     int endSlotIndex = -1;
     bool inRange = true;
@@ -126,13 +129,15 @@ uint32_t SkeletonObject::updateRenderData()
             auto vbSize = vertCount * stride;
             auto indexCount = attachmentVertices->_triangles->indexCount;
             auto ibSize = indexCount * sizeof(uint16_t);
-            SkMeshData* mesh = currMesh = new SkMeshData(vertCount, indexCount, stride);
-            mesh->userData.slotIndex = i;
-            memcpy(mesh->vb, static_cast<void *>(attachmentVertices->_triangles->verts), vbSize);
-            attachment->computeWorldVertices(slot->getBone(),(float *)mesh->vb, 0, stride / sizeof(float));
-            memcpy(mesh->ib, attachmentVertices->_triangles->indices, ibSize);
-            _meshArray.push_back(mesh);
-
+            SkMeshData mesh;
+            mesh.vb = (uint8_t*)attachmentVertices->_triangles->verts;
+            mesh.ib = attachmentVertices->_triangles->indices;
+            mesh.vbCount = vertCount;
+            mesh.ibCount = indexCount;
+            mesh.userData.slotIndex = i;
+            attachment->computeWorldVertices(slot->getBone(),(float *)mesh.vb, 0, stride / sizeof(float));
+            meshes.push_back(mesh);
+            currMesh = mesh;
             color.r = attachment->getColor().r;
             color.g = attachment->getColor().g;
             color.b = attachment->getColor().b;
@@ -145,12 +150,16 @@ uint32_t SkeletonObject::updateRenderData()
             auto vbSize = vertCount * byteStride;
             auto indexCount = attachmentVertices->_triangles->indexCount;
             auto ibSize = indexCount * sizeof(uint16_t);
-            SkMeshData* mesh = currMesh = new SkMeshData(vertCount, indexCount, byteStride);
-            mesh->userData.slotIndex = i;
-            memcpy(mesh->vb, static_cast<void *>(attachmentVertices->_triangles->verts), vbSize);
-            attachment->computeWorldVertices(*slot, 0, attachment->getWorldVerticesLength(), (float *)mesh->vb, 0, byteStride / sizeof(float));
-            memcpy(mesh->ib, attachmentVertices->_triangles->indices, ibSize);
-            _meshArray.push_back(mesh);
+
+            SkMeshData mesh;
+            mesh.vb = (uint8_t*)attachmentVertices->_triangles->verts;
+            mesh.ib = attachmentVertices->_triangles->indices;
+            mesh.vbCount = vertCount;
+            mesh.ibCount = indexCount;
+            mesh.userData.slotIndex = i;
+            attachment->computeWorldVertices(*slot, 0, attachment->getWorldVerticesLength(), (float *)mesh.vb, 0, byteStride / sizeof(float));
+            meshes.push_back(mesh);
+            currMesh = mesh;
 
             color.r = attachment->getColor().r;
             color.g = attachment->getColor().g;
@@ -175,16 +184,16 @@ uint32_t SkeletonObject::updateRenderData()
         if (_clipper->isClipping()) {
 
         } else {
-            int vCount = currMesh->vbCount;
-            V3F_T2F_C4B *vertex = (V3F_T2F_C4B *)currMesh->vb;
+            int vCount = currMesh.vbCount;
+            V3F_T2F_C4B *vertex = (V3F_T2F_C4B *)currMesh.vb;
             if (_effect) {
                 for (int v = 0; v < vCount; ++v) {
                     _effect->transform(vertex[v].vertex.x, vertex[v].vertex.y);
-                    vertex[v].color = color;
+                    vertex[v].color = WHITE;
                 }
             } else {
                 for (int v = 0; v < vCount; ++v) {
-                    vertex[v].color = color;
+                    vertex[v].color = WHITE;
                 }
             }
         }
@@ -193,21 +202,24 @@ uint32_t SkeletonObject::updateRenderData()
     _clipper->clipEnd();
     if (_effect) _effect->end();
 
-    processVertices();
+    processVertices(meshes);
+    mergeMeshes(meshes);
+
     return true;
 }
 
-void SkeletonObject::processVertices()
+void SkeletonObject::processVertices(std::vector<SkMeshData> &meshes)
 {
-   int count = _meshArray.size();
+    int byteStride = sizeof(V3F_T2F_C4B); 
+    int count = meshes.size();
     if (userData.doScale && userData.doFillZ) {
         float scale = userData.scale;
         float zoffset = 0;
         for (int i = 0; i < count; i++) {
-            auto mesh = _meshArray[i];
-            float *ptr = (float *)mesh->vb;
-            for (int m = 0; m < mesh->vbCount; m++) {
-                float *vert = ptr + m * mesh->stride / sizeof(float);
+            auto mesh = meshes[i];
+            float *ptr = (float *)mesh.vb;
+            for (int m = 0; m < mesh.vbCount; m++) {
+                float *vert = ptr + m * byteStride / sizeof(float);
                 vert[0] *= scale;
                 vert[1] *= scale;
                 vert[2] = zoffset;
@@ -218,10 +230,10 @@ void SkeletonObject::processVertices()
         float scale = userData.scale;
         float zValue = 0;
         for (int i = 0; i < count; i++) {
-            auto mesh = _meshArray[i];
-            float *ptr = (float *)mesh->vb;
-            for (int m = 0; m < mesh->vbCount; m++) {
-                float *vert = ptr + m * mesh->stride / sizeof(float);
+            auto mesh = meshes[i];
+            float *ptr = (float *)mesh.vb;
+            for (int m = 0; m < mesh.vbCount; m++) {
+                float *vert = ptr + m * byteStride / sizeof(float);
                 vert[0] *= scale;
                 vert[1] *= scale;
                 vert[2] = zValue;
@@ -230,15 +242,46 @@ void SkeletonObject::processVertices()
     } else if (!userData.doScale && userData.doFillZ) {
         float zoffset = 0;
         for (int i = 0; i < count; i++) {
-            auto mesh = _meshArray[i];
-            float *ptr = (float *)mesh->vb;
-            for (int m = 0; m < mesh->vbCount; m++) {
-                float *vert = ptr + m * mesh->stride / sizeof(float);
+            auto mesh = meshes[i];
+            float *ptr = (float *)mesh.vb;
+            for (int m = 0; m < mesh.vbCount; m++) {
+                float *vert = ptr + m * byteStride / sizeof(float);
                 vert[2] = zoffset;
             }
             zoffset = 0;
         }
     }
+}
+
+void SkeletonObject::mergeMeshes(std::vector<SkMeshData> &meshes) {
+
+    resetMeshArray();
+    int count = meshes.size();
+    int vCount = 0;
+    int iCount = 0;
+    for (int i = 0; i < count; i++) {
+        vCount += meshes[i].vbCount;
+        iCount += meshes[i].ibCount;
+    }
+    uint32_t byteStide = sizeof(V3F_T2F_C4B); 
+    SkMeshData* merge = new SkMeshData(vCount, iCount, byteStide);
+    merge->userData.slotIndex = 0;
+    vCount = 0;
+    iCount = 0;
+    for (int i = 0; i < count; i++) {
+
+        uint16_t* iPtr = merge->ib + iCount;
+        for (int ii = 0; ii < meshes[i].ibCount; ii++) {
+            iPtr[ii] = meshes[i].ib[ii] + vCount;
+        }
+        uint8_t* vPtr = merge->vb + vCount * byteStide;
+        uint32_t byteSize = meshes[i].vbCount * byteStide;
+        memcpy(vPtr, meshes[i].vb, byteSize);
+        vCount += meshes[i].vbCount;
+        iCount += meshes[i].ibCount;
+    }
+
+    this->_meshArray.push_back(merge);
 }
 
 uint32_t SkeletonObject::queryRenderDataInfo() {
@@ -360,6 +403,7 @@ void SkeletonObject::resetMeshArray()
     int count = _meshArray.size();
     for (int i = 0; i < count; i++) {
         auto *mesh = _meshArray[i];
+        mesh->FreeData();
         delete mesh;
     }
     _meshArray.clear();

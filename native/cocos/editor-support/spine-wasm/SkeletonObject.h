@@ -37,7 +37,8 @@ public:
 
     uint32_t testFunc(uint32_t start, uint32_t length);
 private:
-    void processVertices();
+    void processVertices(std::vector<SkMeshData> &meshes);
+    void mergeMeshes(std::vector<SkMeshData> &meshes);
     void resetMeshArray();
 private:
     uint32_t _objID;

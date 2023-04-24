@@ -53,7 +53,7 @@ export class PartialRendererUI extends UIRenderable {
 
     public resetProperties (tex: Texture2D | null) {
         this._texture = tex;
-        if (tex) this._nativeObj.setTexture(tex);
+        if (JSB && tex) this._nativeObj.setTexture(tex);
     }
 
     set meshArray (meshes: Skeleton2DMesh[]) {
@@ -138,10 +138,10 @@ export class PartialRendererUI extends UIRenderable {
             const mesh = this._meshArray[idx];
             const srcVB = mesh.vertices;
             const srcIB = mesh.indices;
-            const length = srcIB.length;
-            for (let ii = 0; ii < length; ii++) {
-                srcIB[ii] += vCount;
-            }
+            //const length = srcIB.length;
+            // for (let ii = 0; ii < length; ii++) {
+            //     srcIB[ii] += vCount;
+            // }
             vb.set(srcVB, vbOffset);
             ib.set(srcIB, ibOffset);
             vbOffset += srcVB.length;
@@ -152,15 +152,15 @@ export class PartialRendererUI extends UIRenderable {
 
     private createRenderData () {
         let accessor = _accessor;
+        const attributes = vfmtPosUvColor4B;
         if (!accessor) {
             const device = director.root!.device;
             const batcher = director.root!.batcher2D;
-            const attributes = vfmtPosUvColor;
             accessor = _accessor = new StaticVBAccessor(device, attributes, 32767);
             //Register to batcher so that batcher can upload buffers after batching process
             batcher.registerBufferAccessor(Number.parseInt('SPINE_2D', 36), _accessor);
         }
-        const rd = RenderData.add(vfmtPosUvColor, accessor);
+        const rd = RenderData.add(attributes, accessor);
         rd.resize(0, 0);
         this._renderData = rd;
     }

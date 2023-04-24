@@ -13,18 +13,18 @@ struct Tex2F {
     float v;
 };
 
-// struct Color4B {
-//     Color4B(uint8_t r, uint8_t g, uint8_t b, uint8_t a): r(r), g(g), b(b), a(a) {}
-//     Color4B(){}
-//     Color4B &operator=(const Color4B &right) = default;
+struct Color4B {
+    Color4B(uint8_t r, uint8_t g, uint8_t b, uint8_t a): r(r), g(g), b(b), a(a) {}
+    Color4B(){}
+    Color4B &operator=(const Color4B &right) = default;
 
-//     uint8_t r = 0;
-//     uint8_t g = 0;
-//     uint8_t b = 0;
-//     uint8_t a = 0;
+    uint8_t r = 0;
+    uint8_t g = 0;
+    uint8_t b = 0;
+    uint8_t a = 0;
 
-//     static const Color4B WHITE;
-// };
+    static const Color4B WHITE;
+};
 
 struct Color4F {
     Color4F(float r, float g, float b, float a): r(r), g(g), b(b), a(a) {}
@@ -42,7 +42,7 @@ struct V3F_T2F_C4B {
     // tex coords (2F)
     Tex2F texCoord;
 
-    Color4F color;
+    Color4B color;
 };
 
 struct Triangles {

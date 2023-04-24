@@ -2,7 +2,6 @@
 
 SkMeshData::SkMeshData()
 {
-
 }
 
 SkMeshData::SkMeshData(uint32_t vc, uint32_t ic, uint32_t byteStride)
@@ -14,7 +13,7 @@ SkMeshData::SkMeshData(uint32_t vc, uint32_t ic, uint32_t byteStride)
     ib = new uint16_t[ic];
 }
 
-SkMeshData::~SkMeshData() {
+uint32_t SkMeshData::FreeData() {
     if (vb) {
         delete[] vb;
         vb = nullptr;
@@ -23,4 +22,8 @@ SkMeshData::~SkMeshData() {
         delete[] ib;
         ib = nullptr;
     }
+    return 0;
+}
+
+SkMeshData::~SkMeshData() {
 }

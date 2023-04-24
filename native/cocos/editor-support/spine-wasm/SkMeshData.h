@@ -10,6 +10,7 @@ public:
     SkMeshData();
     SkMeshData(uint32_t vc, uint32_t ic, uint32_t byteStride);
     ~SkMeshData();
+    uint32_t FreeData();
     
 public:
     uint8_t  *vb;

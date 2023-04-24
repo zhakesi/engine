@@ -72,6 +72,15 @@ function _consoleInfo (start: number, length: number) {
     const result = decoder.decode(source);
     console.log(result);
 }
+function _syscall_openat (dirfd, path, flags, varargs) {
+    console.log(`syscall_openat eeror.`);
+}
+function _syscall_fcntl64 (fd, cmd, varargs) {
+    console.log(`syscall_fcntl64 eeror.`);
+}
+function _syscall_ioctl (fd, op, varargs) {
+    console.log(`syscall_ioctl eeror.`);
+}
 
 function _jsReadFile (start: number, length: number): number {
     const decoder = new TextDecoder();
@@ -92,11 +101,15 @@ const asmLibraryArg = {
     abortOnCannotGrowMemory: _abortOnCannotGrowMemory,
     __cxa_allocate_exception: _cxa_allocate_exception,
     __cxa_throw: _cxa_throw,
+    __syscall_fcntl64: _syscall_fcntl64,
+    __syscall_ioctl: _syscall_ioctl,
+    __syscall_openat: _syscall_openat,
     abort: _abort,
     emscripten_memcpy_big: _emscripten_memcpy_big,
     emscripten_resize_heap: _emscripten_resize_heap,
     fd_close: _reportError,
     fd_seek: _reportError,
+    fd_read: _reportError,
     fd_write: _reportError,
     jsReadFile: _jsReadFile,
 };
@@ -123,7 +136,7 @@ let promiseLoadSpineWasm;
 
 if (EDITOR) {
     promiseLoadSpineWasm = async function promiseLoadSpineWasmEditor () {
-        const spineWasmUrl = 'D:/Cocos/cocos-editor/resources/3d/engine/cocos/spine/cocos-spine/spine2d.wasm';
+        const spineWasmUrl = 'E:/Cocos/cocos-editor/resources/3d/engine/cocos/spine/cocos-spine/spine2d.wasm';
         const importObject = {
             env: asmLibraryArg,
             wasi_snapshot_preview1: asmLibraryArg,
