@@ -97,9 +97,11 @@ export class SpineSkeletonAnimation extends Component {
         setEnumAttr(this, 'animationIndex', Enum({}));
         if (JSB) {
             this._imply = new Skeleton2DImplyNative();
+            console.log('xxx- new Skeleton2DImplyNative');
         } else {
             this._imply = new Skeleton2DImplyWasm();
             this._imply.setDefaultScale(0.01);
+            console.log('xxx- new Skeleton2DImplyWasm');
         }
     }
 

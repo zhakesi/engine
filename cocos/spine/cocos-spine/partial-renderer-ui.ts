@@ -5,7 +5,6 @@ import { Model } from '../../render-scene/scene';
 import { ModelLocalBindings } from '../../rendering/define';
 import { vfmtPosUvColor, getAttributeStride, vfmtPosUvColor4B, vfmtPosUvTwoColor4B } from '../../2d/renderer/vertex-format';
 import { Root } from '../../root';
-import { Skeleton2DMesh } from './skeleton2d-native';
 import { BlendFactor, BlendOp, BufferInfo, BufferUsageBit, Device, MemoryUsageBit, PrimitiveMode, deviceManager } from '../../gfx';
 import { builtinResMgr } from '../../asset/asset-manager';
 import { ccclass, displayName, executeInEditMode, executionOrder, help, serializable, type } from '../../core/data/decorators';
@@ -16,6 +15,8 @@ import { director } from '../../game';
 import { StaticVBAccessor } from '../../2d/renderer/static-vb-accessor';
 import { Batcher2D } from '../../2d/renderer/batcher-2d';
 import { MaterialInstance } from '../../render-scene';
+import { RenderEntity, RenderEntityType } from '../../2d/renderer/render-entity';
+import { Skeleton2DMesh, NativePartialRendererUI } from './skeleton2d-native';
 
 let _accessor: StaticVBAccessor = null!;
 
@@ -35,14 +36,24 @@ const simple: IAssembler = {
 export class PartialRendererUI extends UIRenderable {
     private _texture: Texture2D | null = null;
     private _meshArray: Skeleton2DMesh[] = [];
+    private _nativeObj: NativePartialRendererUI = null!;
 
     constructor () {
         super();
         this._assembler = simple;
+        if (JSB) {
+            this._nativeObj = new NativePartialRendererUI();
+            this._nativeObj.setRenderEntity(this._renderEntity.nativeObj);
+        }
+    }
+
+    get nativeObject () {
+        return this._nativeObj;
     }
 
     public resetProperties (tex: Texture2D | null) {
         this._texture = tex;
+        if (tex) this._nativeObj.setTexture(tex);
     }
 
     set meshArray (meshes: Skeleton2DMesh[]) {
@@ -63,14 +74,19 @@ export class PartialRendererUI extends UIRenderable {
     }
 
     protected updateMaterial () {
+        let mat;
         if (this._customMaterial) {
-            if (this.getMaterial(0) !== this._customMaterial) {
-                this.setMaterial(this._customMaterial, 0);
+            mat = this._customMaterial;
+            if (this.getMaterial(0) !== mat) {
+                this.setMaterial(mat, 0);
             }
-            return;
+        } else {
+            mat = builtinResMgr.get<Material>('default-spine-material');
+            this.setMaterial(mat, 0);
         }
-        const mat = builtinResMgr.get<Material>('default-spine-material');
-        this.setMaterial(mat, 0);
+        if (JSB) {
+            this._nativeObj.setMaterial(mat);
+        }
     }
 
     public updateRenderer () {
@@ -102,6 +118,7 @@ export class PartialRendererUI extends UIRenderable {
     }
 
     private _assembleRenderData () {
+        if (JSB) return;
         const count = this._meshArray.length;
         let vc = 0;
         let ic = 0;
@@ -170,5 +187,10 @@ export class PartialRendererUI extends UIRenderable {
             vb[floatOffset + 3] *= colorA;
             floatOffset += floatStride;
         }
+    }
+    protected createRenderEntity () {
+        const renderEntity = new RenderEntity(RenderEntityType.DYNAMIC);
+        renderEntity.setUseLocal(true);
+        return renderEntity;
     }
 }

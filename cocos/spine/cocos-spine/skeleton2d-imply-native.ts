@@ -11,6 +11,9 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
     constructor () {
         this._nativeObj = new NativeSkeleton2D();
     }
+    get nativeObject () {
+        return this._nativeObj;
+    }
 
     initSkeletonData (data: SkeletonData): boolean {
         if (!data.atlasText) return false;

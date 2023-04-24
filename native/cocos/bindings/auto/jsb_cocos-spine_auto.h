@@ -36,6 +36,8 @@
 #include "bindings/jswrapper/SeApi.h"
 #include "bindings/manual/jsb_conversions.h"
 #include "editor-support/spine-cocos-support/spine-mesh-data.h"
+#include "editor-support/spine-cocos-support/spine-partial-renderer-ui.h"
+#include "editor-support/spine-cocos-support/spine-skeleton-ui.h"
 #include "editor-support/spine-cocos-support/spine-skeleton-animation.h"
 
 
@@ -46,6 +48,16 @@ bool register_all_cocosspine(se::Object* obj);
 JSB_REGISTER_OBJECT_TYPE(cc::cocosspine::Skeleton2DMesh);
 extern se::Object *__jsb_cc_cocosspine_Skeleton2DMesh_proto; // NOLINT
 extern se::Class * __jsb_cc_cocosspine_Skeleton2DMesh_class; // NOLINT
+
+
+JSB_REGISTER_OBJECT_TYPE(cc::cocosspine::SpinePartialRendererUI);
+extern se::Object *__jsb_cc_cocosspine_SpinePartialRendererUI_proto; // NOLINT
+extern se::Class * __jsb_cc_cocosspine_SpinePartialRendererUI_class; // NOLINT
+
+
+JSB_REGISTER_OBJECT_TYPE(cc::cocosspine::SpineSkeletonUI);
+extern se::Object *__jsb_cc_cocosspine_SpineSkeletonUI_proto; // NOLINT
+extern se::Class * __jsb_cc_cocosspine_SpineSkeletonUI_class; // NOLINT
 
 
 JSB_REGISTER_OBJECT_TYPE(cc::cocosspine::Skeleton2D);

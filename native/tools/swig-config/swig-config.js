@@ -11,7 +11,7 @@ const configList = [
     [ 'editor_support.i', 'jsb_editor_support_auto.cpp' ],
     //[ 'dragonbones.i', 'jsb_dragonbones_auto.cpp' ],
     [ 'spine.i', 'jsb_spine_auto.cpp' ],
-    [ 'cocos-spine.i', 'jsb_cocos-spine_auto.cpp' ],
+    [ 'cocos_spine.i', 'jsb_cocos-spine_auto.cpp' ],
     // [ 'extension.i', 'jsb_extension_auto.cpp' ],
     // [ 'geometry.i', 'jsb_geometry_auto.cpp' ],
     // [ 'gfx.i', 'jsb_gfx_auto.cpp' ],

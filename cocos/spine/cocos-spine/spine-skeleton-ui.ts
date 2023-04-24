@@ -28,7 +28,7 @@ import { Enum } from '../../core/value-types/enum';
 import { Skeleton2DImply } from './skeleton2d-imply';
 import { Skeleton2DImplyWasm } from './skeleton2d-imply-wasm';
 import { Skeleton2DImplyNative } from './skeleton2d-imply-native';
-import { Skeleton2DMesh } from './skeleton2d-native';
+import { Skeleton2DMesh, NativeSpineSkeletonUI } from './skeleton2d-native';
 import { PartialRendererUI } from './partial-renderer-ui';
 import { Component, Node } from '../../scene-graph';
 import { SpineSkinEnum, SpineAnimationEnum, setEnumAttr } from './spine-define';
@@ -83,12 +83,13 @@ export class SpineSkeletonUI extends Component {
 
     private _skinName = 'default';
     private _renderer: PartialRendererUI | null = null;
-    declare private _imply: Skeleton2DImply;
+    declare private _imply: Skeleton2DImplyNative | Skeleton2DImplyWasm;
     private _meshArray: Skeleton2DMesh[] = [];
     declare private _slotTable: Map<number, string | null>;
     protected _cachedSockets: Map<string, number> = new Map<string, number>();
     protected _socketNodes: Map<number, Node> = new Map();
     protected _effect: SpineJitterVertexEffect | SpineSwirlVertexEffect | null = null;
+    private _nativeObj: NativeSpineSkeletonUI = null!;
 
     constructor () {
         super();
@@ -96,6 +97,8 @@ export class SpineSkeletonUI extends Component {
         setEnumAttr(this, 'animationIndex', Enum({}));
         if (JSB) {
             this._imply = new Skeleton2DImplyNative();
+            this._nativeObj = new NativeSpineSkeletonUI();
+            this._nativeObj.setSkeletonInstance(this._imply.nativeObject);
         } else {
             this._imply = new Skeleton2DImplyWasm();
         }
@@ -308,8 +311,6 @@ export class SpineSkeletonUI extends Component {
     }
 
     public update (dt: number) {
-        if (!this._imply) return;
-        //if (!EDITOR)
         this._imply.updateAnimation(dt);
         this._syncAttachedNode();
         this._updateRenderData();
@@ -339,6 +340,11 @@ export class SpineSkeletonUI extends Component {
         this._slotTable = this._imply.getSlotsTable();
         this._indexBoneSockets();
         this._updateSocketBindings();
+
+        if (this._renderer) {
+            this._renderer.resetProperties(this._texture);
+        }
+
         this._updateRenderData();
     }
 
@@ -372,10 +378,13 @@ export class SpineSkeletonUI extends Component {
     }
 
     private _updateRenderData () {
-        if (!this._renderer || !this._imply) return;
-        this._meshArray = this._imply.updateRenderData();
-        this._renderer.meshArray = this._meshArray;
-        this._renderer.resetProperties(this._texture);
+        if (!this._renderer) return;
+        if (JSB) {
+            this._nativeObj.updateRenderData();
+        } else {
+            this._meshArray = this._imply.updateRenderData();
+            this._renderer.meshArray = this._meshArray;
+        }
         this._renderer.markForUpdateRenderData();
     }
 
@@ -388,6 +397,9 @@ export class SpineSkeletonUI extends Component {
             render.resetProperties(this._texture);
         }
         this._renderer = render;
+        if (JSB) {
+            this._nativeObj.setPartialRenderer(render.nativeObject);
+        }
     }
 
     private _updateSocketBindings () {
