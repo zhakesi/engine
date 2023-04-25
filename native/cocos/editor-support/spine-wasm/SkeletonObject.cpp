@@ -83,7 +83,7 @@ uint32_t SkeletonObject::initWithSkeletonData(bool isJson, uint32_t start, uint3
 
 uint32_t SkeletonObject::updateRenderData()
 {
-    SkMeshData currMesh;
+    SkMeshData *currMesh;
     std::vector<SkMeshData> meshes;
     meshes.clear();
 
@@ -137,7 +137,7 @@ uint32_t SkeletonObject::updateRenderData()
             mesh.userData.slotIndex = i;
             attachment->computeWorldVertices(slot->getBone(),(float *)mesh.vb, 0, stride / sizeof(float));
             meshes.push_back(mesh);
-            currMesh = mesh;
+            currMesh = &mesh;
             color.r = attachment->getColor().r;
             color.g = attachment->getColor().g;
             color.b = attachment->getColor().b;
@@ -159,7 +159,7 @@ uint32_t SkeletonObject::updateRenderData()
             mesh.userData.slotIndex = i;
             attachment->computeWorldVertices(*slot, 0, attachment->getWorldVerticesLength(), (float *)mesh.vb, 0, byteStride / sizeof(float));
             meshes.push_back(mesh);
-            currMesh = mesh;
+            currMesh = &mesh;
 
             color.r = attachment->getColor().r;
             color.g = attachment->getColor().g;
@@ -184,16 +184,18 @@ uint32_t SkeletonObject::updateRenderData()
         if (_clipper->isClipping()) {
 
         } else {
-            int vCount = currMesh.vbCount;
-            V3F_T2F_C4B *vertex = (V3F_T2F_C4B *)currMesh.vb;
+            int byteStride = sizeof(V3F_T2F_C4B); 
+            int vCount = currMesh->vbCount;
+            V3F_T2F_C4B *vertex = (V3F_T2F_C4B *)currMesh->vb;
+            uint32_t* uPtr = (uint32_t*)currMesh->vb;
             if (_effect) {
                 for (int v = 0; v < vCount; ++v) {
                     _effect->transform(vertex[v].vertex.x, vertex[v].vertex.y);
-                    vertex[v].color = WHITE;
+                    uPtr[v * 6 + 5] = 0xFFFFFFFF;
                 }
             } else {
                 for (int v = 0; v < vCount; ++v) {
-                    vertex[v].color = WHITE;
+                    uPtr[v * 6 + 5] = 0xFFFFFFFF;
                 }
             }
         }
