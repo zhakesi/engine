@@ -762,9 +762,9 @@ function cacheTraverse (worldMat: Mat4 | null) {
 
     let prevDrawIndexOffset = 0;
     const rd = _renderData!;
-    const vbuf = rd.chunk.vb;
+    let vbuf = rd.chunk.vb;
     _vUintBuf = new Uint32Array(vbuf.buffer, vbuf.byteOffset, vbuf.length);
-    const ibuf = rd.indices!;
+    let ibuf = rd.indices!;
     for (let i = 0, n = segments.length; i < n; i++) {
         const segInfo = segments[i];
         material = _getSlotMaterial(segInfo.blendMode!);
@@ -785,6 +785,29 @@ function cacheTraverse (worldMat: Mat4 | null) {
 
         _vertexCount = segInfo.vertexCount;
         _indexCount = segInfo.indexCount;
+
+        if (vbuf.length - frameVFOffset < segInfo.vfCount || ibuf.length - _indexOffset < _indexCount) {
+            const needVC = vbuf.length >= frameVFOffset + segInfo.vfCount ? vbuf.length / 7 : (frameVFOffset + segInfo.vfCount) / 7;
+            const needIC = ibuf.length >= _indexOffset + _indexCount ? ibuf.length : _indexOffset + _indexCount;
+            let updateIBuf = false;
+            if (ibuf.length < _indexOffset + _indexCount) {
+                updateIBuf = true;
+            }
+            const oldIndices = ibuf;
+            const oldChunkOffset = rd.chunk.vertexOffset;
+            rd.resizeAndCopy(needVC, needIC);
+
+            if (updateIBuf) {
+                rd.indices = new Uint16Array(_actualICount);
+                const correction = rd.chunk.vertexOffset - oldChunkOffset;
+                for (let i = 0; i < _indexOffset; ++i) {
+                    ibuf[i] = oldIndices[i] + correction;
+                }
+            }
+            vbuf = rd.chunk.vb;
+            _vUintBuf = new Uint32Array(vbuf.buffer, vbuf.byteOffset, vbuf.length);
+            ibuf = rd.indices!;
+        }
 
         // Fill indices
         chunkOffset = rd.chunk.vertexOffset;
