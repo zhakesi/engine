@@ -354,6 +354,15 @@ uint32_t SkeletonObject::updateAnimation(float dltTime) {
     return true;
 }
 
+void SkeletonObject::setMix(uint32_t start, uint32_t fromLength, uint32_t toLength, float duration) {
+    if (!_animStateData) return;
+
+    spine::String fromName = DataConvert::Convert2SpineString(start, fromLength);
+    spine::String toName = DataConvert::Convert2SpineString(start + fromLength, toLength);
+    LogUtil::PrintToJs(fromName.buffer());
+    _animStateData->setMix(fromName, toName, duration);
+}
+
 uint32_t SkeletonObject::getDrawOrderSize() {
     if (!_skeleton) return 0;
     auto count = (uint32_t)_skeleton->getDrawOrder().size();

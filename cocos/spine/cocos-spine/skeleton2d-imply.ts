@@ -12,6 +12,7 @@ export interface Skeleton2DImply {
     setToSetupPose();
     setTimeScale(timeScale: number): boolean;
     updateAnimation(dltTime: number);
+    setMix(fromAnimation: string, toAnimation: string, duration: number): void;
     updateRenderData(): Skeleton2DMesh[];
     getSlotsTable(): Map<number, string | null>;
     getBoneMatrix(idx: number, matrix: Mat4);

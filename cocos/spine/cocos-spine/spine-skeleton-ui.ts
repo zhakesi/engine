@@ -468,4 +468,9 @@ export class SpineSkeletonUI extends Component {
         if (data.width !== 0) uiTrans.anchorX = Math.abs(data.x) / data.width;
         if (data.height !== 0) uiTrans.anchorY = Math.abs(data.y) / data.height;
     }
+
+    public setMix (fromAnimation: string, toAnimation: string, duration: number): void {
+        if (!this._skeletonData) return;
+        
+    }
 }

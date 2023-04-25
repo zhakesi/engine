@@ -29,10 +29,11 @@ public:
     void     setToSetupPose();
     uint32_t setTimeScale(float timeScale);
     uint32_t updateAnimation(float dltTime);
+    void     setMix(uint32_t start, uint32_t fromLength, uint32_t toLength, float duration);
     uint32_t getDrawOrderSize();
     uint32_t getSlotNameByOrder(uint32_t index);
     uint32_t getBoneMatrix(uint32_t boneIdx);
-    bool setDefualtScale(float scale);
+    bool     setDefualtScale(float scale);
     void     setVertexEffect(spine::VertexEffect *effect);
 
     uint32_t testFunc(uint32_t start, uint32_t length);

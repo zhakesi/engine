@@ -11,6 +11,7 @@ export interface SpineWasmInterface {
     setTimeScale(objID: number, timeScale: number): number;
     setSkin(objID: number, start: number, length: number): number;
     updateAnimation(objID: number, dltTime: number): number;
+    setMix(objID: number, start: number, fromLength: number, toLength: number, duration: number);
     updateRenderData(objID: number): number;
     getDrawOrderSize(objID: number): number;
     getSlotNameByOrder(objID: number, index: number): number;

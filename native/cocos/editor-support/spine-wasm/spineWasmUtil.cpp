@@ -150,6 +150,11 @@ EMSCRIPTEN_KEEPALIVE bool updateSwirlParameters(uint32_t ptr, float x, float y, 
     return true;
 }
 
+EMSCRIPTEN_KEEPALIVE void setMix(uint32_t objID, uint32_t start, uint32_t fromLength, uint32_t toLength, float duration) {
+    auto handle = getSkeletonHandle(objID);
+    return handle->setMix(start, fromLength, toLength, duration);
+}
+
 EMSCRIPTEN_KEEPALIVE uint8_t* queryMemory(uint32_t size) {
     uint8_t* ptr = new uint8_t[size];
     return ptr;

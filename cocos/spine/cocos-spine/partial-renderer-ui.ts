@@ -58,6 +58,7 @@ export class PartialRendererUI extends UIRenderable {
 
     set meshArray (meshes: Skeleton2DMesh[]) {
         this._meshArray = meshes;
+        this._assembleRenderData();
     }
 
     public onLoad () {
@@ -90,7 +91,7 @@ export class PartialRendererUI extends UIRenderable {
     }
 
     public updateRenderer () {
-        this._assembleRenderData();
+        //this._assembleRenderData();
         this._renderFlag = this._canRender();
         this._renderEntity.enabled = this._renderFlag;
     }
@@ -138,10 +139,6 @@ export class PartialRendererUI extends UIRenderable {
             const mesh = this._meshArray[idx];
             const srcVB = mesh.vertices;
             const srcIB = mesh.indices;
-            //const length = srcIB.length;
-            // for (let ii = 0; ii < length; ii++) {
-            //     srcIB[ii] += vCount;
-            // }
             vb.set(srcVB, vbOffset);
             ib.set(srcIB, ibOffset);
             vbOffset += srcVB.length;

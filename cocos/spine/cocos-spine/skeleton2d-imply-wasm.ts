@@ -9,6 +9,9 @@ import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-
 
 const tempBoneMat = new Mat4();
 
+function alignedBytes (address: number, bytes: number) {
+    return Math.floor(address / bytes);
+}
 const floatStride = 6;
 export class Skeleton2DImplyWasm implements Skeleton2DImply {
     constructor () {
@@ -57,7 +60,7 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
     public updateRenderData (): Skeleton2DMesh[] {
         this._meshArray.length = 0;
         const address = this._wasmInstance.updateRenderData(this._objID);
-        let start = address / 4;
+        let start = alignedBytes(address, 4);
         const heap32 = new Uint32Array(this._wasmHEAPU8.buffer);
         const meshSize = heap32[start];
         for (let i = 0; i < meshSize; i++) {
@@ -70,9 +73,13 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
             const indices = new Uint16Array(heap32.buffer, startI, ic);
 
             const mesh = new Skeleton2DMesh();
-            mesh.initialize(slot, vc, ic, 4 * floatStride);
-            mesh.vertices.set(vertices);
-            mesh.indices.set(indices);
+            mesh.slotIndex = slot;
+            mesh.byteStride = 4 * floatStride;
+            mesh.vCount = vc;
+            mesh.iCount = ic;
+            mesh.vertices = vertices;
+            mesh.indices = indices;
+
             this._meshArray.push(mesh);
         }
         return this._meshArray;
@@ -123,6 +130,18 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
         this._wasmInstance.updateAnimation(this._objID, dltTime);
     }
 
+    public setMix (fromAnimation: string, toAnimation: string, duration: number) {
+        const encoder = new TextEncoder();
+        const fromAnimationEncode = encoder.encode(fromAnimation);
+        const toAnimationEncode = encoder.encode(toAnimation);
+        const length = fromAnimationEncode.length + toAnimationEncode.length;
+        const local = this._wasmInstance.queryMemory(length);
+        const array = this._wasmHEAPU8.subarray(local, local + length);
+        array.set(fromAnimationEncode, 0);
+        array.set(toAnimationEncode, fromAnimationEncode.length);
+        this._wasmInstance.updateAnimation(this._objID, fromAnimationEncode.length, );
+    }
+
     getSlotsTable (): Map<number, string | null> {
         const table = new Map<number, string>();
         const count = this._wasmInstance.getDrawOrderSize(this._objID);
@@ -131,8 +150,9 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
         const decoder = new TextDecoder();
         for (i = 0; i < count; i++) {
             const address = this._wasmInstance.getSlotNameByOrder(this._objID, i);
+            const start = alignedBytes(address, 4);
             const heap32 = new Uint32Array(this._wasmHEAPU8.buffer);
-            const length = heap32[address / 4];
+            const length = heap32[start];
             let name;
             if (length < 1) {
                 name = null;

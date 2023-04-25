@@ -76,4 +76,8 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
 
     public setVertexEffect (effect: SpineJitterVertexEffect | SpineSwirlVertexEffect | null) {
     }
+
+    public setMix (fromAnimation: string, toAnimation: string, duration: number) {
+
+    }
 }
