@@ -20,11 +20,18 @@ import { Skeleton2DMesh, NativePartialRendererUI } from './skeleton2d-native';
 
 let _accessor: StaticVBAccessor = null!;
 
+// function MixUint32Color(uintColor:number, r: number, g:number, b:number, a:number) {
+//     const uintA = Math.floor(a * (uintColor >> 24));
+//     const uintB = Math.floor(b * ((uintColor << 8) >>24));
+//     const uintG = Math.floor(g * ((uintColor << 16) >>24));
+//     const uintR = Math.floor(g * ((uintColor << 16) >>24));
+// }
+
 const simple: IAssembler = {
     fillBuffers (render: PartialRendererUI, batcher: IBatcher) {
 
     },
-    updateColor () {
+    updateColor (render: PartialRendererUI) {
 
     },
 };
@@ -45,6 +52,7 @@ export class PartialRendererUI extends UIRenderable {
             this._nativeObj = new NativePartialRendererUI();
             this._nativeObj.setRenderEntity(this._renderEntity.nativeObj);
         }
+        this._useVertexOpacity = true;
     }
 
     get nativeObject () {
@@ -101,7 +109,6 @@ export class PartialRendererUI extends UIRenderable {
         if (!this._texture) return;
         if (!this._renderData) return;
 
-        this._updateVertexColor();
         const rd = this._renderData;
         const chunk = rd.chunk;
         const accessor = chunk.vertexAccessor;
@@ -162,29 +169,6 @@ export class PartialRendererUI extends UIRenderable {
         this._renderData = rd;
     }
 
-    private _updateVertexColor () {
-        if (this.color.r === 255 && this.color.g === 255
-            && this.color.b === 255 && this.color.a === 255) {
-            return;
-        }
-
-        const floatStride = getAttributeStride(vfmtPosUvColor) / 4;
-        const renderData = this._renderData!;
-        const vb = renderData.chunk.vb;
-        const count = renderData.vertexCount;
-        const colorR = this.color.r / 255.0;
-        const colorG = this.color.g / 255.0;
-        const colorB = this.color.b / 255.0;
-        const colorA = this.color.a / 255.0;
-        let floatOffset = 5;
-        for (let i = 0; i < count; i++) {
-            vb[floatOffset] *= colorR;
-            vb[floatOffset + 1] *= colorG;
-            vb[floatOffset + 2] *= colorB;
-            vb[floatOffset + 3] *= colorA;
-            floatOffset += floatStride;
-        }
-    }
     protected createRenderEntity () {
         const renderEntity = new RenderEntity(RenderEntityType.DYNAMIC);
         renderEntity.setUseLocal(true);

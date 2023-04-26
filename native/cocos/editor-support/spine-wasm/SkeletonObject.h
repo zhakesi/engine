@@ -13,8 +13,10 @@ struct UserData
     bool doScale = false;
     bool doFillZ = true;
     float scale = 1.0F;
+    bool premultipliedAlpha = true;
     Color4F color = Color4F(1.0F, 1.0F, 1.0F, 1.0F);
 };
+
 public:
     SkeletonObject();
     ~SkeletonObject();
@@ -35,6 +37,8 @@ public:
     uint32_t getBoneMatrix(uint32_t boneIdx);
     bool     setDefualtScale(float scale);
     void     setVertexEffect(spine::VertexEffect *effect);
+    void     setPremultipliedAlpha(bool premultipliedAlpha);
+    void     setColor(float r, float g, float b, float a);
 
     uint32_t testFunc(uint32_t start, uint32_t length);
 private:
@@ -51,7 +55,7 @@ private:
     spine::VertexEffect *_effect = nullptr;
 
     std::vector<SkMeshData*> _meshArray{};
-    UserData userData;
+    UserData _userData;
 };
 
 typedef SkeletonObject* SkeletonHandle;

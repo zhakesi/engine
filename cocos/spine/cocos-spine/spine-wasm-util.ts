@@ -20,6 +20,8 @@ export interface SpineWasmInterface {
     freeMemory(data: Uint8Array);
     setDefaultScale(objID: number, scale: number): boolean;
     setVertexEffect(objID: number, effect: number, effectType: number);
+    setPremultipliedAlpha(objID: number, premultipliedAlpha: boolean);
+    setColor(objID: number, r: number, g: number, b: number, a: number);
 
     createJitterVertexEffect(x: number, y: number): number;
     updateJitterParameters(handle: number, x: number, y: number);

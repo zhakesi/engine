@@ -75,6 +75,8 @@ export class SpineSkeletonUI extends Component {
     @serializable
     private _useTint = false;
     @serializable
+    protected _premultipliedAlpha = true;
+    @serializable
     private _timeScale = 1.0;
     @serializable
     protected _sockets: SpineSocket[] = [];
@@ -230,6 +232,20 @@ export class SpineSkeletonUI extends Component {
         this._loop = this.loop;
     }
 
+    /**
+     * @en Whether premultipliedAlpha enabled.
+     * @zh 是否启用 alpha 预乘。
+     */
+    @editable
+    @tooltip('i18n:COMPONENT.skeleton.premultipliedAlpha')
+    get premultipliedAlpha (): boolean { return this._premultipliedAlpha; }
+    set premultipliedAlpha (v: boolean) {
+        if (v !== this._premultipliedAlpha) {
+            this._premultipliedAlpha = v;
+            this._imply.setPremultipliedAlpha(this._premultipliedAlpha);
+        }
+    }
+
     @editable
     @range([0, 10.0])
     @type(CCFloat)
@@ -379,6 +395,7 @@ export class SpineSkeletonUI extends Component {
 
     private _updateRenderData () {
         if (!this._renderer) return;
+        this.updateColor();
         if (JSB) {
             this._nativeObj.updateRenderData();
         } else {
@@ -471,6 +488,12 @@ export class SpineSkeletonUI extends Component {
 
     public setMix (fromAnimation: string, toAnimation: string, duration: number): void {
         if (!this._skeletonData) return;
-        
+        this._imply.setMix(fromAnimation, toAnimation,  duration);
+    }
+
+    public updateColor (force?: boolean): void {
+        if (force || this.node._uiProps.colorDirty) {
+            this._imply.setColor(this._renderer!.color);
+        }
     }
 }

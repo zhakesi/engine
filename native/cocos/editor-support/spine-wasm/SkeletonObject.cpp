@@ -98,8 +98,12 @@ uint32_t SkeletonObject::updateRenderData()
         _effect->begin(*_skeleton);
     }
 
+    Color4F color;
     for (int i = 0, n = drawCount; i < n; ++i) {
-        Color4F color(1.0f, 1.0f, 1.0f, 1.0f);
+        color.r = _userData.color.r;
+        color.g = _userData.color.g;
+        color.b = _userData.color.b;
+        color.a = _userData.color.a;
         auto slot = drawOrder[i];
         if (slot->getBone().isActive() == false) {
             continue;
@@ -138,10 +142,10 @@ uint32_t SkeletonObject::updateRenderData()
             attachment->computeWorldVertices(slot->getBone(),(float *)mesh.vb, 0, stride / sizeof(float));
             meshes.push_back(mesh);
             currMesh = &mesh;
-            color.r = attachment->getColor().r;
-            color.g = attachment->getColor().g;
-            color.b = attachment->getColor().b;
-            color.a = attachment->getColor().a;
+            color.r *= attachment->getColor().r;
+            color.g *= attachment->getColor().g;
+            color.b *= attachment->getColor().b;
+            color.a *= attachment->getColor().a;
         } else if (slot->getAttachment()->getRTTI().isExactly(MeshAttachment::rtti)) {
             auto *attachment = dynamic_cast<MeshAttachment *>(slot->getAttachment());
             auto *attachmentVertices = static_cast<AttachmentVertices *>(attachment->getRendererObject());      
@@ -161,10 +165,10 @@ uint32_t SkeletonObject::updateRenderData()
             meshes.push_back(mesh);
             currMesh = &mesh;
 
-            color.r = attachment->getColor().r;
-            color.g = attachment->getColor().g;
-            color.b = attachment->getColor().b;
-            color.a = attachment->getColor().a;
+            color.r *= attachment->getColor().r;
+            color.g *= attachment->getColor().g;
+            color.b *= attachment->getColor().b;
+            color.a *= attachment->getColor().a;
         } else if (slot->getAttachment()->getRTTI().isExactly(ClippingAttachment::rtti)) {
             auto *clip = dynamic_cast<ClippingAttachment *>(slot->getAttachment());
             _clipper->clipStart(*slot, clip);
@@ -174,12 +178,12 @@ uint32_t SkeletonObject::updateRenderData()
             continue;
         }
 
-        bool premultipliedAlpha = false;
-        color.a = _skeleton->getColor().a * slot->getColor().a * color.a;
-        float multiplier = premultipliedAlpha ? color.a : 1.0f;
-        color.r = _skeleton->getColor().r * slot->getColor().r * color.r * multiplier ;
-        color.g = _skeleton->getColor().g * slot->getColor().g * color.g * multiplier;
-        color.b = _skeleton->getColor().b * slot->getColor().b * color.b * multiplier;
+        uint32_t uintA = (uint32_t)(255* _skeleton->getColor().a * slot->getColor().a * color.a);
+        uint32_t multiplier = _userData.premultipliedAlpha ? uintA : 255;
+        uint32_t uintR = (uint32_t)(_skeleton->getColor().r * slot->getColor().r * color.r * multiplier);
+        uint32_t uintG = (uint32_t)(_skeleton->getColor().g * slot->getColor().g * color.g * multiplier);
+        uint32_t uintB = (uint32_t)(_skeleton->getColor().b * slot->getColor().b * color.b * multiplier);
+        uint32_t uintColor = (uintA << 24) + (uintB << 16) + (uintG << 8) + uintR;
 
         if (_clipper->isClipping()) {
 
@@ -191,11 +195,11 @@ uint32_t SkeletonObject::updateRenderData()
             if (_effect) {
                 for (int v = 0; v < vCount; ++v) {
                     _effect->transform(vertex[v].vertex.x, vertex[v].vertex.y);
-                    uPtr[v * 6 + 5] = 0xFFFFFFFF;
+                    uPtr[v * 6 + 5] = uintColor;
                 }
             } else {
                 for (int v = 0; v < vCount; ++v) {
-                    uPtr[v * 6 + 5] = 0xFFFFFFFF;
+                    uPtr[v * 6 + 5] = uintColor;
                 }
             }
         }
@@ -214,8 +218,8 @@ void SkeletonObject::processVertices(std::vector<SkMeshData> &meshes)
 {
     int byteStride = sizeof(V3F_T2F_C4B); 
     int count = meshes.size();
-    if (userData.doScale && userData.doFillZ) {
-        float scale = userData.scale;
+    if (_userData.doScale && _userData.doFillZ) {
+        float scale = _userData.scale;
         float zoffset = 0;
         for (int i = 0; i < count; i++) {
             auto mesh = meshes[i];
@@ -228,8 +232,8 @@ void SkeletonObject::processVertices(std::vector<SkMeshData> &meshes)
             }
             zoffset += 0.01F;
         }
-    } else if (userData.doScale && !userData.doFillZ) {
-        float scale = userData.scale;
+    } else if (_userData.doScale && !_userData.doFillZ) {
+        float scale = _userData.scale;
         float zValue = 0;
         for (int i = 0; i < count; i++) {
             auto mesh = meshes[i];
@@ -241,7 +245,7 @@ void SkeletonObject::processVertices(std::vector<SkMeshData> &meshes)
                 vert[2] = zValue;
             }
         }
-    } else if (!userData.doScale && userData.doFillZ) {
+    } else if (!_userData.doScale && _userData.doFillZ) {
         float zoffset = 0;
         for (int i = 0; i < count; i++) {
             auto mesh = meshes[i];
@@ -402,9 +406,9 @@ uint32_t SkeletonObject::getBoneMatrix(uint32_t boneIdx) {
 }
 
 bool SkeletonObject::setDefualtScale(float scale) {
-    userData.scale = scale;
+    _userData.scale = scale;
     if (scale - 1.0 > 0.1F || scale - 1.0 < -0.1F) {
-        userData.doScale = true;
+        _userData.doScale = true;
     }
     return true;
 }
@@ -422,6 +426,17 @@ void SkeletonObject::resetMeshArray()
 
 void SkeletonObject::setVertexEffect(spine::VertexEffect *effect) {
     _effect = effect;
+}
+
+void SkeletonObject::setPremultipliedAlpha(bool premultipliedAlpha) {
+    _userData.premultipliedAlpha = premultipliedAlpha;
+}
+
+void SkeletonObject::setColor(float r, float g, float b, float a) {
+    _userData.color.r = r;
+    _userData.color.g = g;
+    _userData.color.b = b;
+    _userData.color.a = a;
 }
 
 // create atlas test

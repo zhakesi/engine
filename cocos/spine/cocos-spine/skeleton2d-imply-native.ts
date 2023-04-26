@@ -1,4 +1,4 @@
-import { Mat4 } from '../../core';
+import { Mat4, Color } from '../../core';
 import { SkeletonData } from '../skeleton-data';
 import { Skeleton2DImply } from './skeleton2d-imply';
 import { NativeSkeleton2D, Skeleton2DMesh } from './skeleton2d-native';
@@ -79,5 +79,12 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
 
     public setMix (fromAnimation: string, toAnimation: string, duration: number) {
 
+    }
+
+    public setColor (color: Color) {
+
+    }
+
+    public setPremultipliedAlpha (premultipliedAlpha: boolean) {
     }
 }

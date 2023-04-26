@@ -4,7 +4,7 @@ import { SpineWasmInterface } from './spine-wasm-util';
 import { FileResourceInstance } from './file-resource';
 import { Skeleton2DMesh } from './skeleton2d-native';
 import { Skeleton2DImply } from './skeleton2d-imply';
-import { Mat4 } from '../../core';
+import { Mat4, Color } from '../../core';
 import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-effect-wasm';
 
 const tempBoneMat = new Mat4();
@@ -139,7 +139,7 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
         const array = this._wasmHEAPU8.subarray(local, local + length);
         array.set(fromAnimationEncode, 0);
         array.set(toAnimationEncode, fromAnimationEncode.length);
-        this._wasmInstance.updateAnimation(this._objID, fromAnimationEncode.length, );
+        this._wasmInstance.setMix(this._objID, local, fromAnimationEncode.length, toAnimationEncode.length, duration);
     }
 
     getSlotsTable (): Map<number, string | null> {
@@ -187,6 +187,18 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
             effectHandle = effect.getHandle();
         }
         this._wasmInstance.setVertexEffect(this._objID, effectHandle, 0);
+    }
+
+    public setPremultipliedAlpha (premultipliedAlpha: boolean) {
+        this._wasmInstance.setPremultipliedAlpha(this._objID, premultipliedAlpha);
+    }
+
+    public setColor (color: Color) {
+        const r = color.r / 255.0;
+        const g = color.g / 255.0;
+        const b = color.b / 255.0;
+        const a = color.a / 255.0;
+        this._wasmInstance.setColor(this._objID, r, g, b, a);
     }
 
     private _objID: number;

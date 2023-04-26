@@ -1,4 +1,4 @@
-import { Mat4 } from '../../core';
+import { Mat4, Color } from '../../core';
 import { SkeletonData } from '../skeleton-data';
 import { Skeleton2DMesh } from './skeleton2d-native';
 import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-effect-wasm';
@@ -17,6 +17,8 @@ export interface Skeleton2DImply {
     getSlotsTable(): Map<number, string | null>;
     getBoneMatrix(idx: number, matrix: Mat4);
     setDefaultScale(scale: number);
+    setPremultipliedAlpha(premultipliedAlpha: boolean);
+    setColor(color: Color);
 
     setVertexEffect(effect: SpineJitterVertexEffect | SpineSwirlVertexEffect | null);
 }

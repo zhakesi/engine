@@ -155,6 +155,16 @@ EMSCRIPTEN_KEEPALIVE void setMix(uint32_t objID, uint32_t start, uint32_t fromLe
     return handle->setMix(start, fromLength, toLength, duration);
 }
 
+EMSCRIPTEN_KEEPALIVE void setPremultipliedAlpha(uint32_t objID, bool premultipliedAlpha) {
+    auto handle = getSkeletonHandle(objID);
+    return handle->setPremultipliedAlpha(premultipliedAlpha);
+}
+
+EMSCRIPTEN_KEEPALIVE void setColor(uint32_t objID, float r, float g, float b, float a) {
+    auto handle = getSkeletonHandle(objID);
+    return handle->setColor(r, g, b, a);
+}
+
 EMSCRIPTEN_KEEPALIVE uint8_t* queryMemory(uint32_t size) {
     uint8_t* ptr = new uint8_t[size];
     return ptr;
