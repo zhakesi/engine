@@ -139,6 +139,7 @@ export class PartialRendererUI extends UIRenderable {
         renderData.resize(vc, ic);
         const vb = renderData.chunk.vb;
         const ib = renderData.chunk.ib;
+        const chunkOffset = renderData.chunk.vertexOffset;
         let vbOffset = 0;
         let ibOffset = 0;
         let vCount = 0;
@@ -146,6 +147,9 @@ export class PartialRendererUI extends UIRenderable {
             const mesh = this._meshArray[idx];
             const srcVB = mesh.vertices;
             const srcIB = mesh.indices;
+            for (let ii = 0; ii < srcIB.length; ii++) {
+                srcIB[ii] += chunkOffset;
+            }
             vb.set(srcVB, vbOffset);
             ib.set(srcIB, ibOffset);
             vbOffset += srcVB.length;

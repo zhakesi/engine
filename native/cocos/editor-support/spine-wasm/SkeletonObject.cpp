@@ -99,12 +99,12 @@ uint32_t SkeletonObject::updateRenderData()
     }
 
     Color4F color;
-    for (int i = 0, n = drawCount; i < n; ++i) {
+    for (uint32_t drawIdx = 0, n = drawCount; drawIdx < n; ++drawIdx) {
         color.r = _userData.color.r;
         color.g = _userData.color.g;
         color.b = _userData.color.b;
         color.a = _userData.color.a;
-        auto slot = drawOrder[i];
+        auto slot = drawOrder[drawIdx];
         if (slot->getBone().isActive() == false) {
             continue;
         }
@@ -133,12 +133,13 @@ uint32_t SkeletonObject::updateRenderData()
             auto vbSize = vertCount * stride;
             auto indexCount = attachmentVertices->_triangles->indexCount;
             auto ibSize = indexCount * sizeof(uint16_t);
-            SkMeshData mesh;
-            mesh.vb = (uint8_t*)attachmentVertices->_triangles->verts;
-            mesh.ib = attachmentVertices->_triangles->indices;
-            mesh.vbCount = vertCount;
-            mesh.ibCount = indexCount;
-            mesh.userData.slotIndex = i;
+            SkMeshData mesh(drawIdx,
+                (uint8_t*)attachmentVertices->_triangles->verts,
+                attachmentVertices->_triangles->indices,
+                vertCount,
+                indexCount,
+                byteStride,
+                slot->getData().getBlendMode());
             attachment->computeWorldVertices(slot->getBone(),(float *)mesh.vb, 0, stride / sizeof(float));
             meshes.push_back(mesh);
             currMesh = &mesh;
@@ -155,12 +156,13 @@ uint32_t SkeletonObject::updateRenderData()
             auto indexCount = attachmentVertices->_triangles->indexCount;
             auto ibSize = indexCount * sizeof(uint16_t);
 
-            SkMeshData mesh;
-            mesh.vb = (uint8_t*)attachmentVertices->_triangles->verts;
-            mesh.ib = attachmentVertices->_triangles->indices;
-            mesh.vbCount = vertCount;
-            mesh.ibCount = indexCount;
-            mesh.userData.slotIndex = i;
+            SkMeshData mesh(drawIdx,
+                (uint8_t*)attachmentVertices->_triangles->verts,
+                attachmentVertices->_triangles->indices,
+                vertCount,
+                indexCount,
+                byteStride,
+                slot->getData().getBlendMode());
             attachment->computeWorldVertices(*slot, 0, attachment->getWorldVerticesLength(), (float *)mesh.vb, 0, byteStride / sizeof(float));
             meshes.push_back(mesh);
             currMesh = &mesh;
@@ -271,7 +273,6 @@ void SkeletonObject::mergeMeshes(std::vector<SkMeshData> &meshes) {
     }
     uint32_t byteStide = sizeof(V3F_T2F_C4B); 
     SkMeshData* merge = new SkMeshData(vCount, iCount, byteStide);
-    merge->userData.slotIndex = 0;
     vCount = 0;
     iCount = 0;
     for (int i = 0; i < count; i++) {
@@ -297,7 +298,7 @@ uint32_t SkeletonObject::queryRenderDataInfo() {
     uint32_t* ptr = (uint32_t*)store->uint8Ptr;
     ptr[0] = meshSize;
     for (int i = 0; i < meshSize; i++) {
-        *(++ptr) = _meshArray[i]->userData.slotIndex;
+        *(++ptr) = _meshArray[i]->slotIndex;
         *(++ptr) = _meshArray[i]->vbCount;
         *(++ptr) = _meshArray[i]->ibCount;
         *(++ptr) = (uint32_t)_meshArray[i]->vb;
