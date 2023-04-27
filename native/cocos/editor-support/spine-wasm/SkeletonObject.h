@@ -17,13 +17,18 @@ struct UserData
     Color4F color = Color4F(1.0F, 1.0F, 1.0F, 1.0F);
 };
 
+struct SpineMeshBlendInfo {
+    uint32_t blendMode;
+    uint32_t indexOffset;
+    uint32_t indexCount;
+};
+
 public:
     SkeletonObject();
     ~SkeletonObject();
     uint32_t ObjectID();
     uint32_t initWithSkeletonData(bool isJson, uint32_t start, uint32_t length);
     uint32_t updateRenderData();
-    uint32_t queryRenderDataInfo();
     uint32_t setSkin(uint32_t start, uint32_t length);
     uint32_t setAnimation(uint32_t trackIndex,uint32_t start, uint32_t length, bool loop);
     void     clearTrack(uint32_t trackIndex);
@@ -44,8 +49,9 @@ public:
 private:
     void     collectMeshData(std::vector<SkMeshData> &meshArray);
     void     processVertices(std::vector<SkMeshData> &meshes);
-    void     mergeMeshes(std::vector<SkMeshData> &meshArray);
+    void     mergeMeshes(std::vector<SkMeshData> &meshArray, std::vector<SpineMeshBlendInfo> &blendInfos);
     void     releaseMeshData();
+    uint32_t queryRenderDataInfo(std::vector<SpineMeshBlendInfo> &blendInfos);
 private:
     uint32_t _objID;
     spine::Skeleton *_skeleton = nullptr;
@@ -56,6 +62,7 @@ private:
     spine::VertexEffect *_effect = nullptr;
 
     SkMeshData* _mesh = nullptr;
+
     UserData _userData;
 };
 

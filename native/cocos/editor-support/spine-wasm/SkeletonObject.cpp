@@ -83,13 +83,17 @@ uint32_t SkeletonObject::updateRenderData()
 {
     releaseMeshData();
     std::vector<SkMeshData> meshArray{};
+    std::vector<SpineMeshBlendInfo> blendArray{};
     collectMeshData(meshArray);
 
     processVertices(meshArray);
-    mergeMeshes(meshArray);
+    mergeMeshes(meshArray, blendArray);
+
+    uint32_t storeLoc = queryRenderDataInfo(blendArray);
 
     meshArray.clear();
-    return true;
+    blendArray.clear();
+    return storeLoc;
 }
 
 void SkeletonObject::collectMeshData(std::vector<SkMeshData> &meshArray)
@@ -265,42 +269,67 @@ void SkeletonObject::processVertices(std::vector<SkMeshData> &meshes)
     }
 }
 
-void SkeletonObject::mergeMeshes(std::vector<SkMeshData> &meshes) {
-
-    int count = meshes.size();
+void SkeletonObject::mergeMeshes(std::vector<SkMeshData> &meshArray, std::vector<SpineMeshBlendInfo> &blendInfos) {
+    int count = meshArray.size();
+    if (count < 1) return;
     int vCount = 0;
     int iCount = 0;
     for (int i = 0; i < count; i++) {
-        vCount += meshes[i].vbCount;
-        iCount += meshes[i].ibCount;
+        vCount += meshArray[i].vbCount;
+        iCount += meshArray[i].ibCount;
     }
-    uint32_t byteStide = sizeof(V3F_T2F_C4B); 
-    SkMeshData* merge = new SkMeshData(vCount, iCount, byteStide);
+    uint32_t byteStride = sizeof(V3F_T2F_C4B); 
+    SkMeshData* merge = new SkMeshData(vCount, iCount, byteStride);
     vCount = 0;
     iCount = 0;
-    for (int i = 0; i < count; i++) {
 
-        uint16_t* iPtr = merge->ib + iCount;
-        for (int ii = 0; ii < meshes[i].ibCount; ii++) {
-            iPtr[ii] = meshes[i].ib[ii] + vCount;
+    auto curBlend = meshArray[0].blendMode;
+    SpineMeshBlendInfo blendInfo;
+    blendInfo.blendMode = curBlend;
+    blendInfo.indexOffset = iCount;
+    blendInfos.push_back(blendInfo);
+    for (int i = 0; i < count; i++) {
+        if (meshArray[i].blendMode != curBlend) {
+            auto lastIdx = blendInfos.size() - 1;
+            blendInfos[lastIdx].indexCount = iCount - blendInfos[lastIdx].indexOffset;
+            curBlend = meshArray[i].blendMode;
+            blendInfo.blendMode = curBlend;
+            blendInfo.indexOffset = iCount;
+            blendInfos.push_back(blendInfo);
         }
-        uint8_t* vPtr = merge->vb + vCount * byteStide;
-        uint32_t byteSize = meshes[i].vbCount * byteStide;
-        memcpy(vPtr, meshes[i].vb, byteSize);
-        vCount += meshes[i].vbCount;
-        iCount += meshes[i].ibCount;
+        uint16_t* iPtr = merge->ib + iCount;
+        for (int ii = 0; ii < meshArray[i].ibCount; ii++) {
+            iPtr[ii] = meshArray[i].ib[ii] + vCount;
+        }
+        uint8_t* vPtr = merge->vb + vCount * byteStride;
+        uint32_t byteSize = meshArray[i].vbCount * byteStride;
+        memcpy(vPtr, meshArray[i].vb, byteSize);
+        vCount += meshArray[i].vbCount;
+        iCount += meshArray[i].ibCount;
     }
+    auto lastIdx = blendInfos.size() - 1;
+    blendInfos[lastIdx].indexCount = iCount - blendInfos[lastIdx].indexOffset;
 
     _mesh = merge;
 }
 
-uint32_t SkeletonObject::queryRenderDataInfo() {
+uint32_t SkeletonObject::queryRenderDataInfo(std::vector<SpineMeshBlendInfo> &blendInfos)
+{
     auto store = getStoreMem();
     uint32_t* ptr = (uint32_t*)store->uint8Ptr;
     *(ptr++) = _mesh->vbCount;
     *(ptr++) = _mesh->ibCount;
     *(ptr++) = (uint32_t)_mesh->vb;
     *(ptr++) = (uint32_t)_mesh->ib;
+
+    uint32_t count = blendInfos.size();
+    *(ptr++) = count;
+    for (int i = 0; i < count; i++) {
+        *(ptr++) = blendInfos[i].blendMode;
+        *(ptr++) = blendInfos[i].indexOffset;
+        *(ptr++) = blendInfos[i].indexCount;
+    }
+
     return (uint32_t)store->uint8Ptr;
 }
 

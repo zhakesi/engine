@@ -84,8 +84,7 @@ EMSCRIPTEN_KEEPALIVE uint32_t updateAnimation(uint32_t objID, float dltTime) {
 
 EMSCRIPTEN_KEEPALIVE uint32_t updateRenderData(uint32_t objID) {
     auto handle = getSkeletonHandle(objID);
-    handle->updateRenderData();
-    return handle->queryRenderDataInfo();
+    return handle->updateRenderData();
 }
 
 EMSCRIPTEN_KEEPALIVE uint32_t getDrawOrderSize(uint32_t objID) {

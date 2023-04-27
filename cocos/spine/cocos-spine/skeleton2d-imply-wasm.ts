@@ -59,12 +59,13 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
 
     public updateRenderData (): Skeleton2DMesh {
         const address = this._wasmInstance.updateRenderData(this._objID);
-        let start = alignedBytes(address, 4);
+        let uint32Ptr = alignedBytes(address, 4);
         const heap32 = new Uint32Array(this._wasmHEAPU8.buffer);
-        const vc = heap32[start];
-        const ic = heap32[++start];
-        const startV = heap32[++start];
-        const startI = heap32[++start];
+        const vc = heap32[uint32Ptr++];
+        const ic = heap32[uint32Ptr++];
+        const startV = heap32[uint32Ptr++];
+        const startI = heap32[uint32Ptr++];
+        const blendCount = heap32[uint32Ptr++];
         const vertices = new Float32Array(heap32.buffer, startV, floatStride * vc);
         const indices = new Uint16Array(heap32.buffer, startI, ic);
 
@@ -76,6 +77,15 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
         mesh.vertices = vertices;
         mesh.indices = indices;
 
+        for (let i = 0; i < blendCount; i++) {
+            const blend = heap32[uint32Ptr++];
+            const iOffset = heap32[uint32Ptr++];
+            const iCount = heap32[uint32Ptr++];
+            mesh.blendInfos.push({
+                blendMode: blend,
+                indexOffset: iOffset,
+                indexCount: iCount });
+        }
         return mesh;
     }
 

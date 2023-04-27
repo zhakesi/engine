@@ -242,6 +242,7 @@ export class SpineSkeletonUI extends Component {
         if (v !== this._premultipliedAlpha) {
             this._premultipliedAlpha = v;
             this._imply.setPremultipliedAlpha(this._premultipliedAlpha);
+            if (this._renderer) this._renderer.premultipliedAlpha = v;
         }
     }
 

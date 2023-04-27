@@ -20,12 +20,57 @@ import { Skeleton2DMesh, NativePartialRendererUI } from './skeleton2d-native';
 
 let _accessor: StaticVBAccessor = null!;
 
-// function MixUint32Color(uintColor:number, r: number, g:number, b:number, a:number) {
-//     const uintA = Math.floor(a * (uintColor >> 24));
-//     const uintB = Math.floor(b * ((uintColor << 8) >>24));
-//     const uintG = Math.floor(g * ((uintColor << 16) >>24));
-//     const uintR = Math.floor(g * ((uintColor << 16) >>24));
-// }
+const _spineMaterials = new Map< string, MaterialInstance>();
+
+function getMaterialFromBlend (blendMode: number, premultipliedAlpha: boolean, baseMat: Material): MaterialInstance {
+    const key = `${blendMode}/${premultipliedAlpha}`;
+    const mat = _spineMaterials.get(key);
+    if (mat) {
+        return mat;
+    }
+    let src: BlendFactor;
+    let dst: BlendFactor;
+    switch (blendMode) {
+    case 1:
+        src =  premultipliedAlpha ? BlendFactor.ONE :  BlendFactor.SRC_ALPHA;
+        dst = BlendFactor.ONE;
+        break;
+    case 2:
+        src = BlendFactor.DST_COLOR;
+        dst = BlendFactor.ONE_MINUS_SRC_ALPHA;
+        break;
+    case 3:
+        src = BlendFactor.ONE;
+        dst = BlendFactor.ONE_MINUS_SRC_COLOR;
+        break;
+    case 0:
+    default:
+        src = premultipliedAlpha ? BlendFactor.ONE : BlendFactor.SRC_ALPHA;
+        dst = BlendFactor.ONE_MINUS_SRC_ALPHA;
+        break;
+    }
+
+    const matInfo = {
+        parent: baseMat,
+        subModelIdx: 0,
+    };
+    const inst = new MaterialInstance(matInfo);
+    inst.overridePipelineStates({
+        blendState: {
+            blendColor: Color.WHITE,
+            targets: [{
+                blendEq: BlendOp.ADD,
+                blendAlphaEq: BlendOp.ADD,
+                blendSrc: src,
+                blendDst: dst,
+                blendSrcAlpha: src,
+                blendDstAlpha: dst,
+            }],
+        },
+    });
+    _spineMaterials.set(key, inst);
+    return inst;
+}
 
 const simple: IAssembler = {
     fillBuffers (render: PartialRendererUI, batcher: IBatcher) {
@@ -36,6 +81,16 @@ const simple: IAssembler = {
     },
 };
 
+/**
+ * @internal
+ */
+export interface SpineSkeletonUIDraw {
+    material: Material | null;
+    texture: Texture2D | null;
+    indexOffset: number;
+    indexCount: number;
+}
+
 @ccclass('sp.PartialRendererUI')
 @help('i18n:sp.PartialRendererUI')
 @executionOrder(100)
@@ -44,6 +99,8 @@ export class PartialRendererUI extends UIRenderable {
     private _texture: Texture2D | null = null;
     private _mesh: Skeleton2DMesh = null!;
     private _nativeObj: NativePartialRendererUI = null!;
+    private _drawList: SpineSkeletonUIDraw[] = [];
+    private _premultipliedAlpha = true;
 
     constructor () {
         super();
@@ -62,6 +119,9 @@ export class PartialRendererUI extends UIRenderable {
     public setTexture (tex: Texture2D | null) {
         this._texture = tex;
         if (JSB && tex) this._nativeObj.setTexture(tex);
+    }
+    set premultipliedAlpha (v: boolean) {
+        this._premultipliedAlpha = v;
     }
 
     set mesh (mesh: Skeleton2DMesh) {
@@ -99,7 +159,6 @@ export class PartialRendererUI extends UIRenderable {
     }
 
     public updateRenderer () {
-        //this._assembleRenderData();
         this._renderFlag = this._canRender();
         this._renderEntity.enabled = this._renderFlag;
     }
@@ -115,8 +174,11 @@ export class PartialRendererUI extends UIRenderable {
         const indicesCount = rd.indexCount;
         const meshBuffer = rd.getMeshBuffer()!;
         meshBuffer.setDirty();
-        const origin = meshBuffer.indexOffset;
-        batcher.commitMiddleware(this, meshBuffer, origin, indicesCount, this._texture, this.material!, false);
+        const drawList = this._drawList;
+        drawList.forEach((draw) => {
+            const origin = meshBuffer.indexOffset;
+            batcher.commitMiddleware(this, meshBuffer, origin + draw.indexOffset, draw.indexCount, draw.texture!, draw.material!, false);
+        });
         accessor.appendIndices(chunk.bufferId, rd.chunk.ib);
     }
 
@@ -126,6 +188,7 @@ export class PartialRendererUI extends UIRenderable {
     }
 
     private _assembleRenderData () {
+        this._drawList.length = 0;
         if (JSB || !this._mesh) return;
         const mesh = this._mesh;
 
@@ -142,6 +205,20 @@ export class PartialRendererUI extends UIRenderable {
         }
         vb.set(srcVB, 0);
         ib.set(srcIB, 0);
+
+        const blendInfos = mesh.blendInfos;
+        const drawCount = mesh.blendInfos.length;
+        for (let i = 0; i < drawCount; i++) {
+            const blend = blendInfos[i].blendMode;
+            const mat = getMaterialFromBlend(blend, this._premultipliedAlpha, this.material!);
+            const iOffset = blendInfos[i].indexOffset;
+            const iCount = blendInfos[i].indexCount;
+            this._drawList.push({
+                material: mat,
+                texture: this._texture,
+                indexOffset: iOffset,
+                indexCount: iCount });
+        }
     }
 
     private createRenderData () {

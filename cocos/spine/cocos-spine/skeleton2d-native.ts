@@ -1,6 +1,14 @@
 import { NativeRenderEntity } from '../../2d/renderer/native-2d';
 import { Material, Texture2D } from '../../asset/assets';
 
+/**
+ * @internal
+ */
+export interface SpineMeshBlendInfo {
+    blendMode: number;
+    indexOffset: number;
+    indexCount: number;
+}
 export class Skeleton2DMesh {
     constructor () {
 
@@ -21,6 +29,7 @@ export class Skeleton2DMesh {
     public declare byteStride: number;
     public declare vertices: Float32Array;
     public declare indices: Uint16Array;
+    public blendInfos: SpineMeshBlendInfo[] = [];
 }
 
 export declare class NativeSkeleton2D {
