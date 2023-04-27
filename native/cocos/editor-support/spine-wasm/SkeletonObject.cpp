@@ -26,12 +26,10 @@ SkeletonHandle getSkeletonHandle(uint32_t objID) {
 SkeletonObject::SkeletonObject() {
     _objID = generateID();
     handleTable[_objID] = this;
-
-    _meshArray.clear();
 }
 
 SkeletonObject::~SkeletonObject() {
-
+    releaseMeshData();
 }
 
 uint32_t SkeletonObject::ObjectID() {
@@ -83,9 +81,20 @@ uint32_t SkeletonObject::initWithSkeletonData(bool isJson, uint32_t start, uint3
 
 uint32_t SkeletonObject::updateRenderData()
 {
-    SkMeshData *currMesh;
-    std::vector<SkMeshData> meshes;
-    meshes.clear();
+    releaseMeshData();
+    std::vector<SkMeshData> meshArray{};
+    collectMeshData(meshArray);
+
+    processVertices(meshArray);
+    mergeMeshes(meshArray);
+
+    meshArray.clear();
+    return true;
+}
+
+void SkeletonObject::collectMeshData(std::vector<SkMeshData> &meshArray)
+{
+    SkMeshData *currMesh = nullptr;
 
     unsigned int byteStride = sizeof(V3F_T2F_C4B);
     int startSlotIndex = -1;
@@ -141,7 +150,7 @@ uint32_t SkeletonObject::updateRenderData()
                 byteStride,
                 slot->getData().getBlendMode());
             attachment->computeWorldVertices(slot->getBone(),(float *)mesh.vb, 0, stride / sizeof(float));
-            meshes.push_back(mesh);
+            meshArray.push_back(mesh);
             currMesh = &mesh;
             color.r *= attachment->getColor().r;
             color.g *= attachment->getColor().g;
@@ -164,7 +173,7 @@ uint32_t SkeletonObject::updateRenderData()
                 byteStride,
                 slot->getData().getBlendMode());
             attachment->computeWorldVertices(*slot, 0, attachment->getWorldVerticesLength(), (float *)mesh.vb, 0, byteStride / sizeof(float));
-            meshes.push_back(mesh);
+            meshArray.push_back(mesh);
             currMesh = &mesh;
 
             color.r *= attachment->getColor().r;
@@ -209,11 +218,6 @@ uint32_t SkeletonObject::updateRenderData()
     }
     _clipper->clipEnd();
     if (_effect) _effect->end();
-
-    processVertices(meshes);
-    mergeMeshes(meshes);
-
-    return true;
 }
 
 void SkeletonObject::processVertices(std::vector<SkMeshData> &meshes)
@@ -263,7 +267,6 @@ void SkeletonObject::processVertices(std::vector<SkMeshData> &meshes)
 
 void SkeletonObject::mergeMeshes(std::vector<SkMeshData> &meshes) {
 
-    resetMeshArray();
     int count = meshes.size();
     int vCount = 0;
     int iCount = 0;
@@ -288,23 +291,16 @@ void SkeletonObject::mergeMeshes(std::vector<SkMeshData> &meshes) {
         iCount += meshes[i].ibCount;
     }
 
-    this->_meshArray.push_back(merge);
+    _mesh = merge;
 }
 
 uint32_t SkeletonObject::queryRenderDataInfo() {
     auto store = getStoreMem();
-    int meshSize = _meshArray.size();
-    //LogUtil::PrintIntValue(meshSize, "Mesh Size:");
     uint32_t* ptr = (uint32_t*)store->uint8Ptr;
-    ptr[0] = meshSize;
-    for (int i = 0; i < meshSize; i++) {
-        *(++ptr) = _meshArray[i]->slotIndex;
-        *(++ptr) = _meshArray[i]->vbCount;
-        *(++ptr) = _meshArray[i]->ibCount;
-        *(++ptr) = (uint32_t)_meshArray[i]->vb;
-        *(++ptr) = (uint32_t)_meshArray[i]->ib;
-    }
-
+    *(ptr++) = _mesh->vbCount;
+    *(ptr++) = _mesh->ibCount;
+    *(ptr++) = (uint32_t)_mesh->vb;
+    *(ptr++) = (uint32_t)_mesh->ib;
     return (uint32_t)store->uint8Ptr;
 }
 
@@ -414,15 +410,13 @@ bool SkeletonObject::setDefualtScale(float scale) {
     return true;
 }
 
-void SkeletonObject::resetMeshArray()
+void SkeletonObject::releaseMeshData()
 {
-    int count = _meshArray.size();
-    for (int i = 0; i < count; i++) {
-        auto *mesh = _meshArray[i];
-        mesh->FreeData();
-        delete mesh;
+    if (_mesh) {
+        _mesh->FreeData();
+        delete _mesh;
+        _mesh = nullptr;
     }
-    _meshArray.clear();
 }
 
 void SkeletonObject::setVertexEffect(spine::VertexEffect *effect) {
@@ -438,12 +432,6 @@ void SkeletonObject::setColor(float r, float g, float b, float a) {
     _userData.color.g = g;
     _userData.color.b = b;
     _userData.color.a = a;
-}
-
-// create atlas test
-uint32_t SkeletonObject::testFunc(uint32_t start, uint32_t length) {
-
-    return true;
 }
 
 

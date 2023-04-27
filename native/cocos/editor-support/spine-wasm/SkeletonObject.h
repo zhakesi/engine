@@ -42,9 +42,10 @@ public:
 
     uint32_t testFunc(uint32_t start, uint32_t length);
 private:
-    void processVertices(std::vector<SkMeshData> &meshes);
-    void mergeMeshes(std::vector<SkMeshData> &meshes);
-    void resetMeshArray();
+    void     collectMeshData(std::vector<SkMeshData> &meshArray);
+    void     processVertices(std::vector<SkMeshData> &meshes);
+    void     mergeMeshes(std::vector<SkMeshData> &meshArray);
+    void     releaseMeshData();
 private:
     uint32_t _objID;
     spine::Skeleton *_skeleton = nullptr;
@@ -54,7 +55,7 @@ private:
     spine::SkeletonClipping* _clipper = nullptr;
     spine::VertexEffect *_effect = nullptr;
 
-    std::vector<SkMeshData*> _meshArray{};
+    SkMeshData* _mesh = nullptr;
     UserData _userData;
 };
 

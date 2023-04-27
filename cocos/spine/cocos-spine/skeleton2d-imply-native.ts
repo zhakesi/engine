@@ -43,9 +43,9 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
         this._nativeObj.updateAnimation(dltTime);
         return true;
     }
-    updateRenderData (): Skeleton2DMesh[] {
+    updateRenderData (): Skeleton2DMesh {
         this._nativeMeshArray = this._nativeObj.updateRenderData();
-        return this._nativeMeshArray;
+        return this._nativeMeshArray[0];
     }
 
     getSlotsTable (): Map<number, string | null> {

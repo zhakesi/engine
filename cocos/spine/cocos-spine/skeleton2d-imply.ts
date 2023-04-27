@@ -13,7 +13,7 @@ export interface Skeleton2DImply {
     setTimeScale(timeScale: number): boolean;
     updateAnimation(dltTime: number);
     setMix(fromAnimation: string, toAnimation: string, duration: number): void;
-    updateRenderData(): Skeleton2DMesh[];
+    updateRenderData(): Skeleton2DMesh;
     getSlotsTable(): Map<number, string | null>;
     getBoneMatrix(idx: number, matrix: Mat4);
     setDefaultScale(scale: number);

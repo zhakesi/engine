@@ -86,7 +86,6 @@ export class SpineSkeletonUI extends Component {
     private _skinName = 'default';
     private _renderer: PartialRendererUI | null = null;
     declare private _imply: Skeleton2DImplyNative | Skeleton2DImplyWasm;
-    private _meshArray: Skeleton2DMesh[] = [];
     declare private _slotTable: Map<number, string | null>;
     protected _cachedSockets: Map<string, number> = new Map<string, number>();
     protected _socketNodes: Map<number, Node> = new Map();
@@ -337,7 +336,6 @@ export class SpineSkeletonUI extends Component {
     }
 
     public onDisable () {
-        this._meshArray.length = 0;
         this._updateRenderData();
     }
 
@@ -358,7 +356,7 @@ export class SpineSkeletonUI extends Component {
         this._updateSocketBindings();
 
         if (this._renderer) {
-            this._renderer.resetProperties(this._texture);
+            this._renderer.setTexture(this._texture);
         }
 
         this._updateRenderData();
@@ -399,8 +397,7 @@ export class SpineSkeletonUI extends Component {
         if (JSB) {
             this._nativeObj.updateRenderData();
         } else {
-            this._meshArray = this._imply.updateRenderData();
-            this._renderer.meshArray = this._meshArray;
+            this._renderer.mesh = this._imply.updateRenderData();
         }
         this._renderer.markForUpdateRenderData();
     }
@@ -409,10 +406,8 @@ export class SpineSkeletonUI extends Component {
         let render = this.node.getComponent(PartialRendererUI);
         if (!render) {
             render = this.node.addComponent(PartialRendererUI);
-            render.resetProperties(this._texture);
-        } else {
-            render.resetProperties(this._texture);
         }
+        render.setTexture(this._texture);
         this._renderer = render;
         if (JSB) {
             this._nativeObj.setPartialRenderer(render.nativeObject);

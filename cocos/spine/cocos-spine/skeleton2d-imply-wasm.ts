@@ -57,32 +57,26 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
         return true;
     }
 
-    public updateRenderData (): Skeleton2DMesh[] {
-        this._meshArray.length = 0;
+    public updateRenderData (): Skeleton2DMesh {
         const address = this._wasmInstance.updateRenderData(this._objID);
         let start = alignedBytes(address, 4);
         const heap32 = new Uint32Array(this._wasmHEAPU8.buffer);
-        const meshSize = heap32[start];
-        for (let i = 0; i < meshSize; i++) {
-            const slot = heap32[++start];
-            const vc = heap32[++start];
-            const ic = heap32[++start];
-            const startV = heap32[++start];
-            const startI = heap32[++start];
-            const vertices = new Float32Array(heap32.buffer, startV, floatStride * vc);
-            const indices = new Uint16Array(heap32.buffer, startI, ic);
+        const vc = heap32[start];
+        const ic = heap32[++start];
+        const startV = heap32[++start];
+        const startI = heap32[++start];
+        const vertices = new Float32Array(heap32.buffer, startV, floatStride * vc);
+        const indices = new Uint16Array(heap32.buffer, startI, ic);
 
-            const mesh = new Skeleton2DMesh();
-            mesh.slotIndex = slot;
-            mesh.byteStride = 4 * floatStride;
-            mesh.vCount = vc;
-            mesh.iCount = ic;
-            mesh.vertices = vertices;
-            mesh.indices = indices;
+        const mesh = new Skeleton2DMesh();
+        mesh.slotIndex = 0;
+        mesh.byteStride = 4 * floatStride;
+        mesh.vCount = vc;
+        mesh.iCount = ic;
+        mesh.vertices = vertices;
+        mesh.indices = indices;
 
-            this._meshArray.push(mesh);
-        }
-        return this._meshArray;
+        return mesh;
     }
 
     public setSkin (name: string): boolean {
@@ -204,6 +198,4 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
     private _objID: number;
     private _wasmInstance: SpineWasmInterface;
     private _wasmHEAPU8: Uint8Array = new Uint8Array(0);
-
-    private _meshArray: Skeleton2DMesh[] = [];
 }

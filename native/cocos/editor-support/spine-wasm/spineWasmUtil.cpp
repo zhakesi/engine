@@ -174,11 +174,6 @@ EMSCRIPTEN_KEEPALIVE void freeMemory(uint8_t* ptr) {
     return delete[]ptr;
 }
 
-EMSCRIPTEN_KEEPALIVE uint32_t testFunction(uint32_t objID, uint32_t start, uint32_t length) {
-    auto handle = getSkeletonHandle(objID);
-    return handle->testFunc(start, length);
-}
-
 #ifdef __cplusplus 		  
 }
 #endif

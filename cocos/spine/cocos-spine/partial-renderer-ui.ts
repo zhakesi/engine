@@ -42,7 +42,7 @@ const simple: IAssembler = {
 @executeInEditMode
 export class PartialRendererUI extends UIRenderable {
     private _texture: Texture2D | null = null;
-    private _meshArray: Skeleton2DMesh[] = [];
+    private _mesh: Skeleton2DMesh = null!;
     private _nativeObj: NativePartialRendererUI = null!;
 
     constructor () {
@@ -59,13 +59,13 @@ export class PartialRendererUI extends UIRenderable {
         return this._nativeObj;
     }
 
-    public resetProperties (tex: Texture2D | null) {
+    public setTexture (tex: Texture2D | null) {
         this._texture = tex;
         if (JSB && tex) this._nativeObj.setTexture(tex);
     }
 
-    set meshArray (meshes: Skeleton2DMesh[]) {
-        this._meshArray = meshes;
+    set mesh (mesh: Skeleton2DMesh) {
+        this._mesh = mesh;
         this._assembleRenderData();
     }
 
@@ -105,7 +105,7 @@ export class PartialRendererUI extends UIRenderable {
     }
 
     protected _render (batcher: Batcher2D): void {
-        if (this._meshArray.length < 1) return;
+        if (!this._mesh) return;
         if (!this._texture) return;
         if (!this._renderData) return;
 
@@ -126,36 +126,22 @@ export class PartialRendererUI extends UIRenderable {
     }
 
     private _assembleRenderData () {
-        if (JSB) return;
-        const count = this._meshArray.length;
-        let vc = 0;
-        let ic = 0;
-        for (let idx = 0;  idx < count; idx++) {
-            const mesh = this._meshArray[idx];
-            vc += mesh.vCount;
-            ic += mesh.iCount;
-        }
+        if (JSB || !this._mesh) return;
+        const mesh = this._mesh;
+
         const renderData = this._renderData!;
-        renderData.resize(vc, ic);
+        renderData.resize(mesh.vCount, mesh.iCount);
         const vb = renderData.chunk.vb;
         const ib = renderData.chunk.ib;
         const chunkOffset = renderData.chunk.vertexOffset;
-        let vbOffset = 0;
-        let ibOffset = 0;
-        let vCount = 0;
-        for (let idx = 0;  idx < count; idx++) {
-            const mesh = this._meshArray[idx];
-            const srcVB = mesh.vertices;
-            const srcIB = mesh.indices;
-            for (let ii = 0; ii < srcIB.length; ii++) {
-                srcIB[ii] += chunkOffset;
-            }
-            vb.set(srcVB, vbOffset);
-            ib.set(srcIB, ibOffset);
-            vbOffset += srcVB.length;
-            ibOffset += srcIB.length;
-            vCount += mesh.vCount;
+
+        const srcVB = mesh.vertices;
+        const srcIB = mesh.indices;
+        for (let ii = 0; ii < srcIB.length; ii++) {
+            srcIB[ii] += chunkOffset;
         }
+        vb.set(srcVB, 0);
+        ib.set(srcIB, 0);
     }
 
     private createRenderData () {

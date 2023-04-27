@@ -28,6 +28,5 @@ export interface SpineWasmInterface {
     createSwirlVertexEffect(radius: number, power: number, usePowerOut: boolean): number;
     updateSwirlParameters(handle: number, centerX: number, centerY: number, radius: number, angle: number);
 
-    testFunction(objID: number, start: number, length: number): number;
     memory: any;
 }
