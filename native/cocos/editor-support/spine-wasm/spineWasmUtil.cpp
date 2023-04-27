@@ -40,10 +40,9 @@ EMSCRIPTEN_KEEPALIVE uint32_t setSkeletonData(uint32_t objID, bool isJosn, uint3
     return handle->initWithSkeletonData(isJosn, start, length);
 }
 
-EMSCRIPTEN_KEEPALIVE uint32_t setAnimation(uint32_t objID, uint32_t start, uint32_t length, uint32_t trackIndex, bool loop) {
+EMSCRIPTEN_KEEPALIVE float setAnimation(uint32_t objID, uint32_t start, uint32_t length, uint32_t trackIndex, bool loop) {
     auto handle = getSkeletonHandle(objID);
-    handle->setAnimation(trackIndex, start, length, loop);
-    return true;
+    return handle->setAnimation(trackIndex, start, length, loop);
 }
 
 EMSCRIPTEN_KEEPALIVE bool clearTrack(uint32_t objID, uint32_t trackIndex) {

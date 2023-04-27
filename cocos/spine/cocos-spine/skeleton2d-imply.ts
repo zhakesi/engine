@@ -6,7 +6,7 @@ import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-
 export interface Skeleton2DImply {
     initSkeletonData(data: SkeletonData): boolean;
     setSkin(name: string): boolean;
-    setAnimation(trackIndex: number, name: string, loop: boolean): boolean;
+    setAnimation(trackIndex: number, name: string, loop: boolean): number;
     clearTrack(trackIndex: number);
     clearTracks();
     setToSetupPose();

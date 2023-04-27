@@ -58,6 +58,22 @@ SkeletonData.prototype['init'] = function () {
     }
 };
 
+class SpineAnimationCacheFrameData {
+    public frames: Skeleton2DMesh[] = [];
+    public playTime = -1.0 / 60.0;
+    public totalTime = 1.0 / 60.0;
+    public currFrameIdx = -1;
+    public isCompleted = false;
+
+    public clearCache () {
+        this.frames.length = 0;
+        this.playTime = -1.0 / 60.0;
+        this.totalTime = 1.0 / 60.0;
+        this.currFrameIdx = -1;
+        this.isCompleted = false;
+    }
+}
+
 @ccclass('sp.SpineSkeletonUI')
 @help('i18n:sp.SpineSkeletonUI')
 @executionOrder(99)
@@ -72,6 +88,8 @@ export class SpineSkeletonUI extends Component {
     private _defaultAnimationName = '<None>';
     @serializable
     private _texture: Texture2D | null = null;
+    @serializable
+    private _cacheMode = false;
     @serializable
     private _useTint = false;
     @serializable
@@ -91,6 +109,7 @@ export class SpineSkeletonUI extends Component {
     protected _socketNodes: Map<number, Node> = new Map();
     protected _effect: SpineJitterVertexEffect | SpineSwirlVertexEffect | null = null;
     private _nativeObj: NativeSpineSkeletonUI = null!;
+    private _cache = new SpineAnimationCacheFrameData();
 
     constructor () {
         super();
@@ -204,6 +223,17 @@ export class SpineSkeletonUI extends Component {
     }
     set texture (tex: Texture2D| null) {
         this._texture = tex;
+    }
+
+    @type(CCBoolean)
+    @tooltip('i18n:COMPONENT.skeleton.cacheMode')
+    get cacheMode () {
+        return this._cacheMode;
+    }
+    set cacheMode (val) {
+        if (this._cacheMode !== val) {
+            this._cacheMode = val;
+        }
     }
 
     @type(CCBoolean)
@@ -327,7 +357,7 @@ export class SpineSkeletonUI extends Component {
     }
 
     public update (dt: number) {
-        this._imply.updateAnimation(dt);
+        this._updateAnimation(dt);
         this._syncAttachedNode();
         this._updateRenderData();
     }
@@ -365,16 +395,26 @@ export class SpineSkeletonUI extends Component {
 
     public setAnimation (trackIndex: number, name: string, loop?: boolean) {
         if (loop !== undefined) this._loop = loop;
-        this._imply.setAnimation(trackIndex, name, this._loop);
+        const duration = this._imply.setAnimation(trackIndex, name, this._loop);
         this._imply.setTimeScale(this._timeScale);
         this._updateRenderData();
+
+        if (this._cacheMode) {
+            this._cache.clearCache();
+            this._cache.totalTime = duration;
+        }
     }
 
     public clearTrack (trackIndex: number) {
+        if (this._cacheMode) return;
         this._imply.clearTrack(trackIndex);
     }
 
     public clearTracks () {
+        if (this._cacheMode) {
+            this._cache.clearCache();
+            return;
+        }
         this._imply.clearTracks();
     }
 
@@ -395,11 +435,21 @@ export class SpineSkeletonUI extends Component {
     private _updateRenderData () {
         if (!this._renderer) return;
         this.updateColor();
+        let mesh: Skeleton2DMesh = null!;
         if (JSB) {
             this._nativeObj.updateRenderData();
+        } else if (this._cacheMode) {
+            const frameIdx = this._cache.currFrameIdx;
+            if (this._cache.isCompleted && this._cache.frames[frameIdx]) {
+                mesh = this._cache.frames[frameIdx];
+            } else {
+                mesh = this._imply.updateRenderData();
+                this._cache.frames[frameIdx] = mesh.clone();
+            }
         } else {
-            this._renderer.mesh = this._imply.updateRenderData();
+            mesh = this._imply.updateRenderData();
         }
+        this._renderer.mesh = mesh;
         this._renderer.markForUpdateRenderData();
     }
 
@@ -491,5 +541,20 @@ export class SpineSkeletonUI extends Component {
         if (force || this.node._uiProps.colorDirty) {
             this._imply.setColor(this._renderer!.color);
         }
+    }
+
+    private _updateAnimation (dt: number) {
+        if (!this._cacheMode) {
+            this._imply.updateAnimation(dt);
+            return;
+        }
+        const frameTime = 1.0 / 60.0;
+        this._cache.playTime += frameTime;
+        if (this._cache.playTime > this._cache.totalTime) {
+            this._cache.isCompleted = true;
+            this._cache.playTime = 0;
+        }
+        const frameIdx = Math.floor(this._cache.playTime / frameTime);
+        this._cache.currFrameIdx = frameIdx;
     }
 }

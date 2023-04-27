@@ -23,6 +23,27 @@ export class Skeleton2DMesh {
         this.indices = new Uint16Array(ic);
     }
 
+    public clone (): Skeleton2DMesh {
+        const newOne = new Skeleton2DMesh();
+        newOne.slotIndex = this.slotIndex;
+        newOne.vCount = this.vCount;
+        newOne.iCount = this.iCount;
+        newOne.byteStride = this.byteStride;
+        newOne.vertices = new Float32Array(this.vertices.length);
+        newOne.indices = new Uint16Array(this.indices.length);
+        newOne.vertices.set(this.vertices);
+        newOne.indices.set(this.indices);
+
+        this.blendInfos.forEach((item) => {
+            newOne.blendInfos.push({
+                blendMode: item.blendMode,
+                indexOffset: item.indexOffset,
+                indexCount: item.indexCount });
+        });
+
+        return newOne;
+    }
+
     public declare slotIndex: number;
     public declare vCount: number;
     public declare iCount: number;

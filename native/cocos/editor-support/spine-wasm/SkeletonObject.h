@@ -30,7 +30,7 @@ public:
     uint32_t initWithSkeletonData(bool isJson, uint32_t start, uint32_t length);
     uint32_t updateRenderData();
     uint32_t setSkin(uint32_t start, uint32_t length);
-    uint32_t setAnimation(uint32_t trackIndex,uint32_t start, uint32_t length, bool loop);
+    float    setAnimation(uint32_t trackIndex,uint32_t start, uint32_t length, bool loop);
     void     clearTrack(uint32_t trackIndex);
     void     clearTracks();
     void     setToSetupPose();

@@ -31,9 +31,9 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
         this._nativeObj.setSkin(name);
         return true;
     }
-    setAnimation (trackIdex: number, name: string, loop: boolean): boolean {
+    setAnimation (trackIdex: number, name: string, loop: boolean): number {
         this._nativeObj.setAnimation(name);
-        return true;
+        return 0;
     }
     public setTimeScale (timeScale: number): boolean {
         return true;
