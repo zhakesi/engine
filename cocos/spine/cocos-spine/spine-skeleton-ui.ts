@@ -435,7 +435,7 @@ export class SpineSkeletonUI extends Component {
     private _updateRenderData () {
         if (!this._renderer) return;
         this.updateColor();
-        let mesh: Skeleton2DMesh = null!;
+        let mesh: Skeleton2DMesh | null = null;
         if (JSB) {
             this._nativeObj.updateRenderData();
         } else if (this._cacheMode) {
@@ -449,7 +449,7 @@ export class SpineSkeletonUI extends Component {
         } else {
             mesh = this._imply.updateRenderData();
         }
-        this._renderer.mesh = mesh;
+        this._renderer.mesh = mesh!;
         this._renderer.markForUpdateRenderData();
     }
 
@@ -556,5 +556,8 @@ export class SpineSkeletonUI extends Component {
         }
         const frameIdx = Math.floor(this._cache.playTime / frameTime);
         this._cache.currFrameIdx = frameIdx;
+        if (!this._cache.isCompleted) {
+            this._imply.updateAnimation(frameTime);
+        }
     }
 }

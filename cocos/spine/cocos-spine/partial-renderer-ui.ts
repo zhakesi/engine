@@ -179,7 +179,7 @@ export class PartialRendererUI extends UIRenderable {
             const origin = meshBuffer.indexOffset;
             batcher.commitMiddleware(this, meshBuffer, origin + draw.indexOffset, draw.indexCount, draw.texture!, draw.material!, false);
         });
-        accessor.appendIndices(chunk.bufferId, rd.chunk.ib);
+        accessor.appendIndices(chunk.bufferId, rd.indices!);
     }
 
     public onDestroy () {
@@ -194,18 +194,19 @@ export class PartialRendererUI extends UIRenderable {
 
         const renderData = this._renderData!;
         renderData.resize(mesh.vCount, mesh.iCount);
+        renderData.indices = new Uint16Array(mesh.iCount);
         const vb = renderData.chunk.vb;
-        const ib = renderData.chunk.ib;
+        const ib = renderData.indices;
         const chunkOffset = renderData.chunk.vertexOffset;
 
         const srcVB = mesh.vertices;
         const srcIB = mesh.indices;
-        for (let ii = 0; ii < srcIB.length; ii++) {
-            srcIB[ii] += chunkOffset;
-        }
+
         vb.set(srcVB, 0);
         ib.set(srcIB, 0);
-
+        for (let ii = 0; ii < srcIB.length; ii++) {
+            ib[ii] += chunkOffset;
+        }
         const blendInfos = mesh.blendInfos;
         const drawCount = mesh.blendInfos.length;
         for (let i = 0; i < drawCount; i++) {
