@@ -25,9 +25,9 @@ EMSCRIPTEN_KEEPALIVE bool spineWasmInstanceDestroy() {
     return true;
 }
 
-EMSCRIPTEN_KEEPALIVE uint8_t* getStoreMemory() {
-    auto* mem = getStoreMem();
-    return mem->uint8Ptr;
+EMSCRIPTEN_KEEPALIVE uint8_t* queryStoreMemory() {
+    uint8_t* uint8Ptr = getStoreMemory();
+    return uint8Ptr;
 }
 
 EMSCRIPTEN_KEEPALIVE uint32_t createSkeletonObject() {

@@ -1,21 +1,23 @@
 #include "share-mem.h"
 
-const uint32_t STORE_MEM_SIZE = 16 * 1024 * 1024; 
-static WasmShareMem* storeMem = nullptr;
+const uint32_t MEMORY_SIZE = 16 * 1024 * 1024; 
+static uint8_t* uint8Ptr = nullptr;
 
-WasmShareMem::WasmShareMem(uint32_t size) {
-    uint8Ptr = new uint8_t[size];
-    length = size;
-    used = 0;
+uint8_t* getStoreMemory() {
+    if (uint8Ptr) return uint8Ptr;
+    
+    uint32_t* uint32Ptr = new uint32_t[MEMORY_SIZE / 4];
+    uint8Ptr = (uint8_t*)uint32Ptr;
+    return uint8Ptr;
 }
 
-WasmShareMem::~WasmShareMem() {
-    delete[] uint8Ptr;
-    length = 0;
-    used = 0;
+void freeStoreMemory() {
+    if (uint8Ptr) {
+        delete[] uint8Ptr;
+        uint8Ptr = nullptr;
+    }
 }
 
-WasmShareMem* getStoreMem() {
-    if (!storeMem) storeMem = new WasmShareMem(STORE_MEM_SIZE);
-    return storeMem;
+uint32_t storeMemorySize() {
+    return MEMORY_SIZE;
 }

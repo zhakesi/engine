@@ -89,7 +89,7 @@ function _jsReadFile (start: number, length: number): number {
     const fileResouce = FileResourceInstance();
     const arrayData = fileResouce.RequireFileBuffer(filePath);
     const dataSize = arrayData.length;
-    const address = wasmUtil.getStoreMemory();
+    const address = wasmUtil.queryStoreMemory();
     const storeArray = HEAPU8.subarray(address, address + dataSize);
     storeArray.set(arrayData);
     return dataSize;

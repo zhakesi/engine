@@ -1,7 +1,7 @@
 export interface SpineWasmInterface {
     spineWasmInstanceInit(): number;
     spineWasmInstanceDestroy(): number;
-    getStoreMemory(): number;
+    queryStoreMemory(): number;
     createSkeletonObject (): number;
     setSkeletonData(objID: number, isJosn: boolean, start: number, length: number): number;
     setAnimation(objID: number, start: number, length: number, trackIndex: number, loop: boolean): number;

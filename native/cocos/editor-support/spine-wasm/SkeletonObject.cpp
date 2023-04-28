@@ -315,8 +315,8 @@ void SkeletonObject::mergeMeshes(std::vector<SkMeshData> &meshArray, std::vector
 
 uint32_t SkeletonObject::queryRenderDataInfo(std::vector<SpineMeshBlendInfo> &blendInfos)
 {
-    auto store = getStoreMem();
-    uint32_t* ptr = (uint32_t*)store->uint8Ptr;
+    uint8_t* storePtr = getStoreMemory();
+    uint32_t* ptr = (uint32_t*)storePtr;
     *(ptr++) = _mesh->vbCount;
     *(ptr++) = _mesh->ibCount;
     *(ptr++) = (uint32_t)_mesh->vb;
@@ -330,7 +330,7 @@ uint32_t SkeletonObject::queryRenderDataInfo(std::vector<SpineMeshBlendInfo> &bl
         *(ptr++) = blendInfos[i].indexCount;
     }
 
-    return (uint32_t)store->uint8Ptr;
+    return (uint32_t)storePtr;
 }
 
 uint32_t SkeletonObject::setSkin(uint32_t start, uint32_t length)
@@ -404,24 +404,24 @@ uint32_t SkeletonObject::getDrawOrderSize() {
 }
 
 uint32_t SkeletonObject::getSlotNameByOrder(uint32_t index) {
-    auto store = getStoreMem();
-    uint32_t* pInfo = (uint32_t*)store->uint8Ptr;
-    uint8_t* pData = store->uint8Ptr + 4;
+    uint8_t* storePtr = getStoreMemory();
+    uint32_t* pInfo = (uint32_t*)storePtr;
+    uint8_t* pData = storePtr + 4;
     auto slots = _skeleton->getDrawOrder();
     auto attachment = slots[index]->getAttachment();
     if (!attachment) {
         pInfo[0] = 0;
-        return (uint32_t)store->uint8Ptr;
+        return (uint32_t)storePtr;
     }
     auto name = attachment->getName();
     pInfo[0] = name.length();
     memcpy(pData, (const void *)name.buffer(), name.length());
-    return (uint32_t)store->uint8Ptr;
+    return (uint32_t)storePtr;
 }
 
 uint32_t SkeletonObject::getBoneMatrix(uint32_t boneIdx) {
-    auto store = getStoreMem();
-    float* boneMat = (float*)store->uint8Ptr;
+    uint8_t* storePtr = getStoreMemory();
+    float* boneMat = (float*)storePtr;
     auto bones = _skeleton->getBones();
     auto bone = bones[boneIdx];
     boneMat[0] = bone->getA();
@@ -430,7 +430,7 @@ uint32_t SkeletonObject::getBoneMatrix(uint32_t boneIdx) {
     boneMat[3] = bone->getD();
     boneMat[4] = bone->getWorldX();
     boneMat[5] = bone->getWorldY();
-    return (uint32_t)store->uint8Ptr;
+    return (uint32_t)storePtr;
 }
 
 bool SkeletonObject::setDefualtScale(float scale) {

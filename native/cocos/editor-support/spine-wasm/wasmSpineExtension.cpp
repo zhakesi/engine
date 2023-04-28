@@ -14,7 +14,8 @@ WasmSpineExtension::~WasmSpineExtension() {
 char *WasmSpineExtension::_readFile(const String &path, int *length)
 {
     size_t pathSize = path.length();
-    char* shareBuffer = (char*)(getStoreMem()->uint8Ptr);
+	uint8_t* uint8Ptr = getStoreMemory();
+    char* shareBuffer = (char*)uint8Ptr;
     memcpy(shareBuffer, path.buffer(), pathSize);
     uint32_t resultSize = jsReadFile(shareBuffer, pathSize);
     *length = (int)resultSize;
