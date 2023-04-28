@@ -861,7 +861,9 @@ export class Skeleton extends UIRenderer {
         this.markForUpdateRenderData();
         if (EDITOR && !legacyCC.GAME_VIEW) return;
         if (this.paused) return;
-
+        if (this.isAnimationCached()) {
+            dt = 1.0 / 60.0;
+        }
         dt *= this._timeScale * timeScale;
         if (this.isAnimationCached()) {
             // Cache mode and has animation queue.
