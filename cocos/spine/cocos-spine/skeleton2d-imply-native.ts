@@ -14,7 +14,7 @@ export class Skeleton2DImplyNative {
         return this._nativeObj;
     }
 
-    initSkeletonData (data: SkeletonData): boolean {
+    setSkeletonData (data: SkeletonData): boolean {
         if (!data.atlasText) return false;
         if (data.skeletonJsonStr) {
             this._nativeObj.initSkeletonData(data.skeletonJsonStr, data.atlasText);

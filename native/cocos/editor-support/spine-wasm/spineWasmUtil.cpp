@@ -4,6 +4,7 @@
 #include "LogUtil.h"
 #include "SkeletonObject.h"
 #include "wasmSpineExtension.h"
+#include "data-convert.h"
 
 
 #ifdef __cplusplus
@@ -33,11 +34,6 @@ EMSCRIPTEN_KEEPALIVE uint8_t* queryStoreMemory() {
 EMSCRIPTEN_KEEPALIVE uint32_t createSkeletonObject() {
     auto* obj = new SkeletonObject;
     return obj->ObjectID();
-}
-
-EMSCRIPTEN_KEEPALIVE uint32_t setSkeletonData(uint32_t objID, bool isJosn, uint32_t start, uint32_t length) {
-    auto handle = getSkeletonHandle(objID);
-    return handle->initWithSkeletonData(isJosn, start, length);
 }
 
 EMSCRIPTEN_KEEPALIVE float setAnimation(uint32_t objID, uint32_t start, uint32_t length, uint32_t trackIndex, bool loop) {
@@ -106,6 +102,11 @@ EMSCRIPTEN_KEEPALIVE bool setDefaultScale(uint32_t objID, float scale) {
     return handle->setDefualtScale(scale);
 }
 
+EMSCRIPTEN_KEEPALIVE uint32_t retainSkeletonDataByUUID(uint32_t start, uint32_t length) {
+    std::string uuid = DataConvert::Convert2StdString(start, length);
+    return retainSkeletonData(uuid);
+}
+
 EMSCRIPTEN_KEEPALIVE bool setVertexEffect(uint32_t objID, uint32_t effectHandle, uint32_t effectType) {
     auto handle = getSkeletonHandle(objID);
     spine::VertexEffect* effect = nullptr;
@@ -169,6 +170,20 @@ EMSCRIPTEN_KEEPALIVE void destroyInstance(uint32_t objID) {
         removeSkeletonHandle(objID);
         delete handle;
     }
+}
+
+EMSCRIPTEN_KEEPALIVE void setSkeletonData(uint32_t objID, uint32_t datPtr) {
+    auto handle = getSkeletonHandle(objID);
+    handle->setSkeletonData(datPtr);
+}
+
+EMSCRIPTEN_KEEPALIVE uint32_t initSkeletonData(uint32_t start, uint32_t length, bool isJosn) {
+    auto ptr = createSkeletonData(start, length, isJosn);
+    return ptr;
+}
+
+EMSCRIPTEN_KEEPALIVE void storeSkeletonData(uint32_t start, uint32_t length, uint32_t datPtr) {
+    recordSkeletonDataUUID(start, length, datPtr);
 }
 
 EMSCRIPTEN_KEEPALIVE uint8_t* queryMemory(uint32_t size) {

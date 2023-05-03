@@ -10,9 +10,10 @@
 using namespace spine;
 extern void consoleLog(uint32_t start, uint32_t length);
 
-const Color4B WHITE(255, 255, 255, 255);
-
 static std::map<uint32_t, SkeletonHandle> handleTable {};
+static std::map<std::string, spine::SkeletonData*> skeletonDataTable {};
+
+
 static uint32_t generateID() {
     static uint32_t id = 0;
     return id++;
@@ -41,33 +42,22 @@ uint32_t SkeletonObject::ObjectID() {
     return _objID;
 }
 
-uint32_t SkeletonObject::initWithSkeletonData(bool isJson, uint32_t start, uint32_t length) {
+void SkeletonObject::setSkeletonData(uint32_t datPtr) {
 
-    std::string name = DataConvert::Convert2StdString(start, length);
-    std::string altasStr = name + ".atlas";
-    String atlasFile(altasStr.c_str());
-    auto* atlas = new Atlas(atlasFile, nullptr);
-    if (!atlas) {
-        LogUtil::PrintToJs("create atlas failed!!!");
-        return false;
+    if (_skeleton) {
+        delete _skeleton;
     }
-    //LogUtil::PrintToJs("create atlas ok.");
+    if (_animStateData) {
+        delete _animStateData;
+    }
+    if (_animState) {
+        delete _animState;
+    }
+    if (_clipper) {
+        delete _clipper;
+    }
 
-    AttachmentLoader *attachmentLoader = new AtlasAttachmentLoaderExtension(atlas);
-    if (isJson) {
-        std::string jsonStr = name + ".json";
-        String jsonFile(jsonStr.c_str());
-        SkeletonJson* json = new SkeletonJson(attachmentLoader);
-        _skeletonData = json->readSkeletonDataFile(jsonFile);
-        delete json;
-    } else {
-        SkeletonBinary* binary = new SkeletonBinary(attachmentLoader);
-        std::string binStr = name + ".bin";
-        int byteCount = 0;
-        String binFile(binStr.c_str());
-        _skeletonData = binary->readSkeletonDataFile(binFile);
-        delete binary;
-    }
+    _skeletonData = (spine::SkeletonData*)datPtr;
 
     _skeleton = new Skeleton(_skeletonData);
 
@@ -79,9 +69,6 @@ uint32_t SkeletonObject::initWithSkeletonData(bool isJson, uint32_t start, uint3
 
     _skeleton->setToSetupPose();
     _skeleton->updateWorldTransform();
-
-    //LogUtil::PrintToJs("initWithSkeletonData ok.");
-    return true;
 }
 
 uint32_t SkeletonObject::updateRenderData()
@@ -470,4 +457,50 @@ void SkeletonObject::setColor(float r, float g, float b, float a) {
     _userData.color.a = a;
 }
 
+uint32_t createSkeletonData(uint32_t start, uint32_t length, bool isJson) {
+    spine::SkeletonData *datPtr = nullptr;
+    std::string name = DataConvert::Convert2StdString(start, length);
+    std::string altasStr = name + ".atlas";
+    String atlasFile(altasStr.c_str());
+    auto* atlas = new Atlas(atlasFile, nullptr);
+    if (!atlas) {
+        LogUtil::PrintToJs("create atlas failed!!!");
+        return (uint32_t)datPtr;
+    }
 
+    AttachmentLoader *attachmentLoader = new AtlasAttachmentLoaderExtension(atlas);
+    if (isJson) {
+        std::string jsonStr = name + ".json";
+        String jsonFile(jsonStr.c_str());
+        SkeletonJson* json = new SkeletonJson(attachmentLoader);
+        datPtr = json->readSkeletonDataFile(jsonFile);
+        delete json;
+    } else {
+        SkeletonBinary* binary = new SkeletonBinary(attachmentLoader);
+        std::string binStr = name + ".bin";
+        int byteCount = 0;
+        String binFile(binStr.c_str());
+        datPtr = binary->readSkeletonDataFile(binFile);
+        delete binary;
+    }
+    return (uint32_t)datPtr;
+}
+
+uint32_t retainSkeletonData(std::string& uuid) {
+    for (auto &kv : skeletonDataTable) {
+        LogUtil::PrintToJs(kv.first.c_str());
+    }
+    spine::SkeletonData* datPtr = nullptr;
+    if (skeletonDataTable.find(uuid) != skeletonDataTable.end())
+        datPtr = skeletonDataTable[uuid];
+    return (uint32_t)datPtr;
+}
+
+void recordSkeletonDataUUID(uint32_t start, uint32_t length, uint32_t datPtr)
+{
+    spine::SkeletonData *ptr = (spine::SkeletonData *)datPtr;
+    std::string uuid = DataConvert::Convert2StdString(start, length);
+    if (skeletonDataTable.find(uuid) == skeletonDataTable.end()) {
+        skeletonDataTable[uuid] = ptr;
+    }
+}
