@@ -23,6 +23,11 @@ SkeletonHandle getSkeletonHandle(uint32_t objID) {
     return handleTable[objID];
 }
 
+void removeSkeletonHandle(uint32_t objID) {
+    if (handleTable.find(objID) == handleTable.end()) return;
+    handleTable.erase(objID);
+}
+
 SkeletonObject::SkeletonObject() {
     _objID = generateID();
     handleTable[_objID] = this;

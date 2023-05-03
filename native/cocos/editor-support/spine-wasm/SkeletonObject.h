@@ -45,7 +45,6 @@ public:
     void     setPremultipliedAlpha(bool premultipliedAlpha);
     void     setColor(float r, float g, float b, float a);
 
-    uint32_t testFunc(uint32_t start, uint32_t length);
 private:
     void     collectMeshData(std::vector<SkMeshData> &meshArray);
     void     processVertices(std::vector<SkMeshData> &meshes);
@@ -68,5 +67,6 @@ private:
 
 typedef SkeletonObject* SkeletonHandle;
 SkeletonHandle getSkeletonHandle(uint32_t objID);
+void           removeSkeletonHandle(uint32_t objID);
 
 #endif

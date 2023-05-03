@@ -3,7 +3,6 @@ import { getSpineSpineWasmInstance } from './instantiated';
 import { SpineWasmInterface } from './spine-wasm-util';
 import { FileResourceInstance } from './file-resource';
 import { Skeleton2DMesh } from './skeleton2d-native';
-import { Skeleton2DImply } from './skeleton2d-imply';
 import { Mat4, Color } from '../../core';
 import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-effect-wasm';
 
@@ -13,7 +12,7 @@ function alignedBytes (address: number, bytes: number) {
     return Math.floor(address / bytes);
 }
 const floatStride = 6;
-export class Skeleton2DImplyWasm implements Skeleton2DImply {
+export class Skeleton2DImplyWasm {
     constructor () {
         this._wasmInstance = getSpineSpineWasmInstance();
         this._wasmHEAPU8 = new Uint8Array(this._wasmInstance.memory.buffer);
@@ -203,6 +202,10 @@ export class Skeleton2DImplyWasm implements Skeleton2DImply {
         const b = color.b / 255.0;
         const a = color.a / 255.0;
         this._wasmInstance.setColor(this._objID, r, g, b, a);
+    }
+
+    public onDestroy () {
+        this._wasmInstance.destroyInstance(this._objID);
     }
 
     private _objID: number;

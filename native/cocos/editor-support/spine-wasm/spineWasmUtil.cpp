@@ -163,6 +163,14 @@ EMSCRIPTEN_KEEPALIVE void setColor(uint32_t objID, float r, float g, float b, fl
     return handle->setColor(r, g, b, a);
 }
 
+EMSCRIPTEN_KEEPALIVE void destroyInstance(uint32_t objID) {
+    auto handle = getSkeletonHandle(objID);
+    if (handle) {
+        removeSkeletonHandle(objID);
+        delete handle;
+    }
+}
+
 EMSCRIPTEN_KEEPALIVE uint8_t* queryMemory(uint32_t size) {
     uint8_t* ptr = new uint8_t[size];
     return ptr;

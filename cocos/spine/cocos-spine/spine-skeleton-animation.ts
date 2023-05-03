@@ -26,7 +26,6 @@ import { Material, Texture2D, RenderingSubMesh } from '../../asset/assets';
 import { editable } from '../../core/data/decorators';
 import { errorID } from '../../core/platform/debug';
 import { SkeletonData } from '../skeleton-data';
-import { Skeleton2DImply } from './skeleton2d-imply';
 import { Skeleton2DImplyWasm } from './skeleton2d-imply-wasm';
 import { Skeleton2DImplyNative } from './skeleton2d-imply-native';
 import { Skeleton2DMesh } from './skeleton2d-native';
@@ -84,7 +83,7 @@ export class SpineSkeletonAnimation extends Component {
 
     private _parts: Skeleton2DPartialRenderer[] = [];
 
-    private _imply: Skeleton2DImply = null!;
+    private _imply: Skeleton2DImplyWasm | Skeleton2DImplyNative = null!;
     private _meshArray: Skeleton2DMesh[] = [];
     declare private _slotTable: Map<number, string | null>;
     private _slotList: string[] = [];

@@ -25,7 +25,6 @@ import { errorID } from '../../core/platform/debug';
 import { SkeletonData } from '../skeleton-data';
 
 import { Enum } from '../../core/value-types/enum';
-import { Skeleton2DImply } from './skeleton2d-imply';
 import { Skeleton2DImplyWasm } from './skeleton2d-imply-wasm';
 import { Skeleton2DImplyNative } from './skeleton2d-imply-native';
 import { Skeleton2DMesh, NativeSpineSkeletonUI } from './skeleton2d-native';
@@ -113,17 +112,6 @@ export class SpineSkeletonUI extends Component {
 
     constructor () {
         super();
-        setEnumAttr(this, 'defaultSkinIndex', Enum({}));
-        setEnumAttr(this, 'animationIndex', Enum({}));
-        if (JSB) {
-            this._imply = new Skeleton2DImplyNative();
-            this._nativeObj = new NativeSpineSkeletonUI();
-            this._nativeObj.setSkeletonInstance(this._imply.nativeObject);
-        } else {
-            this._imply = new Skeleton2DImplyWasm();
-        }
-
-        this._skinName = this._defaultSkinName;
     }
 
     @type(SkeletonData)
@@ -133,14 +121,13 @@ export class SpineSkeletonUI extends Component {
     }
     set skeletonData (value: SkeletonData | null) {
         if (this._skeletonData === value) return;
-        if (this._skeletonData !== null) {
-            console.log('need release');
-        }
         this._skeletonData = value;
         if (this._skeletonData) {
             if (this._skeletonData.textures.length > 0) {
                 this._texture = this._skeletonData.textures[0];
             }
+        } else {
+            this._texture = null;
         }
         this._updateSkinEnum();
         this._updateAnimEnum();
@@ -343,6 +330,18 @@ export class SpineSkeletonUI extends Component {
     }
 
     public __preload () {
+        setEnumAttr(this, 'defaultSkinIndex', Enum({}));
+        setEnumAttr(this, 'animationIndex', Enum({}));
+        if (JSB) {
+            this._imply = new Skeleton2DImplyNative();
+            this._nativeObj = new NativeSpineSkeletonUI();
+            this._nativeObj.setSkeletonInstance(this._imply.nativeObject);
+        } else {
+            this._imply = new Skeleton2DImplyWasm();
+        }
+
+        this._skinName = this._defaultSkinName;
+
         if (EDITOR) {
             this._updateSkinEnum();
             this._updateAnimEnum();
@@ -371,9 +370,10 @@ export class SpineSkeletonUI extends Component {
     }
 
     public onDestroy () {
-        // console.log('Skeleton2DRenderer onDestroy');
-        // if (!this._wasmObj) return;
-        // console.log('onDestroy');
+        if (this._imply) {
+            this._imply.onDestroy();
+            this._imply = null!;
+        }
     }
 
     protected _updateSkeletonData () {

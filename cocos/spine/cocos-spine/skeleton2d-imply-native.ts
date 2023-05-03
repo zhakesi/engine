@@ -1,10 +1,9 @@
 import { Mat4, Color } from '../../core';
 import { SkeletonData } from '../skeleton-data';
-import { Skeleton2DImply } from './skeleton2d-imply';
 import { NativeSkeleton2D, Skeleton2DMesh } from './skeleton2d-native';
 import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-effect-wasm';
 
-export class Skeleton2DImplyNative implements Skeleton2DImply {
+export class Skeleton2DImplyNative {
     protected declare _nativeObj: NativeSkeleton2D;
     protected _nativeMeshArray: Skeleton2DMesh[] = [];
 
@@ -86,5 +85,8 @@ export class Skeleton2DImplyNative implements Skeleton2DImply {
     }
 
     public setPremultipliedAlpha (premultipliedAlpha: boolean) {
+    }
+
+    public onDestroy () {
     }
 }
