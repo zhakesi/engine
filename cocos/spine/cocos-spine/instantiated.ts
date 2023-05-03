@@ -39,6 +39,10 @@ function _reportError () {
     console.error('invalid operation');
 }
 
+function _assert_fail () {
+    console.error('_assert_fail');
+}
+
 function _emscripten_memcpy_big (dest, src, num) {
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
     HEAPU8.copyWithin(dest, src, src + num);
@@ -96,7 +100,7 @@ function _jsReadFile (start: number, length: number): number {
 }
 
 const asmLibraryArg = {
-    __assert_fail: _reportError,
+    __assert_fail: _assert_fail,
     consoleInfo: _consoleInfo,
     abortOnCannotGrowMemory: _abortOnCannotGrowMemory,
     __cxa_allocate_exception: _cxa_allocate_exception,

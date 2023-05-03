@@ -11,6 +11,7 @@ extern "C" {
 #endif
 
 EMSCRIPTEN_KEEPALIVE bool spineWasmInstanceInit() {
+    getStoreMemory();
     spine::SpineExtension* tension = new WasmSpineExtension();
     WasmSpineExtension::RTTI_INIT();
     spine::SpineExtension::setInstance(tension);
@@ -22,6 +23,7 @@ EMSCRIPTEN_KEEPALIVE bool spineWasmInstanceDestroy() {
     auto* extension = spine::SpineExtension::getInstance();
     delete extension;
     LogUtil::ReleaseBuffer();
+    freeStoreMemory();
     return true;
 }
 
@@ -35,14 +37,16 @@ EMSCRIPTEN_KEEPALIVE uint32_t createSkeletonObject() {
     return obj->ObjectID();
 }
 
-EMSCRIPTEN_KEEPALIVE uint32_t setSkeletonData(uint32_t objID, bool isJosn, uint32_t start, uint32_t length) {
+EMSCRIPTEN_KEEPALIVE void setSkeletonData(uint32_t objID, uint32_t datPtr) {
     auto handle = getSkeletonHandle(objID);
-    return handle->initWithSkeletonData(isJosn, start, length);
+    handle->setSkeletonData(datPtr);
 }
 
-EMSCRIPTEN_KEEPALIVE float setAnimation(uint32_t objID, uint32_t start, uint32_t length, uint32_t trackIndex, bool loop) {
+EMSCRIPTEN_KEEPALIVE float setAnimation(uint32_t objID, uint32_t length, uint32_t trackIndex, bool loop) {
     auto handle = getSkeletonHandle(objID);
-    return handle->setAnimation(trackIndex, start, length, loop);
+    char* data = (char*)getStoreMemory();
+    std::string animation(data, length);
+    return handle->setAnimation(trackIndex, animation, loop);
 }
 
 EMSCRIPTEN_KEEPALIVE bool clearTrack(uint32_t objID, uint32_t trackIndex) {
@@ -69,9 +73,11 @@ EMSCRIPTEN_KEEPALIVE bool setTimeScale(uint32_t objID, float timeScale) {
     return true;
 }
 
-EMSCRIPTEN_KEEPALIVE uint32_t setSkin(uint32_t objID, uint32_t start, uint32_t length) {
+EMSCRIPTEN_KEEPALIVE uint32_t setSkin(uint32_t objID, uint32_t length) {
+    char* data = (char*)getStoreMemory();
+    std::string skin(data, length);
     auto handle = getSkeletonHandle(objID);
-    handle->setSkin(start, length);
+    handle->setSkin(skin);
     return true;
 }
 
@@ -169,6 +175,26 @@ EMSCRIPTEN_KEEPALIVE void destroyInstance(uint32_t objID) {
         removeSkeletonHandle(objID);
         delete handle;
     }
+}
+
+EMSCRIPTEN_KEEPALIVE uint32_t initSkeletonData(uint32_t length, bool isJosn) {
+    char* data = (char*)getStoreMemory();
+    std::string name(data, length);
+    uint32_t datPtr = createSkeletonData(name, isJosn);
+    return datPtr;
+}
+
+EMSCRIPTEN_KEEPALIVE uint32_t retainSkeletonDataByUUID(uint32_t length) {
+    char* data = (char*)getStoreMemory();
+    std::string uuid(data, length);
+    uint32_t datPtr = retainSkeletonData(uuid);
+    return datPtr;
+}
+
+EMSCRIPTEN_KEEPALIVE void recordSkeletonDataUUID(uint32_t length, uint32_t datPtr) {
+    char* data = (char*)getStoreMemory();
+    std::string uuid(data, length);
+    recordSkeletonData(uuid, datPtr);
 }
 
 EMSCRIPTEN_KEEPALIVE uint8_t* queryMemory(uint32_t size) {

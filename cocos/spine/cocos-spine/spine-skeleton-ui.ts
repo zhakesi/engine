@@ -112,6 +112,17 @@ export class SpineSkeletonUI extends Component {
 
     constructor () {
         super();
+        setEnumAttr(this, 'defaultSkinIndex', Enum({}));
+        setEnumAttr(this, 'animationIndex', Enum({}));
+        if (JSB) {
+            this._imply = new Skeleton2DImplyNative();
+            this._nativeObj = new NativeSpineSkeletonUI();
+            this._nativeObj.setSkeletonInstance(this._imply.nativeObject);
+        } else {
+            this._imply = new Skeleton2DImplyWasm();
+        }
+
+        this._skinName = this._defaultSkinName;
     }
 
     @type(SkeletonData)
@@ -330,18 +341,6 @@ export class SpineSkeletonUI extends Component {
     }
 
     public __preload () {
-        setEnumAttr(this, 'defaultSkinIndex', Enum({}));
-        setEnumAttr(this, 'animationIndex', Enum({}));
-        if (JSB) {
-            this._imply = new Skeleton2DImplyNative();
-            this._nativeObj = new NativeSpineSkeletonUI();
-            this._nativeObj.setSkeletonInstance(this._imply.nativeObject);
-        } else {
-            this._imply = new Skeleton2DImplyWasm();
-        }
-
-        this._skinName = this._defaultSkinName;
-
         if (EDITOR) {
             this._updateSkinEnum();
             this._updateAnimEnum();
@@ -379,7 +378,7 @@ export class SpineSkeletonUI extends Component {
     protected _updateSkeletonData () {
         this._updateUITransform();
         if (this._skeletonData === null || this._imply === null) return;
-        this._imply.initSkeletonData(this._skeletonData);
+        this._imply.setSkeletonData(this._skeletonData);
         this.setSkin(this._defaultSkinName);
         this.setAnimation(0, this._defaultAnimationName);
         this._slotTable = this._imply.getSlotsTable();

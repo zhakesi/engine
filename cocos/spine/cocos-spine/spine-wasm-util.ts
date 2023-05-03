@@ -3,13 +3,13 @@ export interface SpineWasmInterface {
     spineWasmInstanceDestroy(): number;
     queryStoreMemory(): number;
     createSkeletonObject (): number;
-    setSkeletonData(objID: number, isJosn: boolean, start: number, length: number): number;
+    setSkeletonData(objID: number, datPtr: number);
     setAnimation(objID: number, start: number, length: number, trackIndex: number, loop: boolean): number;
     clearTrack(objID: number, trackIndex: number): boolean;
     clearTracks(objID: number): boolean;
     setToSetupPose(objID: number): boolean;
     setTimeScale(objID: number, timeScale: number): number;
-    setSkin(objID: number, start: number, length: number): number;
+    setSkin(objID: number, length: number): number;
     updateAnimation(objID: number, dltTime: number): number;
     setMix(objID: number, start: number, fromLength: number, toLength: number, duration: number);
     updateRenderData(objID: number): number;
@@ -23,6 +23,10 @@ export interface SpineWasmInterface {
     setPremultipliedAlpha(objID: number, premultipliedAlpha: boolean);
     setColor(objID: number, r: number, g: number, b: number, a: number);
     destroyInstance(objID: number);
+
+    retainSkeletonDataByUUID(length: number): number;
+    initSkeletonData(length: number, isJosn: boolean): number;
+    recordSkeletonDataUUID(length: number, datPtr: number);
 
     createJitterVertexEffect(x: number, y: number): number;
     updateJitterParameters(handle: number, x: number, y: number);

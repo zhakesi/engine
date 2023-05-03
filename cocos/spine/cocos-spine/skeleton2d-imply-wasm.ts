@@ -18,42 +18,54 @@ export class Skeleton2DImplyWasm {
         this._wasmHEAPU8 = new Uint8Array(this._wasmInstance.memory.buffer);
         this._objID = this._wasmInstance.createSkeletonObject();
     }
-    public initSkeletonData (data: SkeletonData): boolean {
+
+    public setSkeletonData (data: SkeletonData) {
+        const uuid = data.uuid;
+        const encoder = new TextEncoder();
+        const encodedUUID = encoder.encode(uuid);
+        const length = encodedUUID.length;
+        const local = this._wasmInstance.queryStoreMemory();
+        const array = this._wasmHEAPU8.subarray(local, local + length);
+        array.set(encodedUUID);
+        let datPtr = this._wasmInstance.retainSkeletonDataByUUID(length);
+        if (datPtr === 0) {
+            datPtr = this.initSkeletonData(data);
+            // if (datPtr !== 0) {
+            //     const array = this._wasmHEAPU8.subarray(local, local + length);
+            //     array.set(encodedUUID);
+            //     this._wasmInstance.recordSkeletonDataUUID(length, datPtr);
+            // }
+        }
+        this._wasmInstance.setSkeletonData(this._objID, datPtr);
+    }
+
+    private initSkeletonData (data: SkeletonData): number {
+        const name = data.name;
+        let isJosn = false;
+        const fileInst = FileResourceInstance();
         if (data.skeletonJson) {
-            const name = data.name;
+            isJosn = true;
             const altasName = `${name}.atlas`;
             const jsonName = `${name}.json`;
-            const fileInst = FileResourceInstance();
             fileInst.addTextRes(altasName, data.atlasText);
             fileInst.addTextRes(jsonName, data.skeletonJsonStr);
-            const encoder = new TextEncoder();
-            const encoded = encoder.encode(name);
-            const length = encoded.length;
-
-            const local = this._wasmInstance.queryMemory(length);
-            const array = this._wasmHEAPU8.subarray(local, local + length);
-            array.set(encoded);
-
-            this._wasmInstance.setSkeletonData(this._objID, true, local, length);
         } else {
-            const name = data.name;
             const altasName = `${name}.atlas`;
             const binName = `${name}.bin`;
-            const fileInst = FileResourceInstance();
             fileInst.addTextRes(altasName, data.atlasText);
             fileInst.addRawRes(binName, new Uint8Array(data._nativeAsset));
-            const encoder = new TextEncoder();
-            const encoded = encoder.encode(name);
-            const length = encoded.length;
-
-            const local = this._wasmInstance.queryMemory(length);
-            const array = this._wasmHEAPU8.subarray(local, local + length);
-            array.set(encoded);
-
-            this._wasmInstance.setSkeletonData(this._objID, false, local, length);
         }
+        const encoder = new TextEncoder();
+        const encodedName = encoder.encode(name);
+        const length = encodedName.length;
 
-        return true;
+        const local = this._wasmInstance.queryStoreMemory();
+        const array = this._wasmHEAPU8.subarray(local, local + length);
+        array.set(encodedName);
+
+        const datPtr = this._wasmInstance.initSkeletonData(local, length, isJosn);
+
+        return datPtr;
     }
 
     public updateRenderData (): Skeleton2DMesh {
@@ -93,10 +105,10 @@ export class Skeleton2DImplyWasm {
         const encoded = encoder.encode(name);
         const length = encoded.length;
 
-        const local = this._wasmInstance.queryMemory(length);
+        const local = this._wasmInstance.queryStoreMemory();
         const array = this._wasmHEAPU8.subarray(local, local + length);
         array.set(encoded);
-        this._wasmInstance.setSkin(this._objID, local, length);
+        this._wasmInstance.setSkin(this._objID, length);
         return true;
     }
 
@@ -105,7 +117,7 @@ export class Skeleton2DImplyWasm {
         const encoded = encoder.encode(name);
         const length = encoded.length;
 
-        const local = this._wasmInstance.queryMemory(length);
+        const local = this._wasmInstance.queryStoreMemory();
         const array = this._wasmHEAPU8.subarray(local, local + length);
         array.set(encoded);
         const duration = this._wasmInstance.setAnimation(this._objID, local, length, trackIndex, loop);
@@ -138,7 +150,7 @@ export class Skeleton2DImplyWasm {
         const fromAnimationEncode = encoder.encode(fromAnimation);
         const toAnimationEncode = encoder.encode(toAnimation);
         const length = fromAnimationEncode.length + toAnimationEncode.length;
-        const local = this._wasmInstance.queryMemory(length);
+        const local = this._wasmInstance.queryStoreMemory();
         const array = this._wasmHEAPU8.subarray(local, local + length);
         array.set(fromAnimationEncode, 0);
         array.set(toAnimationEncode, fromAnimationEncode.length);

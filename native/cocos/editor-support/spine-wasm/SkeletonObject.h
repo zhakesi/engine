@@ -27,10 +27,10 @@ public:
     SkeletonObject();
     ~SkeletonObject();
     uint32_t ObjectID();
-    uint32_t initWithSkeletonData(bool isJson, uint32_t start, uint32_t length);
+    void     setSkeletonData(uint32_t datPtr);
     uint32_t updateRenderData();
-    uint32_t setSkin(uint32_t start, uint32_t length);
-    float    setAnimation(uint32_t trackIndex,uint32_t start, uint32_t length, bool loop);
+    uint32_t setSkin(std::string& skinName);
+    float    setAnimation(uint32_t trackIndex, std::string &animationName, bool loop);
     void     clearTrack(uint32_t trackIndex);
     void     clearTracks();
     void     setToSetupPose();
@@ -69,4 +69,7 @@ typedef SkeletonObject* SkeletonHandle;
 SkeletonHandle getSkeletonHandle(uint32_t objID);
 void           removeSkeletonHandle(uint32_t objID);
 
+uint32_t       createSkeletonData(std::string& name, bool isJson);
+uint32_t       retainSkeletonData(std::string& uuid);
+void           recordSkeletonData(std::string& uuid, uint32_t datPtr);
 #endif
