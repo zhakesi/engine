@@ -30,11 +30,11 @@ export class Skeleton2DImplyWasm {
         let datPtr = this._wasmInstance.retainSkeletonDataByUUID(length);
         if (datPtr === 0) {
             datPtr = this.initSkeletonData(data);
-            // if (datPtr !== 0) {
-            //     const array = this._wasmHEAPU8.subarray(local, local + length);
-            //     array.set(encodedUUID);
-            //     this._wasmInstance.recordSkeletonDataUUID(length, datPtr);
-            // }
+            if (datPtr !== 0) {
+                const array = this._wasmHEAPU8.subarray(local, local + length);
+                array.set(encodedUUID);
+                this._wasmInstance.recordSkeletonDataUUID(length, datPtr);
+            }
         }
         this._wasmInstance.setSkeletonData(this._objID, datPtr);
     }
@@ -63,7 +63,7 @@ export class Skeleton2DImplyWasm {
         const array = this._wasmHEAPU8.subarray(local, local + length);
         array.set(encodedName);
 
-        const datPtr = this._wasmInstance.initSkeletonData(local, length, isJosn);
+        const datPtr = this._wasmInstance.initSkeletonData(length, isJosn);
 
         return datPtr;
     }
@@ -120,7 +120,7 @@ export class Skeleton2DImplyWasm {
         const local = this._wasmInstance.queryStoreMemory();
         const array = this._wasmHEAPU8.subarray(local, local + length);
         array.set(encoded);
-        const duration = this._wasmInstance.setAnimation(this._objID, local, length, trackIndex, loop);
+        const duration = this._wasmInstance.setAnimation(this._objID, length, trackIndex, loop);
         return duration;
     }
 

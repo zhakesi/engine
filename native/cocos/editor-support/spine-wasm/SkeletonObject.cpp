@@ -314,7 +314,7 @@ uint32_t SkeletonObject::queryRenderDataInfo(std::vector<SpineMeshBlendInfo> &bl
 uint32_t SkeletonObject::setSkin(std::string& skinName)
 {
     if (!_skeleton) return false;
-    _skeleton->setSkin(skinName.empty() ? "default" : skinName.c_str());
+    _skeleton->setSkin(skinName.empty() ? nullptr : skinName.c_str());
     _skeleton->setSlotsToSetupPose();
     return true;
 }
