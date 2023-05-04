@@ -3,7 +3,7 @@ import { SkeletonData } from '../skeleton-data';
 import { NativeSkeleton2D, Skeleton2DMesh } from './skeleton2d-native';
 import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-effect-wasm';
 
-export class Skeleton2DImplyNative {
+export class SpineSkeletonImplyNative {
     protected declare _nativeObj: NativeSkeleton2D;
     protected _nativeMeshArray: Skeleton2DMesh[] = [];
 

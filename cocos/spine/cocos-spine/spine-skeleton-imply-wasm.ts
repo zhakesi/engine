@@ -12,7 +12,7 @@ function alignedBytes (address: number, bytes: number) {
     return Math.floor(address / bytes);
 }
 const floatStride = 6;
-export class Skeleton2DImplyWasm {
+export class SpineSkeletonImplyWasm {
     constructor () {
         this._wasmInstance = getSpineSpineWasmInstance();
         this._wasmHEAPU8 = new Uint8Array(this._wasmInstance.memory.buffer);

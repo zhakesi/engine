@@ -140,7 +140,7 @@ let promiseLoadSpineWasm;
 
 if (EDITOR) {
     promiseLoadSpineWasm = async function promiseLoadSpineWasmEditor () {
-        const spineWasmUrl = 'E:/Cocos/cocos-editor/resources/3d/engine/cocos/spine/cocos-spine/spine2d.wasm';
+        const spineWasmUrl = 'D:/Cocos/cocos-editor/resources/3d/engine/cocos/spine/cocos-spine/spine2d.wasm';
         const importObject = {
             env: asmLibraryArg,
             wasi_snapshot_preview1: asmLibraryArg,

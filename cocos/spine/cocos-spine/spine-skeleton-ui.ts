@@ -25,8 +25,8 @@ import { errorID } from '../../core/platform/debug';
 import { SkeletonData } from '../skeleton-data';
 
 import { Enum } from '../../core/value-types/enum';
-import { Skeleton2DImplyWasm } from './skeleton2d-imply-wasm';
-import { Skeleton2DImplyNative } from './skeleton2d-imply-native';
+import { SpineSkeletonImplyWasm } from './spine-skeleton-imply-wasm';
+import { SpineSkeletonImplyNative } from './spine-skeleton-imply-native';
 import { Skeleton2DMesh, NativeSpineSkeletonUI } from './skeleton2d-native';
 import { PartialRendererUI } from './partial-renderer-ui';
 import { Component, Node } from '../../scene-graph';
@@ -34,6 +34,7 @@ import { SpineSkinEnum, SpineAnimationEnum, setEnumAttr } from './spine-define';
 import { CCBoolean, CCFloat, Mat4 } from '../../core';
 import { SpineSocket } from '../skeleton';
 import { SpineJitterVertexEffect, SpineSwirlVertexEffect, SpineVertexEffectDelegate } from './spine-vertex-effect-wasm';
+import { SpineSkeletonCache, SpineAnimationCache } from './spine-skeleton-cache';
 
 const attachMat4 = new Mat4();
 
@@ -57,19 +58,13 @@ SkeletonData.prototype['init'] = function () {
     }
 };
 
-class SpineAnimationCacheFrameData {
-    public frames: Skeleton2DMesh[] = [];
+class SpineAnimationCacheInfo {
     public playTime = -1.0 / 60.0;
-    public totalTime = 1.0 / 60.0;
     public currFrameIdx = -1;
-    public isCompleted = false;
 
-    public clearCache () {
-        this.frames.length = 0;
+    public clear () {
         this.playTime = -1.0 / 60.0;
-        this.totalTime = 1.0 / 60.0;
         this.currFrameIdx = -1;
-        this.isCompleted = false;
     }
 }
 
@@ -100,29 +95,29 @@ export class SpineSkeletonUI extends Component {
     @serializable
     protected _loop = true;
 
-    private _skinName = 'default';
+    private _skinName = '';
+    private _animationName = '';
     private _renderer: PartialRendererUI | null = null;
-    declare private _imply: Skeleton2DImplyNative | Skeleton2DImplyWasm;
+    declare private _imply: SpineSkeletonImplyNative | SpineSkeletonImplyWasm;
     declare private _slotTable: Map<number, string | null>;
     protected _cachedSockets: Map<string, number> = new Map<string, number>();
     protected _socketNodes: Map<number, Node> = new Map();
     protected _effect: SpineJitterVertexEffect | SpineSwirlVertexEffect | null = null;
     private _nativeObj: NativeSpineSkeletonUI = null!;
-    private _cache = new SpineAnimationCacheFrameData();
+    private _cacheInfo: SpineAnimationCacheInfo = null!;
+    private _animationCache: SpineAnimationCache = null!;
 
     constructor () {
         super();
         setEnumAttr(this, 'defaultSkinIndex', Enum({}));
         setEnumAttr(this, 'animationIndex', Enum({}));
         if (JSB) {
-            this._imply = new Skeleton2DImplyNative();
+            this._imply = new SpineSkeletonImplyNative();
             this._nativeObj = new NativeSpineSkeletonUI();
             this._nativeObj.setSkeletonInstance(this._imply.nativeObject);
         } else {
-            this._imply = new Skeleton2DImplyWasm();
+            this._imply = new SpineSkeletonImplyWasm();
         }
-
-        this._skinName = this._defaultSkinName;
     }
 
     @type(SkeletonData)
@@ -302,7 +297,7 @@ export class SpineSkeletonUI extends Component {
         return this._skinName;
     }
     public setSkin (skinName: string) {
-        if (!this._imply) return;
+        if (this._skinName === skinName) return;
 
         this._skinName = skinName;
         this._imply.setSkin(skinName);
@@ -345,6 +340,8 @@ export class SpineSkeletonUI extends Component {
             this._updateSkinEnum();
             this._updateAnimEnum();
         }
+        this._skinName = this._defaultSkinName;
+        this._animationName = this._defaultAnimationName;
         this._updateSkeletonData();
         this._initRenderer();
     }
@@ -379,8 +376,8 @@ export class SpineSkeletonUI extends Component {
         this._updateUITransform();
         if (this._skeletonData === null || this._imply === null) return;
         this._imply.setSkeletonData(this._skeletonData);
-        this.setSkin(this._defaultSkinName);
-        this.setAnimation(0, this._defaultAnimationName);
+        this.setSkin(this._skinName);
+        this.setAnimation(0, this._animationName);
         this._slotTable = this._imply.getSlotsTable();
         this._indexBoneSockets();
         this._updateSocketBindings();
@@ -389,18 +386,30 @@ export class SpineSkeletonUI extends Component {
             this._renderer.setTexture(this._texture);
         }
 
+        if (this._cacheMode) {
+            const skeletonCache = SpineSkeletonCache.sharedCache;
+            const data = this._skeletonData;
+            const skinName = this._skinName;
+            const animationName = this._animationName;
+            this._animationCache = skeletonCache.queryAnimationCache(data, skinName, animationName);
+            this._cacheInfo = new SpineAnimationCacheInfo();
+        } else {
+            this._animationCache = null!;
+            this._cacheInfo = null!;
+        }
+
         this._updateRenderData();
     }
 
     public setAnimation (trackIndex: number, name: string, loop?: boolean) {
         if (loop !== undefined) this._loop = loop;
-        const duration = this._imply.setAnimation(trackIndex, name, this._loop);
+        if (trackIndex === 0) this._animationName = name;
+        this._imply.setAnimation(trackIndex, name, this._loop);
         this._imply.setTimeScale(this._timeScale);
         this._updateRenderData();
 
-        if (this._cacheMode) {
-            this._cache.clearCache();
-            this._cache.totalTime = duration;
+        if (this._cacheMode && this._cacheInfo) {
+            this._cacheInfo.clear();
         }
     }
 
@@ -410,8 +419,9 @@ export class SpineSkeletonUI extends Component {
     }
 
     public clearTracks () {
+        this._animationName = '<None>';
         if (this._cacheMode) {
-            this._cache.clearCache();
+            this._cacheInfo.clear();
             return;
         }
         this._imply.clearTracks();
@@ -433,17 +443,21 @@ export class SpineSkeletonUI extends Component {
 
     private _updateRenderData () {
         if (!this._renderer) return;
-        this.updateColor();
-        let mesh: Skeleton2DMesh | null = null;
         if (JSB) {
             this._nativeObj.updateRenderData();
-        } else if (this._cacheMode) {
-            const frameIdx = this._cache.currFrameIdx;
-            if (this._cache.isCompleted && this._cache.frames[frameIdx]) {
-                mesh = this._cache.frames[frameIdx];
+            return;
+        }
+        this.updateColor();
+        let mesh: Skeleton2DMesh = null!;
+        if (this._cacheMode && this._animationCache) {
+            const frameIdx = this._cacheInfo.currFrameIdx;
+            const animationCache = this._animationCache;
+            if (animationCache.frames[frameIdx]) {
+                mesh = animationCache.frames[frameIdx];
             } else {
                 mesh = this._imply.updateRenderData();
-                this._cache.frames[frameIdx] = mesh.clone();
+                animationCache.frames[frameIdx] = mesh.clone();
+                animationCache.checkCompleted();
             }
         } else {
             mesh = this._imply.updateRenderData();
@@ -547,15 +561,16 @@ export class SpineSkeletonUI extends Component {
             this._imply.updateAnimation(dt);
             return;
         }
+        if (!this._animationCache) return;
         const frameTime = 1.0 / 60.0;
-        this._cache.playTime += frameTime;
-        if (this._cache.playTime > this._cache.totalTime) {
-            this._cache.isCompleted = true;
-            this._cache.playTime = 0;
+        this._cacheInfo.playTime += frameTime;
+        if (this._cacheInfo.playTime > this._animationCache.totalTime) {
+            this._cacheInfo.playTime = 0;
         }
-        const frameIdx = Math.floor(this._cache.playTime / frameTime);
-        this._cache.currFrameIdx = frameIdx;
-        if (!this._cache.isCompleted) {
+        const frameIdx = Math.floor(this._cacheInfo.playTime / frameTime);
+        this._cacheInfo.currFrameIdx = frameIdx;
+        const frames = this._animationCache.frames;
+        if (!frames[frameIdx]) {
             this._imply.updateAnimation(frameTime);
         }
     }
