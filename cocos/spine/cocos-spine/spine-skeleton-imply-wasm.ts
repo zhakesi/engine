@@ -2,21 +2,171 @@ import { SkeletonData } from '../skeleton-data';
 import { getSpineSpineWasmInstance } from './instantiated';
 import { SpineWasmInterface } from './spine-wasm-util';
 import { FileResourceInstance } from './file-resource';
-import { Skeleton2DMesh } from './skeleton2d-native';
 import { Mat4, Color } from '../../core';
-import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-effect-wasm';
+import { ccclass } from '../../core/data/decorators';
 
-const tempBoneMat = new Mat4();
+const floatStride = 6;
+
+let _wasmInstance: SpineWasmInterface = null!;
+let _wasmHEAPU8: Uint8Array = null!;
 
 function alignedBytes (address: number, bytes: number) {
     return Math.floor(address / bytes);
 }
-const floatStride = 6;
-export class SpineSkeletonImplyWasm {
+
+/**
+ * @engineInternal
+ */
+export interface SpineMeshBlendInfo {
+    blendMode: number;
+    indexOffset: number;
+    indexCount: number;
+}
+
+/**
+ * @engineInternal
+ */
+export class SpineSkeletonMesh {
     constructor () {
-        this._wasmInstance = getSpineSpineWasmInstance();
-        this._wasmHEAPU8 = new Uint8Array(this._wasmInstance.memory.buffer);
-        this._objID = this._wasmInstance.createSkeletonObject();
+
+    }
+    public initialize (slot: number, vc: number, ic: number, stride: number) {
+        this.slotIndex = slot;
+        this.vCount = vc;
+        this.iCount = ic;
+        this.byteStride = stride;
+        const floatNum = vc * this.byteStride / 4;
+        this.vertices = new Float32Array(floatNum);
+        this.indices = new Uint16Array(ic);
+    }
+
+    public clone (): SpineSkeletonMesh {
+        const newOne = new SpineSkeletonMesh();
+        newOne.slotIndex = this.slotIndex;
+        newOne.vCount = this.vCount;
+        newOne.iCount = this.iCount;
+        newOne.byteStride = this.byteStride;
+        newOne.vertices = new Float32Array(this.vertices.length);
+        newOne.indices = new Uint16Array(this.indices.length);
+        newOne.vertices.set(this.vertices);
+        newOne.indices.set(this.indices);
+
+        this.blendInfos.forEach((item) => {
+            newOne.blendInfos.push({
+                blendMode: item.blendMode,
+                indexOffset: item.indexOffset,
+                indexCount: item.indexCount });
+        });
+
+        return newOne;
+    }
+
+    public declare slotIndex: number;
+    public declare vCount: number;
+    public declare iCount: number;
+    public declare byteStride: number;
+    public declare vertices: Float32Array;
+    public declare indices: Uint16Array;
+    public blendInfos: SpineMeshBlendInfo[] = [];
+}
+
+class SpineVertexEffectDelegate {
+    constructor () {
+        this.handle = -1;
+        if (!_wasmInstance) {
+            _wasmInstance = getSpineSpineWasmInstance();
+        }
+    }
+    public getHandle () {
+        return this.handle;
+    }
+    protected handle: number;
+}
+
+@ccclass('sp.SpineJitterVertexEffect')
+export class SpineJitterVertexEffect extends SpineVertexEffectDelegate {
+    constructor (x: number, y: number) {
+        super();
+        this._jitterX = x;
+        this._jitterY = y;
+        this.handle = _wasmInstance.createJitterVertexEffect(x, y);
+    }
+    private _jitterX = 0;
+    private _jitterY = 0;
+
+    get jitterX () {
+        return this._jitterX;
+    }
+    set jitterX (val: number) {
+        this._jitterX = val;
+        this._updateParameters();
+    }
+    get jitterY () {
+        return this._jitterY;
+    }
+    set jitterY (val: number) {
+        this._jitterY = val;
+        this._updateParameters();
+    }
+    private _updateParameters () {
+        _wasmInstance.updateJitterParameters(this.handle, this._jitterX, this._jitterY);
+    }
+}
+
+@ccclass('sp.SpineSwirlVertexEffect')
+export class SpineSwirlVertexEffect extends SpineVertexEffectDelegate {
+    constructor (radius: number, power: number, usePowerOut: boolean) {
+        super();
+        this.handle = _wasmInstance.createSwirlVertexEffect(radius, power, usePowerOut);
+        this._radius = radius;
+    }
+    private _centerX = 0;
+    private _centerY = 0;
+    private _radius = 0;
+    private _angle = 0;
+
+    get centerX () {
+        return this._centerX;
+    }
+    set centerX (val: number) {
+        this._centerX = val;
+        this._updateParameters();
+    }
+
+    get centerY () {
+        return this._centerY;
+    }
+    set centerY (val: number) {
+        this._centerY = val;
+        this._updateParameters();
+    }
+
+    get radius () {
+        return this._radius;
+    }
+    set radius (val: number) {
+        this._radius = val;
+        this._updateParameters();
+    }
+
+    get angle () {
+        return this._angle;
+    }
+    set angle (val: number) {
+        this._angle = val;
+        this._updateParameters();
+    }
+
+    private _updateParameters () {
+        _wasmInstance.updateSwirlParameters(this.handle, this._centerX, this._centerY, this._radius, this._angle);
+    }
+}
+
+export class SpineSkeletonInstance {
+    constructor () {
+        if (!_wasmInstance) _wasmInstance = getSpineSpineWasmInstance();
+        if (!_wasmHEAPU8) _wasmHEAPU8 = new Uint8Array(_wasmInstance.memory.buffer);
+        this._objID = _wasmInstance.createSkeletonObject();
     }
 
     public setSkeletonData (data: SkeletonData) {
@@ -24,19 +174,19 @@ export class SpineSkeletonImplyWasm {
         const encoder = new TextEncoder();
         const encodedUUID = encoder.encode(uuid);
         const length = encodedUUID.length;
-        const local = this._wasmInstance.queryStoreMemory();
-        const array = this._wasmHEAPU8.subarray(local, local + length);
+        const local = _wasmInstance.queryStoreMemory();
+        const array = _wasmHEAPU8.subarray(local, local + length);
         array.set(encodedUUID);
-        let datPtr = this._wasmInstance.retainSkeletonDataByUUID(length);
+        let datPtr = _wasmInstance.retainSkeletonDataByUUID(length);
         if (datPtr === 0) {
             datPtr = this.initSkeletonData(data);
             if (datPtr !== 0) {
-                const array = this._wasmHEAPU8.subarray(local, local + length);
+                const array = _wasmHEAPU8.subarray(local, local + length);
                 array.set(encodedUUID);
-                this._wasmInstance.recordSkeletonDataUUID(length, datPtr);
+                _wasmInstance.recordSkeletonDataUUID(length, datPtr);
             }
         }
-        this._wasmInstance.setSkeletonData(this._objID, datPtr);
+        _wasmInstance.setSkeletonData(this._objID, datPtr);
     }
 
     private initSkeletonData (data: SkeletonData): number {
@@ -59,19 +209,19 @@ export class SpineSkeletonImplyWasm {
         const encodedName = encoder.encode(name);
         const length = encodedName.length;
 
-        const local = this._wasmInstance.queryStoreMemory();
-        const array = this._wasmHEAPU8.subarray(local, local + length);
+        const local = _wasmInstance.queryStoreMemory();
+        const array = _wasmHEAPU8.subarray(local, local + length);
         array.set(encodedName);
 
-        const datPtr = this._wasmInstance.initSkeletonData(length, isJosn);
+        const datPtr = _wasmInstance.initSkeletonData(length, isJosn);
 
         return datPtr;
     }
 
-    public updateRenderData (): Skeleton2DMesh {
-        const address = this._wasmInstance.updateRenderData(this._objID);
+    public updateRenderData (): SpineSkeletonMesh {
+        const address = _wasmInstance.updateRenderData(this._objID);
         let uint32Ptr = alignedBytes(address, 4);
-        const heap32 = new Uint32Array(this._wasmHEAPU8.buffer);
+        const heap32 = new Uint32Array(_wasmHEAPU8.buffer);
         const vc = heap32[uint32Ptr++];
         const ic = heap32[uint32Ptr++];
         const startV = heap32[uint32Ptr++];
@@ -80,7 +230,7 @@ export class SpineSkeletonImplyWasm {
         const vertices = new Float32Array(heap32.buffer, startV, floatStride * vc);
         const indices = new Uint16Array(heap32.buffer, startI, ic);
 
-        const mesh = new Skeleton2DMesh();
+        const mesh = new SpineSkeletonMesh();
         mesh.slotIndex = 0;
         mesh.byteStride = 4 * floatStride;
         mesh.vCount = vc;
@@ -105,44 +255,44 @@ export class SpineSkeletonImplyWasm {
         const encoded = encoder.encode(name);
         const length = encoded.length;
 
-        const local = this._wasmInstance.queryStoreMemory();
-        const array = this._wasmHEAPU8.subarray(local, local + length);
+        const local = _wasmInstance.queryStoreMemory();
+        const array = _wasmHEAPU8.subarray(local, local + length);
         array.set(encoded);
-        this._wasmInstance.setSkin(this._objID, length);
+        _wasmInstance.setSkin(this._objID, length);
         return true;
     }
 
-    public setAnimation (trackIndex: number, name: string, loop: boolean): number {
+    public setAnimation (trackIndex: number, name: string, loop: boolean): boolean {
         const encoder = new TextEncoder();
         const encoded = encoder.encode(name);
         const length = encoded.length;
 
-        const local = this._wasmInstance.queryStoreMemory();
-        const array = this._wasmHEAPU8.subarray(local, local + length);
+        const local = _wasmInstance.queryStoreMemory();
+        const array = _wasmHEAPU8.subarray(local, local + length);
         array.set(encoded);
-        const duration = this._wasmInstance.setAnimation(this._objID, length, trackIndex, loop);
-        return duration;
+        const ret = _wasmInstance.setAnimation(this._objID, length, trackIndex, loop);
+        return ret;
     }
 
     public clearTrack (trackIndex: number) {
-        this._wasmInstance.clearTrack(this._objID, trackIndex);
+        _wasmInstance.clearTrack(this._objID, trackIndex);
     }
 
     public clearTracks () {
-        this._wasmInstance.clearTracks(this._objID);
+        _wasmInstance.clearTracks(this._objID);
     }
 
     public setToSetupPose () {
-        this._wasmInstance.setToSetupPose(this._objID);
+        _wasmInstance.setToSetupPose(this._objID);
     }
 
     public setTimeScale (timeScale: number): boolean {
-        this._wasmInstance.setTimeScale(this._objID, timeScale);
+        _wasmInstance.setTimeScale(this._objID, timeScale);
         return true;
     }
 
     public updateAnimation (dltTime: number) {
-        this._wasmInstance.updateAnimation(this._objID, dltTime);
+        _wasmInstance.updateAnimation(this._objID, dltTime);
     }
 
     public setMix (fromAnimation: string, toAnimation: string, duration: number) {
@@ -150,29 +300,29 @@ export class SpineSkeletonImplyWasm {
         const fromAnimationEncode = encoder.encode(fromAnimation);
         const toAnimationEncode = encoder.encode(toAnimation);
         const length = fromAnimationEncode.length + toAnimationEncode.length;
-        const local = this._wasmInstance.queryStoreMemory();
-        const array = this._wasmHEAPU8.subarray(local, local + length);
+        const local = _wasmInstance.queryStoreMemory();
+        const array = _wasmHEAPU8.subarray(local, local + length);
         array.set(fromAnimationEncode, 0);
         array.set(toAnimationEncode, fromAnimationEncode.length);
-        this._wasmInstance.setMix(this._objID, local, fromAnimationEncode.length, toAnimationEncode.length, duration);
+        _wasmInstance.setMix(this._objID, local, fromAnimationEncode.length, toAnimationEncode.length, duration);
     }
 
     getSlotsTable (): Map<number, string | null> {
         const table = new Map<number, string>();
-        const count = this._wasmInstance.getDrawOrderSize(this._objID);
+        const count = _wasmInstance.getDrawOrderSize(this._objID);
 
         let i = 0;
         const decoder = new TextDecoder();
         for (i = 0; i < count; i++) {
-            const address = this._wasmInstance.getSlotNameByOrder(this._objID, i);
+            const address = _wasmInstance.getSlotNameByOrder(this._objID, i);
             const start = alignedBytes(address, 4);
-            const heap32 = new Uint32Array(this._wasmHEAPU8.buffer);
+            const heap32 = new Uint32Array(_wasmHEAPU8.buffer);
             const length = heap32[start];
             let name;
             if (length < 1) {
                 name = null;
             } else {
-                const source = this._wasmHEAPU8.subarray(address + 4, address + 4 + length);
+                const source = _wasmHEAPU8.subarray(address + 4, address + 4 + length);
                 name = decoder.decode(source);
             }
             table.set(i, name);
@@ -181,9 +331,9 @@ export class SpineSkeletonImplyWasm {
     }
 
     public getBoneMatrix (index: number, mat: Mat4) {
-        const address = this._wasmInstance.getBoneMatrix(this._objID, index);
+        const address = _wasmInstance.getBoneMatrix(this._objID, index);
         const start = address / 4;
-        const floatArray = new Float32Array(this._wasmHEAPU8.buffer);
+        const floatArray = new Float32Array(_wasmHEAPU8.buffer);
         mat.m00 = floatArray[start];
         mat.m01 = floatArray[start + 1];
         mat.m04 = floatArray[start + 2];
@@ -193,7 +343,7 @@ export class SpineSkeletonImplyWasm {
     }
 
     public setDefaultScale (scale: number) {
-        this._wasmInstance.setDefaultScale(this._objID, scale);
+        _wasmInstance.setDefaultScale(this._objID, scale);
     }
 
     public setVertexEffect (effect: SpineJitterVertexEffect | SpineSwirlVertexEffect | null) {
@@ -201,11 +351,11 @@ export class SpineSkeletonImplyWasm {
         if (effect) {
             effectHandle = effect.getHandle();
         }
-        this._wasmInstance.setVertexEffect(this._objID, effectHandle, 0);
+        _wasmInstance.setVertexEffect(this._objID, effectHandle, 0);
     }
 
     public setPremultipliedAlpha (premultipliedAlpha: boolean) {
-        this._wasmInstance.setPremultipliedAlpha(this._objID, premultipliedAlpha);
+        _wasmInstance.setPremultipliedAlpha(this._objID, premultipliedAlpha);
     }
 
     public setColor (color: Color) {
@@ -213,14 +363,12 @@ export class SpineSkeletonImplyWasm {
         const g = color.g / 255.0;
         const b = color.b / 255.0;
         const a = color.a / 255.0;
-        this._wasmInstance.setColor(this._objID, r, g, b, a);
+        _wasmInstance.setColor(this._objID, r, g, b, a);
     }
 
     public onDestroy () {
-        this._wasmInstance.destroyInstance(this._objID);
+        _wasmInstance.destroyInstance(this._objID);
     }
 
     private _objID: number;
-    private _wasmInstance: SpineWasmInterface;
-    private _wasmHEAPU8: Uint8Array = new Uint8Array(0);
 }

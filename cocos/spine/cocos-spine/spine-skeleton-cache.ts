@@ -1,9 +1,8 @@
-
-import { Skeleton2DMesh } from './skeleton2d-native';
+import { SpineSkeletonMesh } from './spine-skeleton-imply-wasm';
 import { SkeletonData } from '../skeleton-data';
 
 export class SpineAnimationCache {
-    public frames: Skeleton2DMesh[] = [];
+    public frames: SpineSkeletonMesh[] = [];
     public totalTime = 0;
     public totalFrames = 0;
     public isCompleted = false;

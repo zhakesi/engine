@@ -1,14 +1,10 @@
-import { EDITOR, JSB } from 'internal:constants';
-import { Material, RenderingSubMesh, Texture2D } from '../../asset/assets';
-import { legacyCC } from '../../core/global-exports';
-import { Model } from '../../render-scene/scene';
-import { ModelLocalBindings } from '../../rendering/define';
-import { vfmtPosUvColor, getAttributeStride, vfmtPosUvColor4B, vfmtPosUvTwoColor4B } from '../../2d/renderer/vertex-format';
-import { Root } from '../../root';
-import { BlendFactor, BlendOp, BufferInfo, BufferUsageBit, Device, MemoryUsageBit, PrimitiveMode, deviceManager } from '../../gfx';
+import { JSB } from 'internal:constants';
+import { Material, Texture2D } from '../../asset/assets';
+import { vfmtPosUvColor4B } from '../../2d/renderer/vertex-format';
+import { BlendFactor, BlendOp } from '../../gfx';
 import { builtinResMgr } from '../../asset/asset-manager';
-import { ccclass, displayName, executeInEditMode, executionOrder, help, serializable, type } from '../../core/data/decorators';
-import { CCClass, Color, Enum, ccenum } from '../../core';
+import { ccclass, executeInEditMode, executionOrder, help } from '../../core/data/decorators';
+import { Color } from '../../core';
 import { IAssembler, RenderData, UIRenderable } from '../../2d';
 import { IBatcher } from '../../2d/renderer/i-batcher';
 import { director } from '../../game';
@@ -16,7 +12,8 @@ import { StaticVBAccessor } from '../../2d/renderer/static-vb-accessor';
 import { Batcher2D } from '../../2d/renderer/batcher-2d';
 import { MaterialInstance } from '../../render-scene';
 import { RenderEntity, RenderEntityType } from '../../2d/renderer/render-entity';
-import { Skeleton2DMesh, NativePartialRendererUI } from './skeleton2d-native';
+import { SpineSkeletonMesh } from './spine-skeleton-imply-wasm';
+import { NativePartialRendererUI } from './skeleton2d-native';
 
 let _accessor: StaticVBAccessor = null!;
 
@@ -97,7 +94,7 @@ export interface SpineSkeletonUIDraw {
 @executeInEditMode
 export class PartialRendererUI extends UIRenderable {
     private _texture: Texture2D | null = null;
-    private _mesh: Skeleton2DMesh = null!;
+    private _mesh: SpineSkeletonMesh = null!;
     private _nativeObj: NativePartialRendererUI = null!;
     private _drawList: SpineSkeletonUIDraw[] = [];
     private _premultipliedAlpha = true;
@@ -124,7 +121,7 @@ export class PartialRendererUI extends UIRenderable {
         this._premultipliedAlpha = v;
     }
 
-    set mesh (mesh: Skeleton2DMesh) {
+    set mesh (mesh: SpineSkeletonMesh) {
         this._mesh = mesh;
         this._assembleRenderData();
     }

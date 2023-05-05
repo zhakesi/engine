@@ -4,9 +4,9 @@ import { legacyCC } from '../../core/global-exports';
 import { ModelRenderer } from '../../misc/model-renderer';
 import { Model } from '../../render-scene/scene';
 import { ModelLocalBindings } from '../../rendering/define';
-import { vfmtPosUvColor, getAttributeStride, vfmtPosUvColor4B } from '../../2d/renderer/vertex-format';
+import { vfmtPosUvColor, getAttributeStride } from '../../2d/renderer/vertex-format';
 import { Root } from '../../root';
-import { Skeleton2DMesh } from './skeleton2d-native';
+import { SpineSkeletonMesh } from './spine-skeleton-imply-wasm';
 import { BufferInfo, BufferUsageBit, Device, MemoryUsageBit, PrimitiveMode, deviceManager } from '../../gfx';
 import { builtinResMgr } from '../../asset/asset-manager';
 import { ccclass, displayName, executeInEditMode, executionOrder, help, serializable, type } from '../../core/data/decorators';
@@ -33,7 +33,7 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
     private _slotStart = 0;
 
     private _texture: Texture2D | null = null;
-    private _meshArray: Skeleton2DMesh[] = [];
+    private _meshArray: SpineSkeletonMesh[] = [];
     public slotList: string[] = [];
 
     constructor () {
@@ -46,7 +46,7 @@ export class Skeleton2DPartialRenderer extends ModelRenderer {
         this._updateSlotEnum();
     }
 
-    set meshArray (meshes: Skeleton2DMesh[]) {
+    set meshArray (meshes: SpineSkeletonMesh[]) {
         this._meshArray = meshes;
     }
 

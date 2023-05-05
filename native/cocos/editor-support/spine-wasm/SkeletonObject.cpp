@@ -320,19 +320,17 @@ uint32_t SkeletonObject::setSkin(std::string& skinName)
 }
 
 
-float SkeletonObject::setAnimation(uint32_t trackIndex, std::string &animationName, bool loop)
+bool SkeletonObject::setAnimation(uint32_t trackIndex, std::string &animationName, bool loop)
 {
     if (!_skeleton) return 0;
     Animation *animation = _skeleton->getData()->findAnimation(animationName.c_str());
     if (!animation) {
         LogUtil::PrintToJs("Spine: Animation not found:!!!");
-        return 0;
+        return false;
     }
     auto *trackEntry = _animState->setAnimation(trackIndex, animation, loop);
     _animState->apply(*_skeleton);
-
-    float duration = animation->getDuration();    
-    return duration;
+    return true;
 }
 
 void SkeletonObject::clearTrack(uint32_t trackIndex) {

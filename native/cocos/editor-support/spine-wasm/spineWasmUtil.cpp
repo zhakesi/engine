@@ -42,7 +42,7 @@ EMSCRIPTEN_KEEPALIVE void setSkeletonData(uint32_t objID, uint32_t datPtr) {
     handle->setSkeletonData(datPtr);
 }
 
-EMSCRIPTEN_KEEPALIVE float setAnimation(uint32_t objID, uint32_t length, uint32_t trackIndex, bool loop) {
+EMSCRIPTEN_KEEPALIVE bool setAnimation(uint32_t objID, uint32_t length, uint32_t trackIndex, bool loop) {
     auto handle = getSkeletonHandle(objID);
     char* data = (char*)getStoreMemory();
     std::string animation(data, length);

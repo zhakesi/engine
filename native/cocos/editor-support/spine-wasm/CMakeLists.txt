@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-set(APP_NAME "spine2d" CACHE STRING "Project Name")
+set(APP_NAME "spine" CACHE STRING "Project Name")
 project(${APP_NAME}_wasm)
 
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11  -Wextra -Wno-nonportable-include-path -fno-exceptions -v")

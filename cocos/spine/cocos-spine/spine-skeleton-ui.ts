@@ -22,19 +22,16 @@ import { EDITOR, JSB } from 'internal:constants';
 import { ccclass, executeInEditMode, executionOrder, help, menu, serializable, type, displayName, range, tooltip, editable } from 'cc.decorator';
 import { Texture2D } from '../../asset/assets';
 import { errorID } from '../../core/platform/debug';
-import { SkeletonData } from '../skeleton-data';
-
 import { Enum } from '../../core/value-types/enum';
-import { SpineSkeletonImplyWasm } from './spine-skeleton-imply-wasm';
-import { SpineSkeletonImplyNative } from './spine-skeleton-imply-native';
-import { Skeleton2DMesh, NativeSpineSkeletonUI } from './skeleton2d-native';
-import { PartialRendererUI } from './partial-renderer-ui';
 import { Component, Node } from '../../scene-graph';
-import { SpineSkinEnum, SpineAnimationEnum, setEnumAttr } from './spine-define';
 import { CCBoolean, CCFloat, Mat4 } from '../../core';
+import { SkeletonData } from '../skeleton-data';
+import { NativeSpineSkeletonUI } from './skeleton2d-native';
+import { PartialRendererUI } from './partial-renderer-ui';
+import { SpineSkinEnum, SpineAnimationEnum, setEnumAttr } from './spine-define';
 import { SpineSocket } from '../skeleton';
-import { SpineJitterVertexEffect, SpineSwirlVertexEffect, SpineVertexEffectDelegate } from './spine-vertex-effect-wasm';
 import { SpineSkeletonCache, SpineAnimationCache } from './spine-skeleton-cache';
+import { SpineSkeletonInstance, SpineSkeletonMesh, SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-skeleton-imply-wasm';
 
 const attachMat4 = new Mat4();
 
@@ -98,7 +95,7 @@ export class SpineSkeletonUI extends Component {
     private _skinName = '';
     private _animationName = '';
     private _renderer: PartialRendererUI | null = null;
-    declare private _imply: SpineSkeletonImplyNative | SpineSkeletonImplyWasm;
+    declare private _skeletonInstance: SpineSkeletonInstance;
     declare private _slotTable: Map<number, string | null>;
     protected _cachedSockets: Map<string, number> = new Map<string, number>();
     protected _socketNodes: Map<number, Node> = new Map();
@@ -111,13 +108,7 @@ export class SpineSkeletonUI extends Component {
         super();
         setEnumAttr(this, 'defaultSkinIndex', Enum({}));
         setEnumAttr(this, 'animationIndex', Enum({}));
-        if (JSB) {
-            this._imply = new SpineSkeletonImplyNative();
-            this._nativeObj = new NativeSpineSkeletonUI();
-            this._nativeObj.setSkeletonInstance(this._imply.nativeObject);
-        } else {
-            this._imply = new SpineSkeletonImplyWasm();
-        }
+        this._skeletonInstance = new SpineSkeletonInstance();
     }
 
     @type(SkeletonData)
@@ -264,7 +255,7 @@ export class SpineSkeletonUI extends Component {
     set premultipliedAlpha (v: boolean) {
         if (v !== this._premultipliedAlpha) {
             this._premultipliedAlpha = v;
-            this._imply.setPremultipliedAlpha(this._premultipliedAlpha);
+            this._skeletonInstance.setPremultipliedAlpha(this._premultipliedAlpha);
             if (this._renderer) this._renderer.premultipliedAlpha = v;
         }
     }
@@ -300,7 +291,7 @@ export class SpineSkeletonUI extends Component {
         if (this._skinName === skinName) return;
 
         this._skinName = skinName;
-        this._imply.setSkin(skinName);
+        this._skeletonInstance.setSkin(skinName);
         this._updateRenderData();
     }
 
@@ -366,19 +357,19 @@ export class SpineSkeletonUI extends Component {
     }
 
     public onDestroy () {
-        if (this._imply) {
-            this._imply.onDestroy();
-            this._imply = null!;
+        if (this._skeletonInstance) {
+            this._skeletonInstance.onDestroy();
+            this._skeletonInstance = null!;
         }
     }
 
     protected _updateSkeletonData () {
         this._updateUITransform();
-        if (this._skeletonData === null || this._imply === null) return;
-        this._imply.setSkeletonData(this._skeletonData);
+        if (this._skeletonData === null || this._skeletonInstance === null) return;
+        this._skeletonInstance.setSkeletonData(this._skeletonData);
         this.setSkin(this._skinName);
         this.setAnimation(0, this._animationName);
-        this._slotTable = this._imply.getSlotsTable();
+        this._slotTable = this._skeletonInstance.getSlotsTable();
         this._indexBoneSockets();
         this._updateSocketBindings();
 
@@ -404,8 +395,8 @@ export class SpineSkeletonUI extends Component {
     public setAnimation (trackIndex: number, name: string, loop?: boolean) {
         if (loop !== undefined) this._loop = loop;
         if (trackIndex === 0) this._animationName = name;
-        this._imply.setAnimation(trackIndex, name, this._loop);
-        this._imply.setTimeScale(this._timeScale);
+        this._skeletonInstance.setAnimation(trackIndex, name, this._loop);
+        this._skeletonInstance.setTimeScale(this._timeScale);
         this._updateRenderData();
 
         if (this._cacheMode && this._cacheInfo) {
@@ -415,7 +406,7 @@ export class SpineSkeletonUI extends Component {
 
     public clearTrack (trackIndex: number) {
         if (this._cacheMode) return;
-        this._imply.clearTrack(trackIndex);
+        this._skeletonInstance.clearTrack(trackIndex);
     }
 
     public clearTracks () {
@@ -424,21 +415,20 @@ export class SpineSkeletonUI extends Component {
             this._cacheInfo.clear();
             return;
         }
-        this._imply.clearTracks();
+        this._skeletonInstance.clearTracks();
     }
 
     public setToSetupPose () {
-        this._imply.setToSetupPose();
+        this._skeletonInstance.setToSetupPose();
     }
 
     public setVertexEffectDelegate (effect: SpineJitterVertexEffect | SpineSwirlVertexEffect | null) {
         this._effect = effect;
-        this._imply.setVertexEffect(this._effect);
+        this._skeletonInstance.setVertexEffect(this._effect);
     }
 
     public updateTimeScale (val: number) {
-        if (!this._imply) return;
-        this._imply.setTimeScale(val);
+        this._skeletonInstance.setTimeScale(val);
     }
 
     private _updateRenderData () {
@@ -448,19 +438,19 @@ export class SpineSkeletonUI extends Component {
             return;
         }
         this.updateColor();
-        let mesh: Skeleton2DMesh = null!;
+        let mesh: SpineSkeletonMesh = null!;
         if (this._cacheMode && this._animationCache) {
             const frameIdx = this._cacheInfo.currFrameIdx;
             const animationCache = this._animationCache;
             if (animationCache.frames[frameIdx]) {
                 mesh = animationCache.frames[frameIdx];
             } else {
-                mesh = this._imply.updateRenderData();
+                mesh = this._skeletonInstance.updateRenderData();
                 animationCache.frames[frameIdx] = mesh.clone();
                 animationCache.checkCompleted();
             }
         } else {
-            mesh = this._imply.updateRenderData();
+            mesh = this._skeletonInstance.updateRenderData();
         }
         this._renderer.mesh = mesh!;
         this._renderer.markForUpdateRenderData();
@@ -521,7 +511,7 @@ export class SpineSkeletonUI extends Component {
         for (const boneIdx of socketNodes.keys()) {
             const boneNode = socketNodes.get(boneIdx);
             if (!boneNode) continue;
-            this._imply.getBoneMatrix(boneIdx, attachMat4);
+            this._skeletonInstance.getBoneMatrix(boneIdx, attachMat4);
             boneNode.matrix = attachMat4;
         }
     }
@@ -547,18 +537,18 @@ export class SpineSkeletonUI extends Component {
 
     public setMix (fromAnimation: string, toAnimation: string, duration: number): void {
         if (!this._skeletonData) return;
-        this._imply.setMix(fromAnimation, toAnimation,  duration);
+        this._skeletonInstance.setMix(fromAnimation, toAnimation,  duration);
     }
 
     public updateColor (force?: boolean): void {
         if (force || this.node._uiProps.colorDirty) {
-            this._imply.setColor(this._renderer!.color);
+            this._skeletonInstance.setColor(this._renderer!.color);
         }
     }
 
     private _updateAnimation (dt: number) {
         if (!this._cacheMode) {
-            this._imply.updateAnimation(dt);
+            this._skeletonInstance.updateAnimation(dt);
             return;
         }
         if (!this._animationCache) return;
@@ -571,7 +561,7 @@ export class SpineSkeletonUI extends Component {
         this._cacheInfo.currFrameIdx = frameIdx;
         const frames = this._animationCache.frames;
         if (!frames[frameIdx]) {
-            this._imply.updateAnimation(frameTime);
+            this._skeletonInstance.updateAnimation(frameTime);
         }
     }
 }

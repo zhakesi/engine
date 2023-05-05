@@ -140,7 +140,7 @@ let promiseLoadSpineWasm;
 
 if (EDITOR) {
     promiseLoadSpineWasm = async function promiseLoadSpineWasmEditor () {
-        const spineWasmUrl = 'D:/Cocos/cocos-editor/resources/3d/engine/cocos/spine/cocos-spine/spine2d.wasm';
+        const spineWasmUrl = 'D:/Cocos/cocos-editor/resources/3d/engine/cocos/spine/cocos-spine/spine.wasm';
         const importObject = {
             env: asmLibraryArg,
             wasi_snapshot_preview1: asmLibraryArg,
@@ -155,7 +155,7 @@ if (EDITOR) {
     };
 } else {
     promiseLoadSpineWasm = async function promiseLoadSpineWasmRuntime () {
-        const spineWasmUrl = 'scripting/engine/cocos/spine/cocos-spine/spine2d.wasm';
+        const spineWasmUrl = 'scripting/engine/cocos/spine/cocos-spine/spine.wasm';
         const importObject = {
             env: asmLibraryArg,
             wasi_snapshot_preview1: asmLibraryArg,
