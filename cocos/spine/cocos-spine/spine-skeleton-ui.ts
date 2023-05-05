@@ -492,6 +492,7 @@ export class SpineSkeletonUI extends Component {
 
         const getBoneName = (bone: any): any => {
             if (bone.parent == null) return bone.name || '<Unamed>';
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             return `${getBoneName(bones[bone.parent.index])}/${bone.name}`;
         };
 

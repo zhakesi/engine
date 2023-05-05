@@ -1,17 +1,17 @@
-// import { Mat4, Color } from '../../core';
-// import { SkeletonData } from '../skeleton-data';
-// import { NativeSkeleton2D, SpineSkeletonMesh } from './skeleton2d-native';
-// import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-effect';
+// // import { Mat4, Color } from '../../core';
+// // import { SkeletonData } from '../skeleton-data';
+// // import { NativeSkeleton2D, SpineSkeletonMesh } from './skeleton2d-native';
+// // import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-effect';
 
 // export class SpineSkeletonInstance {
-//     protected declare _nativeObj: NativeSkeleton2D;
-//     protected _nativeMeshArray: SpineSkeletonMesh[] = [];
+//     // protected declare _nativeObj: NativeSkeleton2D;
+//     // protected _nativeMeshArray: SpineSkeletonMesh[] = [];
 
 //     constructor () {
-//         this._nativeObj = new NativeSkeleton2D();
+//         //this._nativeObj = new NativeSkeleton2D();
 //     }
 //     get nativeObject () {
-//         return this._nativeObj;
+//         //return this._nativeObj;
 //     }
 //     public setSkeletonData (data: SkeletonData) {
 
@@ -91,5 +91,6 @@
 //     }
 
 //     public onDestroy () {
+
 //     }
 // }

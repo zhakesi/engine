@@ -1,7 +1,5 @@
 import { SkeletonData } from '../skeleton-data';
-import { getSpineSpineWasmInstance } from './instantiated';
-import { SpineWasmInterface } from './spine-wasm-util';
-import { FileResourceInstance } from './file-resource';
+import { getSpineSpineWasmInstance, SpineWasmInterface, wasmResourceInstance } from './instantiated';
 import { Mat4, Color } from '../../core';
 import { ccclass } from '../../core/data/decorators';
 
@@ -192,18 +190,17 @@ export class SpineSkeletonInstance {
     private initSkeletonData (data: SkeletonData): number {
         const name = data.name;
         let isJosn = false;
-        const fileInst = FileResourceInstance();
         if (data.skeletonJson) {
             isJosn = true;
             const altasName = `${name}.atlas`;
             const jsonName = `${name}.json`;
-            fileInst.addTextRes(altasName, data.atlasText);
-            fileInst.addTextRes(jsonName, data.skeletonJsonStr);
+            wasmResourceInstance.addTextRes(altasName, data.atlasText);
+            wasmResourceInstance.addTextRes(jsonName, data.skeletonJsonStr);
         } else {
             const altasName = `${name}.atlas`;
             const binName = `${name}.bin`;
-            fileInst.addTextRes(altasName, data.atlasText);
-            fileInst.addRawRes(binName, new Uint8Array(data._nativeAsset));
+            wasmResourceInstance.addTextRes(altasName, data.atlasText);
+            wasmResourceInstance.addRawRes(binName, new Uint8Array(data._nativeAsset));
         }
         const encoder = new TextEncoder();
         const encodedName = encoder.encode(name);

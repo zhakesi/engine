@@ -22,12 +22,77 @@
  */
 
 import { EDITOR, JSB } from 'internal:constants';
-import { SpineWasmInterface } from './spine-wasm-util';
-import { FileResourceInstance } from './file-resource';
-import { JsReadFile } from './jsfile.js';
+import { JsReadFile } from './js-file-util.js';
 
-let wasmUtil: SpineWasmInterface;
-let HEAPU8: Uint8Array;
+/**
+ * @engineInternal
+ */
+export interface SpineWasmInterface {
+    spineWasmInstanceInit(): number;
+    spineWasmInstanceDestroy(): number;
+    queryStoreMemory(): number;
+    createSkeletonObject (): number;
+    setSkeletonData(objID: number, datPtr: number);
+    setAnimation(objID: number, length: number, trackIndex: number, loop: boolean): boolean;
+    clearTrack(objID: number, trackIndex: number): boolean;
+    clearTracks(objID: number): boolean;
+    setToSetupPose(objID: number): boolean;
+    setTimeScale(objID: number, timeScale: number): number;
+    setSkin(objID: number, length: number): number;
+    updateAnimation(objID: number, dltTime: number): number;
+    setMix(objID: number, start: number, fromLength: number, toLength: number, duration: number);
+    updateRenderData(objID: number): number;
+    getDrawOrderSize(objID: number): number;
+    getSlotNameByOrder(objID: number, index: number): number;
+    getBoneMatrix(objID: number, index: number): number;
+    queryMemory(size: number): number;
+    freeMemory(data: Uint8Array);
+    setDefaultScale(objID: number, scale: number): boolean;
+    setVertexEffect(objID: number, effect: number, effectType: number);
+    setPremultipliedAlpha(objID: number, premultipliedAlpha: boolean);
+    setColor(objID: number, r: number, g: number, b: number, a: number);
+    destroyInstance(objID: number);
+
+    retainSkeletonDataByUUID(length: number): number;
+    initSkeletonData(length: number, isJosn: boolean): number;
+    recordSkeletonDataUUID(length: number, datPtr: number);
+
+    createJitterVertexEffect(x: number, y: number): number;
+    updateJitterParameters(handle: number, x: number, y: number);
+    createSwirlVertexEffect(radius: number, power: number, usePowerOut: boolean): number;
+    updateSwirlParameters(handle: number, centerX: number, centerY: number, radius: number, angle: number);
+
+    memory: any;
+}
+
+/**
+ * @engineInternal
+ */
+export class FileResource {
+    private fileList = new Map<string, Uint8Array>();
+    public addTextRes (name: string, data: string) {
+        const encoder = new TextEncoder();
+        const array = encoder.encode(data);
+        this.fileList.set(name, array);
+    }
+    public addRawRes (name: string, data: Uint8Array) {
+        const encoder = new TextEncoder();
+        this.fileList.set(name, data);
+    }
+
+    public RequireFileBuffer (name: string): Uint8Array {
+        if (!this.fileList.has(name)) return new Uint8Array(0);
+        const array = this.fileList.get(name);
+        return array!;
+    }
+}
+/**
+ * @engineInternal
+ */
+export const wasmResourceInstance = new FileResource();
+
+let _wasmUtil: SpineWasmInterface = null!;
+let _HEAPU8: Uint8Array = null!;
 
 function assert (condition, text) {
     if (!condition) {
@@ -45,7 +110,7 @@ function _assert_fail () {
 
 function _emscripten_memcpy_big (dest, src, num) {
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    HEAPU8.copyWithin(dest, src, src + num);
+    _HEAPU8.copyWithin(dest, src, src + num);
 }
 
 function _emscripten_resize_heap (requestedSize) {
@@ -72,7 +137,7 @@ function _cxa_allocate_exception (size) {
 
 function _consoleInfo (start: number, length: number) {
     const decoder = new TextDecoder();
-    const source = HEAPU8.subarray(start, start + length);
+    const source = _HEAPU8.subarray(start, start + length);
     const result = decoder.decode(source);
     console.log(result);
 }
@@ -88,13 +153,12 @@ function _syscall_ioctl (fd, op, varargs) {
 
 function _jsReadFile (start: number, length: number): number {
     const decoder = new TextDecoder();
-    const source = HEAPU8.subarray(start, start + length);
+    const source = _HEAPU8.subarray(start, start + length);
     const filePath = decoder.decode(source);
-    const fileResouce = FileResourceInstance();
-    const arrayData = fileResouce.RequireFileBuffer(filePath);
+    const arrayData = wasmResourceInstance.RequireFileBuffer(filePath);
     const dataSize = arrayData.length;
-    const address = wasmUtil.queryStoreMemory();
-    const storeArray = HEAPU8.subarray(address, address + dataSize);
+    const address = _wasmUtil.queryStoreMemory();
+    const storeArray = _HEAPU8.subarray(address, address + dataSize);
     storeArray.set(arrayData);
     return dataSize;
 }
@@ -122,24 +186,26 @@ function receiveInstance (instance) {
     const wasmMemory = instance.exports.memory;
     const exports = instance.exports;
     assert(wasmMemory, 'memory not found in wasm exports');
-    HEAPU8 = new Uint8Array(wasmMemory.buffer);
-    wasmUtil = exports as unknown as SpineWasmInterface;
-    //console.log('xxx receiveInstance');
+    _HEAPU8 = new Uint8Array(wasmMemory.buffer);
+    _wasmUtil = exports as unknown as SpineWasmInterface;
 }
 
 function receiveInstantiationResult (result) {
     receiveInstance(result.instance);
-    wasmUtil.spineWasmInstanceInit();
+    _wasmUtil.spineWasmInstanceInit();
 }
 
+/**
+ * @engineInternal
+ */
 export function getSpineSpineWasmInstance () {
-    return wasmUtil;
+    return _wasmUtil;
 }
 
-let promiseLoadSpineWasm;
+let _promiseLoadSpineWasm;
 
 if (EDITOR) {
-    promiseLoadSpineWasm = async function promiseLoadSpineWasmEditor () {
+    _promiseLoadSpineWasm = async function promiseLoadSpineWasmEditor () {
         const spineWasmUrl = 'D:/Cocos/cocos-editor/resources/3d/engine/cocos/spine/cocos-spine/spine.wasm';
         const importObject = {
             env: asmLibraryArg,
@@ -154,7 +220,7 @@ if (EDITOR) {
         const result = await promise;
     };
 } else {
-    promiseLoadSpineWasm = async function promiseLoadSpineWasmRuntime () {
+    _promiseLoadSpineWasm = async function promiseLoadSpineWasmRuntime () {
         const spineWasmUrl = 'scripting/engine/cocos/spine/cocos-spine/spine.wasm';
         const importObject = {
             env: asmLibraryArg,
@@ -174,5 +240,5 @@ if (EDITOR) {
 }
 
 if (!JSB) {
-    promiseLoadSpineWasm();
+    _promiseLoadSpineWasm();
 }
