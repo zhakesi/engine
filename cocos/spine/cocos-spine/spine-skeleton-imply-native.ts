@@ -1,53 +1,38 @@
-// // import { Mat4, Color } from '../../core';
-// // import { SkeletonData } from '../skeleton-data';
-// // import { NativeSkeleton2D, SpineSkeletonMesh } from './skeleton2d-native';
-// // import { SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-vertex-effect';
+// import { Mat4, Color } from '../../core';
+// import { SkeletonData } from '../skeleton-data';
+
+// declare const cocosspine: any;
+
+// export const NativeSkeleton2D = cocosspine.Skeleton2D;
+// export const SpineSkeletonMesh = cocosspine.SpineSkeletonMesh;
+// export const NativeSpineSkeletonRendererUI = cocosspine.SpineSpineSkeletonRendererUI;
+// export const NativeSpineSkeletonUI = cocosspine.SpineSkeletonUI;
+
 
 // export class SpineSkeletonInstance {
-//     // protected declare _nativeObj: NativeSkeleton2D;
-//     // protected _nativeMeshArray: SpineSkeletonMesh[] = [];
 
 //     constructor () {
-//         //this._nativeObj = new NativeSkeleton2D();
 //     }
-//     get nativeObject () {
-//         //return this._nativeObj;
-//     }
+
 //     public setSkeletonData (data: SkeletonData) {
 
 //     }
 
 //     initSkeletonData (data: SkeletonData): boolean {
-//         if (!data.atlasText) return false;
-//         if (data.skeletonJsonStr) {
-//             this._nativeObj.initSkeletonData(data.skeletonJsonStr, data.atlasText);
-//         } else if (data.nativeUrl.length > 0) {
-//             this._nativeObj.initSkeletonDataBinary(data.nativeUrl, data.atlasText);
-//         } else {
-//             return false;
-//         }
-
 //         return true;
 //     }
 //     setSkin (name: string): boolean {
-//         this._nativeObj.setSkin(name);
 //         return true;
 //     }
-//     setAnimation (trackIdex: number, name: string, loop: boolean): number {
-//         this._nativeObj.setAnimation(name);
-//         return 0;
+//     setAnimation (trackIdex: number, name: string, loop: boolean): boolean {
+//         return true;
 //     }
 //     public setTimeScale (timeScale: number): boolean {
 //         return true;
 //     }
 
 //     updateAnimation (dltTime: number) {
-//         this._nativeObj.updateAnimation(dltTime);
 //         return true;
-//     }
-//     updateRenderData (): SpineSkeletonMesh {
-//         this._nativeMeshArray = this._nativeObj.updateRenderData();
-//         return this._nativeMeshArray[0];
 //     }
 
 //     getSlotsTable (): Map<number, string | null> {
@@ -94,3 +79,5 @@
 
 //     }
 // }
+
+

@@ -26,8 +26,7 @@ import { Enum } from '../../core/value-types/enum';
 import { Component, Node } from '../../scene-graph';
 import { CCBoolean, CCFloat, Mat4 } from '../../core';
 import { SkeletonData } from '../skeleton-data';
-import { NativeSpineSkeletonUI } from './skeleton2d-native';
-import { PartialRendererUI } from './partial-renderer-ui';
+import { SpineSkeletonRendererUI } from './spine-skeleton-renderer-ui';
 import { SpineSkinEnum, SpineAnimationEnum, setEnumAttr } from './spine-define';
 import { SpineSocket } from '../skeleton';
 import { SpineSkeletonCache, SpineAnimationCache } from './spine-skeleton-cache';
@@ -94,13 +93,12 @@ export class SpineSkeletonUI extends Component {
 
     private _skinName = '';
     private _animationName = '';
-    private _renderer: PartialRendererUI | null = null;
+    private _renderer: SpineSkeletonRendererUI | null = null;
     declare private _skeletonInstance: SpineSkeletonInstance;
     declare private _slotTable: Map<number, string | null>;
     protected _cachedSockets: Map<string, number> = new Map<string, number>();
     protected _socketNodes: Map<number, Node> = new Map();
     protected _effect: SpineJitterVertexEffect | SpineSwirlVertexEffect | null = null;
-    private _nativeObj: NativeSpineSkeletonUI = null!;
     private _cacheInfo: SpineAnimationCacheInfo = null!;
     private _animationCache: SpineAnimationCache = null!;
 
@@ -433,10 +431,6 @@ export class SpineSkeletonUI extends Component {
 
     private _updateRenderData () {
         if (!this._renderer) return;
-        if (JSB) {
-            this._nativeObj.updateRenderData();
-            return;
-        }
         this.updateColor();
         let mesh: SpineSkeletonMesh = null!;
         if (this._cacheMode && this._animationCache) {
@@ -457,15 +451,12 @@ export class SpineSkeletonUI extends Component {
     }
 
     private _initRenderer () {
-        let render = this.node.getComponent(PartialRendererUI);
+        let render = this.node.getComponent(SpineSkeletonRendererUI);
         if (!render) {
-            render = this.node.addComponent(PartialRendererUI);
+            render = this.node.addComponent(SpineSkeletonRendererUI);
         }
         render.setTexture(this._texture);
         this._renderer = render;
-        if (JSB) {
-            this._nativeObj.setPartialRenderer(render.nativeObject);
-        }
     }
 
     private _updateSocketBindings () {

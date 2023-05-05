@@ -235,7 +235,6 @@
                 "cocos/gfx/base/pipeline-state.ts": "cocos/gfx/base/pipeline-state.jsb.ts",
                 "cocos/gfx/index.ts": "cocos/gfx/index.jsb.ts",
                 "cocos/spine/index.ts": "cocos/spine/index.jsb.ts",
-                "cocos/spine/cocos-spine/skeleton2d-native.ts": "cocos/spine/cocos-spine/skeleton2d-native.jsb.ts",
                 "cocos/dragon-bones/index.ts": "cocos/dragon-bones/index.jsb.ts",
                 "cocos/physics/physx/instantiate.ts": "cocos/physics/physx/instantiate.jsb.ts",
                 "cocos/scene-graph/node.ts": "cocos/scene-graph/node.jsb.ts",

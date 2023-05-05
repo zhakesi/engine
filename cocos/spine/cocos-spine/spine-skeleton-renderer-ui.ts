@@ -13,7 +13,6 @@ import { Batcher2D } from '../../2d/renderer/batcher-2d';
 import { MaterialInstance } from '../../render-scene';
 import { RenderEntity, RenderEntityType } from '../../2d/renderer/render-entity';
 import { SpineSkeletonMesh } from './spine-skeleton-imply-wasm';
-import { NativePartialRendererUI } from './skeleton2d-native';
 
 let _accessor: StaticVBAccessor = null!;
 
@@ -70,10 +69,10 @@ function getMaterialFromBlend (blendMode: number, premultipliedAlpha: boolean, b
 }
 
 const simple: IAssembler = {
-    fillBuffers (render: PartialRendererUI, batcher: IBatcher) {
+    fillBuffers (render: SpineSkeletonRendererUI, batcher: IBatcher) {
 
     },
-    updateColor (render: PartialRendererUI) {
+    updateColor (render: SpineSkeletonRendererUI) {
 
     },
 };
@@ -88,34 +87,24 @@ export interface SpineSkeletonUIDraw {
     indexCount: number;
 }
 
-@ccclass('sp.PartialRendererUI')
-@help('i18n:sp.PartialRendererUI')
+@ccclass('sp.SpineSkeletonRendererUI')
+@help('i18n:sp.SpineSkeletonRendererUI')
 @executionOrder(100)
 @executeInEditMode
-export class PartialRendererUI extends UIRenderable {
+export class SpineSkeletonRendererUI extends UIRenderable {
     private _texture: Texture2D | null = null;
     private _mesh: SpineSkeletonMesh = null!;
-    private _nativeObj: NativePartialRendererUI = null!;
     private _drawList: SpineSkeletonUIDraw[] = [];
     private _premultipliedAlpha = true;
 
     constructor () {
         super();
         this._assembler = simple;
-        if (JSB) {
-            this._nativeObj = new NativePartialRendererUI();
-            this._nativeObj.setRenderEntity(this._renderEntity.nativeObj);
-        }
         this._useVertexOpacity = true;
-    }
-
-    get nativeObject () {
-        return this._nativeObj;
     }
 
     public setTexture (tex: Texture2D | null) {
         this._texture = tex;
-        if (JSB && tex) this._nativeObj.setTexture(tex);
     }
     set premultipliedAlpha (v: boolean) {
         this._premultipliedAlpha = v;
@@ -149,9 +138,6 @@ export class PartialRendererUI extends UIRenderable {
         } else {
             mat = builtinResMgr.get<Material>('default-spine-material');
             this.setMaterial(mat, 0);
-        }
-        if (JSB) {
-            this._nativeObj.setMaterial(mat);
         }
     }
 
