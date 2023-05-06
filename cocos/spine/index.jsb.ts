@@ -47,8 +47,7 @@ export * from './skeleton';
 export * from './skeleton-data';
 export * from './assembler';
 export * from './cocos-spine/spine-skeleton-ui';
-export * from './cocos-spine/partial-renderer-ui';
-export * from './cocos-spine/spine-vertex-effect';
+export * from './cocos-spine/spine-skeleton-renderer-ui';
 
 export const spine = globalThis.spine;
 export const VertexEffectDelegate = spine.VertexEffectDelegate;

@@ -183,7 +183,7 @@ bool jsb_register_all_modules() {
     #if CC_USE_SPINE
     se->addRegisterCallback(register_all_spine);
     se->addRegisterCallback(register_all_spine_manual);
-    se->addRegisterCallback(register_all_cocosspine);
+    se->addRegisterCallback(register_all_cocosSpine);
     #endif
 
     #if CC_USE_DRAGONBONES

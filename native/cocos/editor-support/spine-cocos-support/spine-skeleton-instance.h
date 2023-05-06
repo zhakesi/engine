@@ -9,12 +9,12 @@
 #include "spine-mesh-data.h"
 
 namespace cc {
-namespace cocosspine {
+namespace cocosSpine {
 
-class Skeleton2D {
+class SpineSkeletonInstance {
 public:
-    Skeleton2D();
-    ~Skeleton2D();
+    SpineSkeletonInstance();
+    ~SpineSkeletonInstance();
     void initSkeletonData(ccstd::string &jsonStr, ccstd::string &atlasText);
     void initSkeletonDataBinary(ccstd::string &datPath, ccstd::string &atlasText);
     void setSkin(ccstd::string &name);
@@ -33,7 +33,7 @@ private:
     spine::AnimationStateData *_animStateData = nullptr;
     spine::AnimationState *_animState = nullptr;
     spine::SkeletonClipping *_clipper = nullptr;
-}; // class Skeleton2D
+}; // class 
 
-} // namespace cocosspine
+} // namespace cocosSpine
 } // namespace cc

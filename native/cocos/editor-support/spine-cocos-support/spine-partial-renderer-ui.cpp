@@ -6,7 +6,7 @@
 #include "core/Root.h"
 
 namespace cc {
-namespace cocosspine {
+namespace cocosSpine {
 
 static const std::vector<gfx::Attribute> ATTRIBUTES_V3F_T2F_C4B{
     gfx::Attribute{gfx::ATTR_NAME_POSITION, gfx::Format::RGB32F},
@@ -95,5 +95,5 @@ cc::RenderDrawInfo *SpinePartialRendererUI::requestDrawInfo(int idx) {
     return _drawInfoArray[idx];
 }
 
-} // namespace cocosspine
+} // namespace cocosSpine
 } // namespace cc

@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include "bindings/utils/BindingUtils.h"
 namespace cc {
-namespace cocosspine {
+namespace cocosSpine {
 
 class Skeleton2DMesh {
 public:

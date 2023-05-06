@@ -3,7 +3,7 @@
 #include "base/memory/Memory.h"
 
 namespace cc {
-namespace cocosspine {
+namespace cocosSpine {
 Skeleton2DMesh::Skeleton2DMesh() {
 
 }

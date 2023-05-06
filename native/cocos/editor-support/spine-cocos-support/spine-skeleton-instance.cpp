@@ -1,4 +1,4 @@
-#include "spine-skeleton-animation.h"
+#include "spine-skeleton-instance.h"
 #include "core/platform/Debug.h"
 #include "platform/FileUtils.h"
 #include "cocos/editor-support/spine/spine.h"
@@ -7,16 +7,16 @@
 
 
 namespace cc {
-namespace cocosspine {
+namespace cocosSpine {
 
-Skeleton2D::Skeleton2D() {
+SpineSkeletonInstance::SpineSkeletonInstance() {
 
 }
 
-Skeleton2D::~Skeleton2D() {
+SpineSkeletonInstance::~SpineSkeletonInstance() {
 }
 
-void Skeleton2D::initSkeletonData(ccstd::string &jsonStr, ccstd::string &atlasText) {
+void SpineSkeletonInstance::initSkeletonData(ccstd::string &jsonStr, ccstd::string &atlasText) {
     spine::Atlas *atlas = new spine::Atlas(atlasText.c_str(), (int)atlasText.size(), "", nullptr, false);
     spine::AttachmentLoader *attachmentLoader = new spine::Cocos2dAtlasAttachmentLoader(atlas);
     spine::SkeletonJson json(attachmentLoader);
@@ -35,7 +35,7 @@ void Skeleton2D::initSkeletonData(ccstd::string &jsonStr, ccstd::string &atlasTe
     _skeleton->updateWorldTransform();
 }
 
-void Skeleton2D::initSkeletonDataBinary(ccstd::string &dataPath, ccstd::string &atlasText) {
+void SpineSkeletonInstance::initSkeletonDataBinary(ccstd::string &dataPath, ccstd::string &atlasText) {
     spine::Atlas *atlas = new spine::Atlas(atlasText.c_str(), (int)atlasText.size(), "", nullptr, false);
     spine::AttachmentLoader *attachmentLoader = new spine::Cocos2dAtlasAttachmentLoader(atlas);
 
@@ -64,13 +64,13 @@ void Skeleton2D::initSkeletonDataBinary(ccstd::string &dataPath, ccstd::string &
     _skeleton->updateWorldTransform();
 }
 
-void Skeleton2D::setSkin(ccstd::string &name) {
+void SpineSkeletonInstance::setSkin(ccstd::string &name) {
     if (!_skeleton) return;
     _skeleton->setSkin(name.c_str());
     _skeleton->setSlotsToSetupPose();
 }
 
-void Skeleton2D::setAnimation (ccstd::string &name) {
+void SpineSkeletonInstance::setAnimation (ccstd::string &name) {
     if (!_skeleton) return;
     spine::Animation *animation = _skeleton->getData()->findAnimation(name.c_str());
     if (!animation) {
@@ -82,7 +82,7 @@ void Skeleton2D::setAnimation (ccstd::string &name) {
     //CC_LOG_DEBUG("setAnimation:%s", name.c_str());
 }
 
-void Skeleton2D::updateAnimation(float dltTime) {
+void SpineSkeletonInstance::updateAnimation(float dltTime) {
     if (!_skeleton) return;
     _skeleton->update(dltTime);
     _animState->update(dltTime);
@@ -90,7 +90,7 @@ void Skeleton2D::updateAnimation(float dltTime) {
     _skeleton->updateWorldTransform();
 }
 
-std::vector<Skeleton2DMesh *> &Skeleton2D::updateRenderData() {
+std::vector<Skeleton2DMesh *> &SpineSkeletonInstance::updateRenderData() {
     for (auto &m : _meshes) {
         delete m;
     }
@@ -100,7 +100,7 @@ std::vector<Skeleton2DMesh *> &Skeleton2D::updateRenderData() {
     return _meshes;
 }
 
-void Skeleton2D::realTimeTraverse() {
+void SpineSkeletonInstance::realTimeTraverse() {
     unsigned byteStride = sizeof(middleware::V3F_T2F_C4B);
     int startSlotIndex = -1;
     int endSlotIndex = -1;
@@ -199,7 +199,7 @@ void Skeleton2D::realTimeTraverse() {
     _clipper->clipEnd();
 }
 
-void Skeleton2D::processVertices() {
+void SpineSkeletonInstance::processVertices() {
     unsigned byteStride = sizeof(middleware::V3F_T2F_C4B);
     int count = _meshes.size();
     float z_offset = 0.1f;
@@ -216,5 +216,5 @@ void Skeleton2D::processVertices() {
     }
 }
 
-} // namespace cocosspine
+} // namespace cocosSpine
 } // namespace cc

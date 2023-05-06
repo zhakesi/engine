@@ -38,30 +38,30 @@
 #include "editor-support/spine-cocos-support/spine-mesh-data.h"
 #include "editor-support/spine-cocos-support/spine-partial-renderer-ui.h"
 #include "editor-support/spine-cocos-support/spine-skeleton-ui.h"
-#include "editor-support/spine-cocos-support/spine-skeleton-animation.h"
+#include "editor-support/spine-cocos-support/spine-skeleton-instance.h"
 
 
 
-bool register_all_cocosspine(se::Object* obj);
+bool register_all_cocosSpine(se::Object* obj);
 
 
-JSB_REGISTER_OBJECT_TYPE(cc::cocosspine::Skeleton2DMesh);
-extern se::Object *__jsb_cc_cocosspine_Skeleton2DMesh_proto; // NOLINT
-extern se::Class * __jsb_cc_cocosspine_Skeleton2DMesh_class; // NOLINT
+JSB_REGISTER_OBJECT_TYPE(cc::cocosSpine::Skeleton2DMesh);
+extern se::Object *__jsb_cc_cocosSpine_Skeleton2DMesh_proto; // NOLINT
+extern se::Class * __jsb_cc_cocosSpine_Skeleton2DMesh_class; // NOLINT
 
 
-JSB_REGISTER_OBJECT_TYPE(cc::cocosspine::SpinePartialRendererUI);
-extern se::Object *__jsb_cc_cocosspine_SpinePartialRendererUI_proto; // NOLINT
-extern se::Class * __jsb_cc_cocosspine_SpinePartialRendererUI_class; // NOLINT
+JSB_REGISTER_OBJECT_TYPE(cc::cocosSpine::SpinePartialRendererUI);
+extern se::Object *__jsb_cc_cocosSpine_SpinePartialRendererUI_proto; // NOLINT
+extern se::Class * __jsb_cc_cocosSpine_SpinePartialRendererUI_class; // NOLINT
 
 
-JSB_REGISTER_OBJECT_TYPE(cc::cocosspine::SpineSkeletonUI);
-extern se::Object *__jsb_cc_cocosspine_SpineSkeletonUI_proto; // NOLINT
-extern se::Class * __jsb_cc_cocosspine_SpineSkeletonUI_class; // NOLINT
+JSB_REGISTER_OBJECT_TYPE(cc::cocosSpine::SpineSkeletonUI);
+extern se::Object *__jsb_cc_cocosSpine_SpineSkeletonUI_proto; // NOLINT
+extern se::Class * __jsb_cc_cocosSpine_SpineSkeletonUI_class; // NOLINT
 
 
-JSB_REGISTER_OBJECT_TYPE(cc::cocosspine::Skeleton2D);
-extern se::Object *__jsb_cc_cocosspine_Skeleton2D_proto; // NOLINT
-extern se::Class * __jsb_cc_cocosspine_Skeleton2D_class; // NOLINT
+JSB_REGISTER_OBJECT_TYPE(cc::cocosSpine::SpineSkeletonInstance);
+extern se::Object *__jsb_cc_cocosSpine_SpineSkeletonInstance_proto; // NOLINT
+extern se::Class * __jsb_cc_cocosSpine_SpineSkeletonInstance_class; // NOLINT
 
 // clang-format on

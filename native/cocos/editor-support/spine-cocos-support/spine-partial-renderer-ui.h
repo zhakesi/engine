@@ -18,7 +18,7 @@ class UIMeshBuffer;
 };
 
 namespace cc {
-namespace cocosspine {
+namespace cocosSpine {
 
 class SpinePartialRendererUI {
 public:
@@ -49,5 +49,5 @@ private:
     cc::UIMeshBuffer *_uiMesh = nullptr;
 }; // class SpinePartialRendererUI
 
-} // namespace cocosspine
+} // namespace cocosSpine
 } // namespace cc
