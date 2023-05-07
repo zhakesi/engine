@@ -11,7 +11,6 @@ export class SpineSkeletonInstance {
     }
 
     public onDestroy () {
-
     }
     public updateRenderData() {
         this._nativeObj.updateRenderData();

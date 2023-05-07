@@ -23,8 +23,13 @@ void SpineSkeletonUI::setSkeletonRendererer(cc::cocosSpine::SpineSkeletonRendere
 
 void SpineSkeletonUI::updateRenderData() {
     if (!_skeletonInstance || !_renderer) return;
-    auto meshes = _skeletonInstance->updateRenderData();
-    _renderer->updateMeshData(meshes);
+    std::vector<SpineMeshBlendInfo> blendArray;
+    auto meshe = _skeletonInstance->updateRenderData(blendArray);
+    _renderer->updateMeshData(meshe, blendArray);
+}
+
+void SpineSkeletonUI::onDestroy() {
+    
 }
 
 } // namespace cocosSpine

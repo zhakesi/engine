@@ -21,6 +21,7 @@ public:
     void setSkeletonInstance(cc::cocosSpine::SpineSkeletonInstance* obj);
     void setSkeletonRendererer(cc::cocosSpine::SpineSkeletonRendererUI* rendererUI);
     void updateRenderData();
+    void onDestroy();
 
 private:
     cc::cocosSpine::SpineSkeletonInstance* _skeletonInstance = nullptr;

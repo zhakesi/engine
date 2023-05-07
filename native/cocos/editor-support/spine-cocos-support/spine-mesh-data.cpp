@@ -4,20 +4,51 @@
 
 namespace cc {
 namespace cocosSpine {
-Skeleton2DMesh::Skeleton2DMesh() {
 
+SpineSkeletonMeshData::SpineSkeletonMeshData() {
+    vBuf = nullptr;
+    iBuf = nullptr;
+    vCount = 0;
+    iCount = 0;
+    byteStride = 0;
+    slotIndex = 0;
+    blendMode = 0;
 }
 
-Skeleton2DMesh::~Skeleton2DMesh() {
+SpineSkeletonMeshData::SpineSkeletonMeshData(uint32_t vc, uint32_t ic, uint32_t bStride) {
+    vCount = vc;
+    iCount = ic;
+    byteStride = bStride;
+    vBuf = new uint8_t[vc * byteStride];;
+    iBuf = new uint16_t[ic];
+    slotIndex = 0;
+    blendMode = 0;
 }
 
-Skeleton2DMesh::Skeleton2DMesh(int vNum, int iNum, int stride) {
-    vCount = vNum;
-    iCount = iNum;
+SpineSkeletonMeshData::SpineSkeletonMeshData(uint32_t slot, uint8_t* vb, uint16_t* ib,
+    uint32_t vc, uint32_t ic, uint32_t stride, uint32_t blend) {
+    slotIndex = slot;
+    vBuf = vb;
+    iBuf = ib;
+    vCount = vc;
+    iCount = ic;
     byteStride = stride;
-    auto floatNum = vCount * byteStride / sizeof(float);
-    vertices.resize(floatNum);
-    indices.resize(iCount);
+    blendMode = blend;
+}
+
+SpineSkeletonMeshData::~SpineSkeletonMeshData() {
+
+}
+
+void SpineSkeletonMeshData::Release() {
+    if (vBuf) {
+        delete[] vBuf;
+        vBuf = nullptr;
+    }
+    if (iBuf) {
+        delete[] iBuf;
+        iBuf = nullptr;
+    }
 }
 
 }

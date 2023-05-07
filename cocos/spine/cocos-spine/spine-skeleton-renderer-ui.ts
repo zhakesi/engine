@@ -183,7 +183,9 @@ export class SpineSkeletonRendererUI extends UIRenderable {
 
     public onDestroy () {
         super.onDestroy();
-        console.log('Skeleton2DPartialRenderer destroy');
+        if (JSB) {
+            this._nativeObj.onDestroy();
+        }
     }
 
     private _assembleRenderData () {

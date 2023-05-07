@@ -77,6 +77,8 @@
 %ignore cc::Batcher2d::handleModelDraw;
 %ignore cc::Batcher2d::handleMiddlewareDraw;
 %ignore cc::Batcher2d::handleSubNode;
+%ignore cc::Batcher2d::addMeshBuffer;
+%ignore cc::Batcher2d::removeMeshBuffer;
 
 %ignore cc::RenderEntity::getDynamicRenderDrawInfo;
 %ignore cc::RenderEntity::getDynamicRenderDrawInfos;

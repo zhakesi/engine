@@ -30,7 +30,7 @@ public:
     void     setSkeletonData(uint32_t datPtr);
     uint32_t updateRenderData();
     uint32_t setSkin(std::string& skinName);
-    bool    setAnimation(uint32_t trackIndex, std::string &animationName, bool loop);
+    bool     setAnimation(uint32_t trackIndex, std::string &animationName, bool loop);
     void     clearTrack(uint32_t trackIndex);
     void     clearTracks();
     void     setToSetupPose();

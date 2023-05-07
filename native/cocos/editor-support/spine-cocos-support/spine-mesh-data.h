@@ -5,22 +5,28 @@
 namespace cc {
 namespace cocosSpine {
 
-class Skeleton2DMesh {
+struct SpineMeshBlendInfo {
+    uint32_t blendMode;
+    uint32_t indexOffset;
+    uint32_t indexCount;
+};
+
+class SpineSkeletonMeshData {
 public:
-    Skeleton2DMesh();
-    Skeleton2DMesh(int vNum, int iNum, int stride);
-    ~Skeleton2DMesh();
-    inline std::vector<float>& getVertices() {return vertices;}
-    inline std::vector<uint16_t>&getIndices() {return indices;}
-    inline int getByteStride() {return byteStride;}
-    inline int getVCount() {return vCount;}
-    inline int getICount() {return iCount;}
+    SpineSkeletonMeshData();
+    SpineSkeletonMeshData(uint32_t vc, uint32_t ic, uint32_t byteStride);
+    SpineSkeletonMeshData(uint32_t slot, uint8_t* vBuf, uint16_t* iBuf,
+        uint32_t vc, uint32_t ic, uint32_t byteStride, uint32_t blend);
+    ~SpineSkeletonMeshData();
+    void Release();
 public:
-    std::vector<float> vertices;
-    std::vector<uint16_t> indices;
-    int    byteStride;
-    int    vCount;
-    int    iCount;
+    uint8_t  *vBuf;
+    uint16_t *iBuf;
+    uint32_t vCount;
+    uint32_t iCount;
+    uint32_t byteStride;
+    uint32_t slotIndex;
+    uint32_t blendMode;
 };
 
 }

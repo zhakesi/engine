@@ -24,4 +24,6 @@ export declare class NativeSpineSkeletonRendererUI {
     setTexture (tex: Texture2D);
     setRenderEntity(nativeEntity: NativeRenderEntity);
     setMaterial(mat: Material);
+
+    onDestroy();
 }

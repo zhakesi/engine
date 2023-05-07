@@ -25,12 +25,13 @@ public:
     SpineSkeletonRendererUI();
     ~SpineSkeletonRendererUI();
     void setRenderEntity(cc::RenderEntity* entity);
-    void updateMeshData(std::vector<Skeleton2DMesh *> &meshes);
-    cc::RenderDrawInfo *requestDrawInfo(int idx);
+    void updateMeshData(SpineSkeletonMeshData* mesh, std::vector<SpineMeshBlendInfo> &blendArray);
+    void onDestroy();
 
     inline Material *getMaterial() const { return _material; }
     inline void setMaterial(Material *material) {
         _material = material;
+        destroyMaterialCaches();
     }
 
     inline Texture2D *getTexture() const { return _texture; }
@@ -39,14 +40,18 @@ public:
     }
 
 private:
+    cc::RenderDrawInfo *requestDrawInfo(int idx);
+    cc::Material *requestMaterial(uint32_t blend);
+    cc::Material *requestMaterial(uint16_t blendSrc, uint16_t blendDst);
+    void destroyMaterialCaches();
+
+private:
     cc::RenderEntity *_entity = nullptr;
     cc::Material *_material = nullptr;
     cc::Texture2D *_texture = nullptr;
     std::vector<cc::RenderDrawInfo *> _drawInfoArray;
-
-    std::vector<float> _vData;
-    std::vector<uint16_t> _iData;
     cc::UIMeshBuffer *_uiMesh = nullptr;
+    ccstd::unordered_map<uint32_t, cc::Material*> _materialCaches;
 }; // class SpinePartialRendererUI
 
 } // namespace cocosSpine

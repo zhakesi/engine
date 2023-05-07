@@ -61,32 +61,205 @@
 #include "bindings/auto/jsb_cocos-spine_auto.h"
 
 
-#define cc_cocosSpine_Skeleton2DMesh_vertices_get(self_) self_->getVertices()
-  
 
-#define cc_cocosSpine_Skeleton2DMesh_indices_get(self_) self_->getIndices()
-  
+se::Class* __jsb_cc_cocosSpine_SpineMeshBlendInfo_class = nullptr;
+se::Object* __jsb_cc_cocosSpine_SpineMeshBlendInfo_proto = nullptr;
+SE_DECLARE_FINALIZE_FUNC(js_delete_cc_cocosSpine_SpineMeshBlendInfo) 
 
-#define cc_cocosSpine_Skeleton2DMesh_byteStride_get(self_) self_->getByteStride()
-  
+static bool js_cc_cocosSpine_SpineMeshBlendInfo_blendMode_set(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cocosSpine::SpineMeshBlendInfo *arg1 = (cc::cocosSpine::SpineMeshBlendInfo *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineMeshBlendInfo>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg1->blendMode, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
+    
+    
+    return true;
+}
+SE_BIND_PROP_SET(js_cc_cocosSpine_SpineMeshBlendInfo_blendMode_set) 
 
-#define cc_cocosSpine_Skeleton2DMesh_vCount_get(self_) self_->getVCount()
-  
+static bool js_cc_cocosSpine_SpineMeshBlendInfo_blendMode_get(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    cc::cocosSpine::SpineMeshBlendInfo *arg1 = (cc::cocosSpine::SpineMeshBlendInfo *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineMeshBlendInfo>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= nativevalue_to_se(arg1->blendMode, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_PROP_GET(js_cc_cocosSpine_SpineMeshBlendInfo_blendMode_get) 
 
-#define cc_cocosSpine_Skeleton2DMesh_iCount_get(self_) self_->getICount()
-  
+static bool js_cc_cocosSpine_SpineMeshBlendInfo_indexOffset_set(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cocosSpine::SpineMeshBlendInfo *arg1 = (cc::cocosSpine::SpineMeshBlendInfo *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineMeshBlendInfo>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg1->indexOffset, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
+    
+    
+    return true;
+}
+SE_BIND_PROP_SET(js_cc_cocosSpine_SpineMeshBlendInfo_indexOffset_set) 
+
+static bool js_cc_cocosSpine_SpineMeshBlendInfo_indexOffset_get(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    cc::cocosSpine::SpineMeshBlendInfo *arg1 = (cc::cocosSpine::SpineMeshBlendInfo *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineMeshBlendInfo>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= nativevalue_to_se(arg1->indexOffset, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_PROP_GET(js_cc_cocosSpine_SpineMeshBlendInfo_indexOffset_get) 
+
+static bool js_cc_cocosSpine_SpineMeshBlendInfo_indexCount_set(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cocosSpine::SpineMeshBlendInfo *arg1 = (cc::cocosSpine::SpineMeshBlendInfo *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineMeshBlendInfo>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg1->indexCount, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
+    
+    
+    return true;
+}
+SE_BIND_PROP_SET(js_cc_cocosSpine_SpineMeshBlendInfo_indexCount_set) 
+
+static bool js_cc_cocosSpine_SpineMeshBlendInfo_indexCount_get(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    cc::cocosSpine::SpineMeshBlendInfo *arg1 = (cc::cocosSpine::SpineMeshBlendInfo *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineMeshBlendInfo>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= nativevalue_to_se(arg1->indexCount, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_PROP_GET(js_cc_cocosSpine_SpineMeshBlendInfo_indexCount_get) 
+
+static bool js_new_cc_cocosSpine_SpineMeshBlendInfo(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    
+    cc::cocosSpine::SpineMeshBlendInfo *result;
+    result = (cc::cocosSpine::SpineMeshBlendInfo *)new cc::cocosSpine::SpineMeshBlendInfo();
+    
+    
+    auto *ptr = JSB_MAKE_PRIVATE_OBJECT_WITH_INSTANCE(result);
+    s.thisObject()->setPrivateObject(ptr);
+    return true;
+}
+SE_BIND_CTOR(js_new_cc_cocosSpine_SpineMeshBlendInfo, __jsb_cc_cocosSpine_SpineMeshBlendInfo_class, js_delete_cc_cocosSpine_SpineMeshBlendInfo)
+
+static bool js_delete_cc_cocosSpine_SpineMeshBlendInfo(se::State& s)
+{
+    return true;
+}
+SE_BIND_FINALIZE_FUNC(js_delete_cc_cocosSpine_SpineMeshBlendInfo) 
+
+template<>
+bool sevalue_to_native(const se::Value &from, cc::cocosSpine::SpineMeshBlendInfo * to, se::Object *ctx)
+{
+    assert(from.isObject());
+    se::Object *json = from.toObject();
+    auto* data = reinterpret_cast<cc::cocosSpine::SpineMeshBlendInfo*>(json->getPrivateData());
+    if (data) {
+        *to = *data;
+        return true;
+    }
+    se::Value field;
+    bool ok = true;
+    
+    json->getProperty("blendMode", &field, true);
+    if (!field.isNullOrUndefined()) {
+        ok &= sevalue_to_native(field, &(to->blendMode), ctx);
+    }
+    
+    
+    json->getProperty("indexOffset", &field, true);
+    if (!field.isNullOrUndefined()) {
+        ok &= sevalue_to_native(field, &(to->indexOffset), ctx);
+    }
+    
+    
+    json->getProperty("indexCount", &field, true);
+    if (!field.isNullOrUndefined()) {
+        ok &= sevalue_to_native(field, &(to->indexCount), ctx);
+    }
+    
+    
+    return ok;
+}
 
 
-se::Class* __jsb_cc_cocosSpine_Skeleton2DMesh_class = nullptr;
-se::Object* __jsb_cc_cocosSpine_Skeleton2DMesh_proto = nullptr;
-SE_DECLARE_FINALIZE_FUNC(js_delete_cc_cocosSpine_Skeleton2DMesh) 
+bool js_register_cc_cocosSpine_SpineMeshBlendInfo(se::Object* obj) {
+    auto* cls = se::Class::create("SpineMeshBlendInfo", obj, nullptr, _SE(js_new_cc_cocosSpine_SpineMeshBlendInfo)); 
+    
+    cls->defineStaticProperty("__isJSB", se::Value(true), se::PropertyAttribute::READ_ONLY | se::PropertyAttribute::DONT_ENUM | se::PropertyAttribute::DONT_DELETE);
+    cls->defineProperty("blendMode", _SE(js_cc_cocosSpine_SpineMeshBlendInfo_blendMode_get), _SE(js_cc_cocosSpine_SpineMeshBlendInfo_blendMode_set)); 
+    cls->defineProperty("indexOffset", _SE(js_cc_cocosSpine_SpineMeshBlendInfo_indexOffset_get), _SE(js_cc_cocosSpine_SpineMeshBlendInfo_indexOffset_set)); 
+    cls->defineProperty("indexCount", _SE(js_cc_cocosSpine_SpineMeshBlendInfo_indexCount_get), _SE(js_cc_cocosSpine_SpineMeshBlendInfo_indexCount_set)); 
+    
+    
+    
+    
+    
+    cls->defineFinalizeFunction(_SE(js_delete_cc_cocosSpine_SpineMeshBlendInfo));
+    
+    
+    cls->install();
+    JSBClassType::registerClass<cc::cocosSpine::SpineMeshBlendInfo>(cls);
+    
+    __jsb_cc_cocosSpine_SpineMeshBlendInfo_proto = cls->getProto();
+    __jsb_cc_cocosSpine_SpineMeshBlendInfo_class = cls;
+    se::ScriptEngine::getInstance()->clearException();
+    return true;
+}
 
-static bool js_new_cc_cocosSpine_Skeleton2DMesh__SWIG_0(se::State& s) // NOLINT(readability-identifier-naming)
+
+se::Class* __jsb_cc_cocosSpine_SpineSkeletonMeshData_class = nullptr;
+se::Object* __jsb_cc_cocosSpine_SpineSkeletonMeshData_proto = nullptr;
+SE_DECLARE_FINALIZE_FUNC(js_delete_cc_cocosSpine_SpineSkeletonMeshData) 
+
+static bool js_new_cc_cocosSpine_SpineSkeletonMeshData__SWIG_0(se::State& s) // NOLINT(readability-identifier-naming)
 {
     const auto& args = s.args();
     CC_UNUSED bool ok = true;
-    cc::cocosSpine::Skeleton2DMesh *result;
-    result = (cc::cocosSpine::Skeleton2DMesh *)new cc::cocosSpine::Skeleton2DMesh();
+    cc::cocosSpine::SpineSkeletonMeshData *result;
+    result = (cc::cocosSpine::SpineSkeletonMeshData *)new cc::cocosSpine::SpineSkeletonMeshData();
     
     
     auto *ptr = JSB_MAKE_PRIVATE_OBJECT_WITH_INSTANCE(result);
@@ -95,24 +268,74 @@ static bool js_new_cc_cocosSpine_Skeleton2DMesh__SWIG_0(se::State& s) // NOLINT(
 }
 
 
-static bool js_new_cc_cocosSpine_Skeleton2DMesh__SWIG_1(se::State& s) // NOLINT(readability-identifier-naming)
+static bool js_new_cc_cocosSpine_SpineSkeletonMeshData__SWIG_1(se::State& s) // NOLINT(readability-identifier-naming)
 {
     const auto& args = s.args();
     CC_UNUSED bool ok = true;
-    int arg1 ;
-    int arg2 ;
-    int arg3 ;
-    cc::cocosSpine::Skeleton2DMesh *result;
+    uint32_t arg1 ;
+    uint32_t arg2 ;
+    uint32_t arg3 ;
+    cc::cocosSpine::SpineSkeletonMeshData *result;
     
     ok &= sevalue_to_native(args[0], &arg1, s.thisObject());
-    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
+    
+    ok &= sevalue_to_native(args[1], &arg2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
+    
+    ok &= sevalue_to_native(args[2], &arg3, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
+    result = (cc::cocosSpine::SpineSkeletonMeshData *)new cc::cocosSpine::SpineSkeletonMeshData(arg1,arg2,arg3);
+    
+    
+    auto *ptr = JSB_MAKE_PRIVATE_OBJECT_WITH_INSTANCE(result);
+    s.thisObject()->setPrivateObject(ptr);
+    return true;
+}
+
+
+static bool js_new_cc_cocosSpine_SpineSkeletonMeshData__SWIG_2(se::State& s) // NOLINT(readability-identifier-naming)
+{
+    const auto& args = s.args();
+    CC_UNUSED bool ok = true;
+    uint32_t arg1 ;
+    uint8_t *arg2 = (uint8_t *) NULL ;
+    uint16_t *arg3 = (uint16_t *) NULL ;
+    uint32_t arg4 ;
+    uint32_t arg5 ;
+    uint32_t arg6 ;
+    uint32_t arg7 ;
+    cc::cocosSpine::SpineSkeletonMeshData *result;
+    
+    ok &= sevalue_to_native(args[0], &arg1, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
     
     ok &= sevalue_to_native(args[1], &arg2, s.thisObject());
     SE_PRECONDITION2(ok, false, "Error processing arguments"); 
     
     ok &= sevalue_to_native(args[2], &arg3, s.thisObject());
     SE_PRECONDITION2(ok, false, "Error processing arguments"); 
-    result = (cc::cocosSpine::Skeleton2DMesh *)new cc::cocosSpine::Skeleton2DMesh(arg1,arg2,arg3);
+    
+    ok &= sevalue_to_native(args[3], &arg4, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
+    
+    ok &= sevalue_to_native(args[4], &arg5, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
+    
+    ok &= sevalue_to_native(args[5], &arg6, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
+    
+    ok &= sevalue_to_native(args[6], &arg7, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
+    result = (cc::cocosSpine::SpineSkeletonMeshData *)new cc::cocosSpine::SpineSkeletonMeshData(arg1,arg2,arg3,arg4,arg5,arg6,arg7);
     
     
     auto *ptr = JSB_MAKE_PRIVATE_OBJECT_WITH_INSTANCE(result);
@@ -121,147 +344,328 @@ static bool js_new_cc_cocosSpine_Skeleton2DMesh__SWIG_1(se::State& s) // NOLINT(
 }
 
 
-static bool js_new_Skeleton2DMesh(se::State& s) // NOLINT(readability-identifier-naming)
+static bool js_new_SpineSkeletonMeshData(se::State& s) // NOLINT(readability-identifier-naming)
 {
     size_t argc = s.args().size();
     bool ret = false;
     
     if(argc == 0) {
-        ret = js_new_cc_cocosSpine_Skeleton2DMesh__SWIG_0(s);
+        ret = js_new_cc_cocosSpine_SpineSkeletonMeshData__SWIG_0(s);
         if (ret) {
             return ret; 
         } /* reset exception and return */
     }
     
     if(argc == 3) {
-        ret = js_new_cc_cocosSpine_Skeleton2DMesh__SWIG_1(s);
+        ret = js_new_cc_cocosSpine_SpineSkeletonMeshData__SWIG_1(s);
         if (ret) {
             return ret; 
         } /* reset exception and return */
     }
     
-    SE_REPORT_ERROR("Illegal arguments for construction of Skeleton2DMesh");
+    if(argc == 7) {
+        ret = js_new_cc_cocosSpine_SpineSkeletonMeshData__SWIG_2(s);
+        if (ret) {
+            return ret; 
+        } /* reset exception and return */
+    }
+    
+    SE_REPORT_ERROR("Illegal arguments for construction of SpineSkeletonMeshData");
     return false;
 }
-SE_BIND_CTOR(js_new_Skeleton2DMesh, __jsb_cc_cocosSpine_Skeleton2DMesh_class, js_delete_cc_cocosSpine_Skeleton2DMesh)
+SE_BIND_CTOR(js_new_SpineSkeletonMeshData, __jsb_cc_cocosSpine_SpineSkeletonMeshData_class, js_delete_cc_cocosSpine_SpineSkeletonMeshData)
 
-static bool js_delete_cc_cocosSpine_Skeleton2DMesh(se::State& s)
+static bool js_delete_cc_cocosSpine_SpineSkeletonMeshData(se::State& s)
 {
     return true;
 }
-SE_BIND_FINALIZE_FUNC(js_delete_cc_cocosSpine_Skeleton2DMesh) 
+SE_BIND_FINALIZE_FUNC(js_delete_cc_cocosSpine_SpineSkeletonMeshData) 
 
-static bool js_cc_cocosSpine_Skeleton2DMesh_vertices_get(se::State& s)
+static bool js_cc_cocosSpine_SpineSkeletonMeshData_Release(se::State& s)
 {
     CC_UNUSED bool ok = true;
-    cc::cocosSpine::Skeleton2DMesh *arg1 = (cc::cocosSpine::Skeleton2DMesh *) NULL ;
-    std::vector< float > *result = 0 ;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cocosSpine::SpineSkeletonMeshData *arg1 = (cc::cocosSpine::SpineSkeletonMeshData *) NULL ;
     
-    arg1 = SE_THIS_OBJECT<cc::cocosSpine::Skeleton2DMesh>(s);
+    if(argc != 0) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonMeshData>(s);
     if (nullptr == arg1) return true;
-    result = (std::vector< float > *) &cc_cocosSpine_Skeleton2DMesh_vertices_get(arg1);
+    (arg1)->Release();
     
-    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonMeshData_Release) 
+
+static bool js_cc_cocosSpine_SpineSkeletonMeshData_vBuf_set(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cocosSpine::SpineSkeletonMeshData *arg1 = (cc::cocosSpine::SpineSkeletonMeshData *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonMeshData>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg1->vBuf, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    
+    
+    return true;
+}
+SE_BIND_PROP_SET(js_cc_cocosSpine_SpineSkeletonMeshData_vBuf_set) 
+
+static bool js_cc_cocosSpine_SpineSkeletonMeshData_vBuf_get(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    cc::cocosSpine::SpineSkeletonMeshData *arg1 = (cc::cocosSpine::SpineSkeletonMeshData *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonMeshData>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= nativevalue_to_se(arg1->vBuf, s.rval(), s.thisObject());
     SE_PRECONDITION2(ok, false, "Error processing arguments");
-    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    SE_HOLD_RETURN_VALUE(arg1->vBuf, s.thisObject(), s.rval()); 
     
     
     return true;
 }
-SE_BIND_PROP_GET(js_cc_cocosSpine_Skeleton2DMesh_vertices_get) 
+SE_BIND_PROP_GET(js_cc_cocosSpine_SpineSkeletonMeshData_vBuf_get) 
 
-static bool js_cc_cocosSpine_Skeleton2DMesh_indices_get(se::State& s)
+static bool js_cc_cocosSpine_SpineSkeletonMeshData_iBuf_set(se::State& s)
 {
     CC_UNUSED bool ok = true;
-    cc::cocosSpine::Skeleton2DMesh *arg1 = (cc::cocosSpine::Skeleton2DMesh *) NULL ;
-    std::vector< uint16_t > *result = 0 ;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cocosSpine::SpineSkeletonMeshData *arg1 = (cc::cocosSpine::SpineSkeletonMeshData *) NULL ;
     
-    arg1 = SE_THIS_OBJECT<cc::cocosSpine::Skeleton2DMesh>(s);
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonMeshData>(s);
     if (nullptr == arg1) return true;
-    result = (std::vector< uint16_t > *) &cc_cocosSpine_Skeleton2DMesh_indices_get(arg1);
     
-    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    ok &= sevalue_to_native(args[0], &arg1->iBuf, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    
+    
+    return true;
+}
+SE_BIND_PROP_SET(js_cc_cocosSpine_SpineSkeletonMeshData_iBuf_set) 
+
+static bool js_cc_cocosSpine_SpineSkeletonMeshData_iBuf_get(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    cc::cocosSpine::SpineSkeletonMeshData *arg1 = (cc::cocosSpine::SpineSkeletonMeshData *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonMeshData>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= nativevalue_to_se(arg1->iBuf, s.rval(), s.thisObject());
     SE_PRECONDITION2(ok, false, "Error processing arguments");
-    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    SE_HOLD_RETURN_VALUE(arg1->iBuf, s.thisObject(), s.rval()); 
     
     
     return true;
 }
-SE_BIND_PROP_GET(js_cc_cocosSpine_Skeleton2DMesh_indices_get) 
+SE_BIND_PROP_GET(js_cc_cocosSpine_SpineSkeletonMeshData_iBuf_get) 
 
-static bool js_cc_cocosSpine_Skeleton2DMesh_byteStride_get(se::State& s)
+static bool js_cc_cocosSpine_SpineSkeletonMeshData_vCount_set(se::State& s)
 {
     CC_UNUSED bool ok = true;
-    cc::cocosSpine::Skeleton2DMesh *arg1 = (cc::cocosSpine::Skeleton2DMesh *) NULL ;
-    int result;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cocosSpine::SpineSkeletonMeshData *arg1 = (cc::cocosSpine::SpineSkeletonMeshData *) NULL ;
     
-    arg1 = SE_THIS_OBJECT<cc::cocosSpine::Skeleton2DMesh>(s);
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonMeshData>(s);
     if (nullptr == arg1) return true;
-    result = (int)cc_cocosSpine_Skeleton2DMesh_byteStride_get(arg1);
     
-    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    ok &= sevalue_to_native(args[0], &arg1->vCount, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
     
     
     return true;
 }
-SE_BIND_PROP_GET(js_cc_cocosSpine_Skeleton2DMesh_byteStride_get) 
+SE_BIND_PROP_SET(js_cc_cocosSpine_SpineSkeletonMeshData_vCount_set) 
 
-static bool js_cc_cocosSpine_Skeleton2DMesh_vCount_get(se::State& s)
+static bool js_cc_cocosSpine_SpineSkeletonMeshData_vCount_get(se::State& s)
 {
     CC_UNUSED bool ok = true;
-    cc::cocosSpine::Skeleton2DMesh *arg1 = (cc::cocosSpine::Skeleton2DMesh *) NULL ;
-    int result;
+    cc::cocosSpine::SpineSkeletonMeshData *arg1 = (cc::cocosSpine::SpineSkeletonMeshData *) NULL ;
     
-    arg1 = SE_THIS_OBJECT<cc::cocosSpine::Skeleton2DMesh>(s);
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonMeshData>(s);
     if (nullptr == arg1) return true;
-    result = (int)cc_cocosSpine_Skeleton2DMesh_vCount_get(arg1);
     
-    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    ok &= nativevalue_to_se(arg1->vCount, s.rval(), s.thisObject()); 
     
     
     return true;
 }
-SE_BIND_PROP_GET(js_cc_cocosSpine_Skeleton2DMesh_vCount_get) 
+SE_BIND_PROP_GET(js_cc_cocosSpine_SpineSkeletonMeshData_vCount_get) 
 
-static bool js_cc_cocosSpine_Skeleton2DMesh_iCount_get(se::State& s)
+static bool js_cc_cocosSpine_SpineSkeletonMeshData_iCount_set(se::State& s)
 {
     CC_UNUSED bool ok = true;
-    cc::cocosSpine::Skeleton2DMesh *arg1 = (cc::cocosSpine::Skeleton2DMesh *) NULL ;
-    int result;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cocosSpine::SpineSkeletonMeshData *arg1 = (cc::cocosSpine::SpineSkeletonMeshData *) NULL ;
     
-    arg1 = SE_THIS_OBJECT<cc::cocosSpine::Skeleton2DMesh>(s);
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonMeshData>(s);
     if (nullptr == arg1) return true;
-    result = (int)cc_cocosSpine_Skeleton2DMesh_iCount_get(arg1);
     
-    ok &= nativevalue_to_se(result, s.rval(), s.thisObject()); 
+    ok &= sevalue_to_native(args[0], &arg1->iCount, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
     
     
     return true;
 }
-SE_BIND_PROP_GET(js_cc_cocosSpine_Skeleton2DMesh_iCount_get) 
+SE_BIND_PROP_SET(js_cc_cocosSpine_SpineSkeletonMeshData_iCount_set) 
 
-bool js_register_cc_cocosSpine_Skeleton2DMesh(se::Object* obj) {
-    auto* cls = se::Class::create("Skeleton2DMesh", obj, nullptr, _SE(js_new_Skeleton2DMesh)); 
+static bool js_cc_cocosSpine_SpineSkeletonMeshData_iCount_get(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    cc::cocosSpine::SpineSkeletonMeshData *arg1 = (cc::cocosSpine::SpineSkeletonMeshData *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonMeshData>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= nativevalue_to_se(arg1->iCount, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_PROP_GET(js_cc_cocosSpine_SpineSkeletonMeshData_iCount_get) 
+
+static bool js_cc_cocosSpine_SpineSkeletonMeshData_byteStride_set(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cocosSpine::SpineSkeletonMeshData *arg1 = (cc::cocosSpine::SpineSkeletonMeshData *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonMeshData>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg1->byteStride, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
+    
+    
+    return true;
+}
+SE_BIND_PROP_SET(js_cc_cocosSpine_SpineSkeletonMeshData_byteStride_set) 
+
+static bool js_cc_cocosSpine_SpineSkeletonMeshData_byteStride_get(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    cc::cocosSpine::SpineSkeletonMeshData *arg1 = (cc::cocosSpine::SpineSkeletonMeshData *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonMeshData>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= nativevalue_to_se(arg1->byteStride, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_PROP_GET(js_cc_cocosSpine_SpineSkeletonMeshData_byteStride_get) 
+
+static bool js_cc_cocosSpine_SpineSkeletonMeshData_slotIndex_set(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cocosSpine::SpineSkeletonMeshData *arg1 = (cc::cocosSpine::SpineSkeletonMeshData *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonMeshData>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg1->slotIndex, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
+    
+    
+    return true;
+}
+SE_BIND_PROP_SET(js_cc_cocosSpine_SpineSkeletonMeshData_slotIndex_set) 
+
+static bool js_cc_cocosSpine_SpineSkeletonMeshData_slotIndex_get(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    cc::cocosSpine::SpineSkeletonMeshData *arg1 = (cc::cocosSpine::SpineSkeletonMeshData *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonMeshData>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= nativevalue_to_se(arg1->slotIndex, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_PROP_GET(js_cc_cocosSpine_SpineSkeletonMeshData_slotIndex_get) 
+
+static bool js_cc_cocosSpine_SpineSkeletonMeshData_blendMode_set(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cocosSpine::SpineSkeletonMeshData *arg1 = (cc::cocosSpine::SpineSkeletonMeshData *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonMeshData>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg1->blendMode, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    
+    
+    
+    return true;
+}
+SE_BIND_PROP_SET(js_cc_cocosSpine_SpineSkeletonMeshData_blendMode_set) 
+
+static bool js_cc_cocosSpine_SpineSkeletonMeshData_blendMode_get(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    cc::cocosSpine::SpineSkeletonMeshData *arg1 = (cc::cocosSpine::SpineSkeletonMeshData *) NULL ;
+    
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonMeshData>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= nativevalue_to_se(arg1->blendMode, s.rval(), s.thisObject()); 
+    
+    
+    return true;
+}
+SE_BIND_PROP_GET(js_cc_cocosSpine_SpineSkeletonMeshData_blendMode_get) 
+
+bool js_register_cc_cocosSpine_SpineSkeletonMeshData(se::Object* obj) {
+    auto* cls = se::Class::create("SpineSkeletonMeshData", obj, nullptr, _SE(js_new_SpineSkeletonMeshData)); 
     
     cls->defineStaticProperty("__isJSB", se::Value(true), se::PropertyAttribute::READ_ONLY | se::PropertyAttribute::DONT_ENUM | se::PropertyAttribute::DONT_DELETE);
-    cls->defineProperty("vertices", _SE(js_cc_cocosSpine_Skeleton2DMesh_vertices_get), nullptr); 
-    cls->defineProperty("indices", _SE(js_cc_cocosSpine_Skeleton2DMesh_indices_get), nullptr); 
-    cls->defineProperty("byteStride", _SE(js_cc_cocosSpine_Skeleton2DMesh_byteStride_get), nullptr); 
-    cls->defineProperty("vCount", _SE(js_cc_cocosSpine_Skeleton2DMesh_vCount_get), nullptr); 
-    cls->defineProperty("iCount", _SE(js_cc_cocosSpine_Skeleton2DMesh_iCount_get), nullptr); 
+    cls->defineProperty("vBuf", _SE(js_cc_cocosSpine_SpineSkeletonMeshData_vBuf_get), _SE(js_cc_cocosSpine_SpineSkeletonMeshData_vBuf_set)); 
+    cls->defineProperty("iBuf", _SE(js_cc_cocosSpine_SpineSkeletonMeshData_iBuf_get), _SE(js_cc_cocosSpine_SpineSkeletonMeshData_iBuf_set)); 
+    cls->defineProperty("vCount", _SE(js_cc_cocosSpine_SpineSkeletonMeshData_vCount_get), _SE(js_cc_cocosSpine_SpineSkeletonMeshData_vCount_set)); 
+    cls->defineProperty("iCount", _SE(js_cc_cocosSpine_SpineSkeletonMeshData_iCount_get), _SE(js_cc_cocosSpine_SpineSkeletonMeshData_iCount_set)); 
+    cls->defineProperty("byteStride", _SE(js_cc_cocosSpine_SpineSkeletonMeshData_byteStride_get), _SE(js_cc_cocosSpine_SpineSkeletonMeshData_byteStride_set)); 
+    cls->defineProperty("slotIndex", _SE(js_cc_cocosSpine_SpineSkeletonMeshData_slotIndex_get), _SE(js_cc_cocosSpine_SpineSkeletonMeshData_slotIndex_set)); 
+    cls->defineProperty("blendMode", _SE(js_cc_cocosSpine_SpineSkeletonMeshData_blendMode_get), _SE(js_cc_cocosSpine_SpineSkeletonMeshData_blendMode_set)); 
+    
+    cls->defineFunction("Release", _SE(js_cc_cocosSpine_SpineSkeletonMeshData_Release)); 
     
     
     
     
-    
-    cls->defineFinalizeFunction(_SE(js_delete_cc_cocosSpine_Skeleton2DMesh));
+    cls->defineFinalizeFunction(_SE(js_delete_cc_cocosSpine_SpineSkeletonMeshData));
     
     
     cls->install();
-    JSBClassType::registerClass<cc::cocosSpine::Skeleton2DMesh>(cls);
+    JSBClassType::registerClass<cc::cocosSpine::SpineSkeletonMeshData>(cls);
     
-    __jsb_cc_cocosSpine_Skeleton2DMesh_proto = cls->getProto();
-    __jsb_cc_cocosSpine_Skeleton2DMesh_class = cls;
+    __jsb_cc_cocosSpine_SpineSkeletonMeshData_proto = cls->getProto();
+    __jsb_cc_cocosSpine_SpineSkeletonMeshData_class = cls;
     se::ScriptEngine::getInstance()->clearException();
     return true;
 }
@@ -323,38 +727,12 @@ static bool js_cc_cocosSpine_SpineSkeletonRendererUI_updateMeshData(se::State& s
     const auto& args = s.args();
     size_t argc = args.size();
     cc::cocosSpine::SpineSkeletonRendererUI *arg1 = (cc::cocosSpine::SpineSkeletonRendererUI *) NULL ;
-    std::vector< cc::cocosSpine::Skeleton2DMesh * > *arg2 = 0 ;
-    std::vector< cc::cocosSpine::Skeleton2DMesh * > temp2 ;
+    cc::cocosSpine::SpineSkeletonMeshData *arg2 = (cc::cocosSpine::SpineSkeletonMeshData *) NULL ;
+    std::vector< cc::cocosSpine::SpineMeshBlendInfo > *arg3 = 0 ;
+    std::vector< cc::cocosSpine::SpineMeshBlendInfo > temp3 ;
     
-    if(argc != 1) {
-        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
-        return false;
-    }
-    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonRendererUI>(s);
-    if (nullptr == arg1) return true;
-    
-    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
-    SE_PRECONDITION2(ok, false, "Error processing arguments");
-    arg2 = &temp2;
-    
-    (arg1)->updateMeshData(*arg2);
-    
-    
-    return true;
-}
-SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonRendererUI_updateMeshData) 
-
-static bool js_cc_cocosSpine_SpineSkeletonRendererUI_requestDrawInfo(se::State& s)
-{
-    CC_UNUSED bool ok = true;
-    const auto& args = s.args();
-    size_t argc = args.size();
-    cc::cocosSpine::SpineSkeletonRendererUI *arg1 = (cc::cocosSpine::SpineSkeletonRendererUI *) NULL ;
-    int arg2 ;
-    cc::RenderDrawInfo *result = 0 ;
-    
-    if(argc != 1) {
-        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    if(argc != 2) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 2);
         return false;
     }
     arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonRendererUI>(s);
@@ -362,16 +740,37 @@ static bool js_cc_cocosSpine_SpineSkeletonRendererUI_requestDrawInfo(se::State& 
     
     ok &= sevalue_to_native(args[0], &arg2, s.thisObject());
     SE_PRECONDITION2(ok, false, "Error processing arguments"); 
-    result = (cc::RenderDrawInfo *)(arg1)->requestDrawInfo(arg2);
     
-    ok &= nativevalue_to_se(result, s.rval(), s.thisObject());
+    ok &= sevalue_to_native(args[1], &temp3, s.thisObject());
     SE_PRECONDITION2(ok, false, "Error processing arguments");
-    SE_HOLD_RETURN_VALUE(result, s.thisObject(), s.rval()); 
+    arg3 = &temp3;
+    
+    (arg1)->updateMeshData(arg2,*arg3);
     
     
     return true;
 }
-SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonRendererUI_requestDrawInfo) 
+SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonRendererUI_updateMeshData) 
+
+static bool js_cc_cocosSpine_SpineSkeletonRendererUI_onDestroy(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cocosSpine::SpineSkeletonRendererUI *arg1 = (cc::cocosSpine::SpineSkeletonRendererUI *) NULL ;
+    
+    if(argc != 0) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonRendererUI>(s);
+    if (nullptr == arg1) return true;
+    (arg1)->onDestroy();
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonRendererUI_onDestroy) 
 
 static bool js_cc_cocosSpine_SpineSkeletonRendererUI_getMaterial(se::State& s)
 {
@@ -478,7 +877,7 @@ bool js_register_cc_cocosSpine_SpineSkeletonRendererUI(se::Object* obj) {
     
     cls->defineFunction("setRenderEntity", _SE(js_cc_cocosSpine_SpineSkeletonRendererUI_setRenderEntity)); 
     cls->defineFunction("updateMeshData", _SE(js_cc_cocosSpine_SpineSkeletonRendererUI_updateMeshData)); 
-    cls->defineFunction("requestDrawInfo", _SE(js_cc_cocosSpine_SpineSkeletonRendererUI_requestDrawInfo)); 
+    cls->defineFunction("onDestroy", _SE(js_cc_cocosSpine_SpineSkeletonRendererUI_onDestroy)); 
     cls->defineFunction("getMaterial", _SE(js_cc_cocosSpine_SpineSkeletonRendererUI_getMaterial)); 
     cls->defineFunction("setMaterial", _SE(js_cc_cocosSpine_SpineSkeletonRendererUI_setMaterial)); 
     cls->defineFunction("getTexture", _SE(js_cc_cocosSpine_SpineSkeletonRendererUI_getTexture)); 
@@ -594,6 +993,26 @@ static bool js_cc_cocosSpine_SpineSkeletonUI_updateRenderData(se::State& s)
 }
 SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonUI_updateRenderData) 
 
+static bool js_cc_cocosSpine_SpineSkeletonUI_onDestroy(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cocosSpine::SpineSkeletonUI *arg1 = (cc::cocosSpine::SpineSkeletonUI *) NULL ;
+    
+    if(argc != 0) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonUI>(s);
+    if (nullptr == arg1) return true;
+    (arg1)->onDestroy();
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonUI_onDestroy) 
+
 bool js_register_cc_cocosSpine_SpineSkeletonUI(se::Object* obj) {
     auto* cls = se::Class::create("SpineSkeletonUI", obj, nullptr, _SE(js_new_cc_cocosSpine_SpineSkeletonUI)); 
     
@@ -602,6 +1021,7 @@ bool js_register_cc_cocosSpine_SpineSkeletonUI(se::Object* obj) {
     cls->defineFunction("setSkeletonInstance", _SE(js_cc_cocosSpine_SpineSkeletonUI_setSkeletonInstance)); 
     cls->defineFunction("setSkeletonRendererer", _SE(js_cc_cocosSpine_SpineSkeletonUI_setSkeletonRendererer)); 
     cls->defineFunction("updateRenderData", _SE(js_cc_cocosSpine_SpineSkeletonUI_updateRenderData)); 
+    cls->defineFunction("onDestroy", _SE(js_cc_cocosSpine_SpineSkeletonUI_onDestroy)); 
     
     
     
@@ -833,19 +1253,26 @@ static bool js_cc_cocosSpine_SpineSkeletonInstance_updateRenderData(se::State& s
     const auto& args = s.args();
     size_t argc = args.size();
     cc::cocosSpine::SpineSkeletonInstance *arg1 = (cc::cocosSpine::SpineSkeletonInstance *) NULL ;
-    std::vector< cc::cocosSpine::Skeleton2DMesh * > *result = 0 ;
+    std::vector< cc::cocosSpine::SpineMeshBlendInfo > *arg2 = 0 ;
+    std::vector< cc::cocosSpine::SpineMeshBlendInfo > temp2 ;
+    cc::cocosSpine::SpineSkeletonMeshData *result = 0 ;
     
-    if(argc != 0) {
-        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
+    if(argc != 1) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
         return false;
     }
     arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonInstance>(s);
     if (nullptr == arg1) return true;
-    result = (std::vector< cc::cocosSpine::Skeleton2DMesh * > *) &(arg1)->updateRenderData();
     
-    ok &= nativevalue_to_se(*result, s.rval(), s.thisObject());
+    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
     SE_PRECONDITION2(ok, false, "Error processing arguments");
-    SE_HOLD_RETURN_VALUE(*result, s.thisObject(), s.rval()); 
+    arg2 = &temp2;
+    
+    result = (cc::cocosSpine::SpineSkeletonMeshData *)(arg1)->updateRenderData(*arg2);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    SE_HOLD_RETURN_VALUE(result, s.thisObject(), s.rval()); 
     
     
     return true;
@@ -894,7 +1321,8 @@ bool register_all_cocosSpine(se::Object* obj) {
     }
     se::Object* ns = nsVal.toObject();
     /* Register classes */
-    js_register_cc_cocosSpine_Skeleton2DMesh(ns); 
+    js_register_cc_cocosSpine_SpineMeshBlendInfo(ns); 
+    js_register_cc_cocosSpine_SpineSkeletonMeshData(ns); 
     js_register_cc_cocosSpine_SpineSkeletonRendererUI(ns); 
     js_register_cc_cocosSpine_SpineSkeletonUI(ns); 
     js_register_cc_cocosSpine_SpineSkeletonInstance(ns); 

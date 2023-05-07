@@ -45,9 +45,18 @@
 bool register_all_cocosSpine(se::Object* obj);
 
 
-JSB_REGISTER_OBJECT_TYPE(cc::cocosSpine::Skeleton2DMesh);
-extern se::Object *__jsb_cc_cocosSpine_Skeleton2DMesh_proto; // NOLINT
-extern se::Class * __jsb_cc_cocosSpine_Skeleton2DMesh_class; // NOLINT
+JSB_REGISTER_OBJECT_TYPE(cc::cocosSpine::SpineMeshBlendInfo);
+extern se::Object *__jsb_cc_cocosSpine_SpineMeshBlendInfo_proto; // NOLINT
+extern se::Class * __jsb_cc_cocosSpine_SpineMeshBlendInfo_class; // NOLINT
+
+
+template<>
+bool sevalue_to_native(const se::Value &from, cc::cocosSpine::SpineMeshBlendInfo * to, se::Object *ctx);
+
+
+JSB_REGISTER_OBJECT_TYPE(cc::cocosSpine::SpineSkeletonMeshData);
+extern se::Object *__jsb_cc_cocosSpine_SpineSkeletonMeshData_proto; // NOLINT
+extern se::Class * __jsb_cc_cocosSpine_SpineSkeletonMeshData_class; // NOLINT
 
 
 JSB_REGISTER_OBJECT_TYPE(cc::cocosSpine::SpineSkeletonRendererUI);
