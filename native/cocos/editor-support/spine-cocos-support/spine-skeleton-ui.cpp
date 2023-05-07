@@ -13,19 +13,19 @@ SpineSkeletonUI::~SpineSkeletonUI() {
 
 }
 
-//void SpineSkeletonUI::setSkeletonInstance(cc::cocosSpine::Skeleton2D* obj) {
-//    skeletonInstance = obj;
-//}
-
-void SpineSkeletonUI::updateRenderData() {
-    //if (!skeletonInstance || !renderer) return;
-    //auto meshes = skeletonInstance->updateRenderData();
-    //renderer->updateMeshData(meshes);
+void SpineSkeletonUI::setSkeletonInstance(cc::cocosSpine::SpineSkeletonInstance* obj) {
+    _skeletonInstance = obj;
 }
 
-// void SpineSkeletonUI::setPartialRenderer(cc::cocosSpine::SpinePartialRendererUI* rendererUI) {
-//     renderer = rendererUI;
-// }
+void SpineSkeletonUI::setSkeletonRendererer(cc::cocosSpine::SpineSkeletonRendererUI* rendererUI) {
+    _renderer = rendererUI;
+}
+
+void SpineSkeletonUI::updateRenderData() {
+    if (!_skeletonInstance || !_renderer) return;
+    auto meshes = _skeletonInstance->updateRenderData();
+    _renderer->updateMeshData(meshes);
+}
 
 } // namespace cocosSpine
 } // namespace cc

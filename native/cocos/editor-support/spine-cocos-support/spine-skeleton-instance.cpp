@@ -70,16 +70,16 @@ void SpineSkeletonInstance::setSkin(ccstd::string &name) {
     _skeleton->setSlotsToSetupPose();
 }
 
-void SpineSkeletonInstance::setAnimation (ccstd::string &name) {
-    if (!_skeleton) return;
+bool SpineSkeletonInstance::setAnimation (uint32_t trackIndex, ccstd::string &name, bool loop) {
+    if (!_skeleton) return false;
     spine::Animation *animation = _skeleton->getData()->findAnimation(name.c_str());
     if (!animation) {
         CC_LOG_DEBUG("Spine: Animation not found:!!!");
-        return;
+        return false;
     }
-    auto *trackEntry = _animState->setAnimation(0, animation, true);
+    auto *trackEntry = _animState->setAnimation(0, animation, loop);
     _animState->apply(*_skeleton);
-    //CC_LOG_DEBUG("setAnimation:%s", name.c_str());
+    return true;
 }
 
 void SpineSkeletonInstance::updateAnimation(float dltTime) {
@@ -88,6 +88,12 @@ void SpineSkeletonInstance::updateAnimation(float dltTime) {
     _animState->update(dltTime);
     _animState->apply(*_skeleton);
     _skeleton->updateWorldTransform();
+}
+
+void SpineSkeletonInstance::setTimeScale(float scale) {
+    if (_animState) {
+        _animState->setTimeScale(scale);
+    }
 }
 
 std::vector<Skeleton2DMesh *> &SpineSkeletonInstance::updateRenderData() {
@@ -208,8 +214,8 @@ void SpineSkeletonInstance::processVertices() {
         float *ptr = mesh->vertices.data();
         for (int m = 0; m < mesh->vCount; m++) {
             float *vert = ptr + m * mesh->byteStride / sizeof(float);
-            vert[0] *= 0.01f;
-            vert[1] *= 0.01f;
+            // vert[0] *= 0.01f;
+            // vert[1] *= 0.01f;
             vert[2] = 0;
         }
         //z_offset += 0.01f;

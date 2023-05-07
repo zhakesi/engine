@@ -267,45 +267,45 @@ bool js_register_cc_cocosSpine_Skeleton2DMesh(se::Object* obj) {
 }
 
 
-se::Class* __jsb_cc_cocosSpine_SpinePartialRendererUI_class = nullptr;
-se::Object* __jsb_cc_cocosSpine_SpinePartialRendererUI_proto = nullptr;
-SE_DECLARE_FINALIZE_FUNC(js_delete_cc_cocosSpine_SpinePartialRendererUI) 
+se::Class* __jsb_cc_cocosSpine_SpineSkeletonRendererUI_class = nullptr;
+se::Object* __jsb_cc_cocosSpine_SpineSkeletonRendererUI_proto = nullptr;
+SE_DECLARE_FINALIZE_FUNC(js_delete_cc_cocosSpine_SpineSkeletonRendererUI) 
 
-static bool js_new_cc_cocosSpine_SpinePartialRendererUI(se::State& s) // NOLINT(readability-identifier-naming)
+static bool js_new_cc_cocosSpine_SpineSkeletonRendererUI(se::State& s) // NOLINT(readability-identifier-naming)
 {
     CC_UNUSED bool ok = true;
     const auto& args = s.args();
     size_t argc = args.size();
     
-    cc::cocosSpine::SpinePartialRendererUI *result;
-    result = (cc::cocosSpine::SpinePartialRendererUI *)new cc::cocosSpine::SpinePartialRendererUI();
+    cc::cocosSpine::SpineSkeletonRendererUI *result;
+    result = (cc::cocosSpine::SpineSkeletonRendererUI *)new cc::cocosSpine::SpineSkeletonRendererUI();
     
     
     auto *ptr = JSB_MAKE_PRIVATE_OBJECT_WITH_INSTANCE(result);
     s.thisObject()->setPrivateObject(ptr);
     return true;
 }
-SE_BIND_CTOR(js_new_cc_cocosSpine_SpinePartialRendererUI, __jsb_cc_cocosSpine_SpinePartialRendererUI_class, js_delete_cc_cocosSpine_SpinePartialRendererUI)
+SE_BIND_CTOR(js_new_cc_cocosSpine_SpineSkeletonRendererUI, __jsb_cc_cocosSpine_SpineSkeletonRendererUI_class, js_delete_cc_cocosSpine_SpineSkeletonRendererUI)
 
-static bool js_delete_cc_cocosSpine_SpinePartialRendererUI(se::State& s)
+static bool js_delete_cc_cocosSpine_SpineSkeletonRendererUI(se::State& s)
 {
     return true;
 }
-SE_BIND_FINALIZE_FUNC(js_delete_cc_cocosSpine_SpinePartialRendererUI) 
+SE_BIND_FINALIZE_FUNC(js_delete_cc_cocosSpine_SpineSkeletonRendererUI) 
 
-static bool js_cc_cocosSpine_SpinePartialRendererUI_setRenderEntity(se::State& s)
+static bool js_cc_cocosSpine_SpineSkeletonRendererUI_setRenderEntity(se::State& s)
 {
     CC_UNUSED bool ok = true;
     const auto& args = s.args();
     size_t argc = args.size();
-    cc::cocosSpine::SpinePartialRendererUI *arg1 = (cc::cocosSpine::SpinePartialRendererUI *) NULL ;
+    cc::cocosSpine::SpineSkeletonRendererUI *arg1 = (cc::cocosSpine::SpineSkeletonRendererUI *) NULL ;
     cc::RenderEntity *arg2 = (cc::RenderEntity *) NULL ;
     
     if(argc != 1) {
         SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
         return false;
     }
-    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpinePartialRendererUI>(s);
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonRendererUI>(s);
     if (nullptr == arg1) return true;
     
     ok &= sevalue_to_native(args[0], &arg2, s.thisObject());
@@ -315,14 +315,14 @@ static bool js_cc_cocosSpine_SpinePartialRendererUI_setRenderEntity(se::State& s
     
     return true;
 }
-SE_BIND_FUNC(js_cc_cocosSpine_SpinePartialRendererUI_setRenderEntity) 
+SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonRendererUI_setRenderEntity) 
 
-static bool js_cc_cocosSpine_SpinePartialRendererUI_updateMeshData(se::State& s)
+static bool js_cc_cocosSpine_SpineSkeletonRendererUI_updateMeshData(se::State& s)
 {
     CC_UNUSED bool ok = true;
     const auto& args = s.args();
     size_t argc = args.size();
-    cc::cocosSpine::SpinePartialRendererUI *arg1 = (cc::cocosSpine::SpinePartialRendererUI *) NULL ;
+    cc::cocosSpine::SpineSkeletonRendererUI *arg1 = (cc::cocosSpine::SpineSkeletonRendererUI *) NULL ;
     std::vector< cc::cocosSpine::Skeleton2DMesh * > *arg2 = 0 ;
     std::vector< cc::cocosSpine::Skeleton2DMesh * > temp2 ;
     
@@ -330,7 +330,7 @@ static bool js_cc_cocosSpine_SpinePartialRendererUI_updateMeshData(se::State& s)
         SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
         return false;
     }
-    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpinePartialRendererUI>(s);
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonRendererUI>(s);
     if (nullptr == arg1) return true;
     
     ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
@@ -342,14 +342,14 @@ static bool js_cc_cocosSpine_SpinePartialRendererUI_updateMeshData(se::State& s)
     
     return true;
 }
-SE_BIND_FUNC(js_cc_cocosSpine_SpinePartialRendererUI_updateMeshData) 
+SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonRendererUI_updateMeshData) 
 
-static bool js_cc_cocosSpine_SpinePartialRendererUI_requestDrawInfo(se::State& s)
+static bool js_cc_cocosSpine_SpineSkeletonRendererUI_requestDrawInfo(se::State& s)
 {
     CC_UNUSED bool ok = true;
     const auto& args = s.args();
     size_t argc = args.size();
-    cc::cocosSpine::SpinePartialRendererUI *arg1 = (cc::cocosSpine::SpinePartialRendererUI *) NULL ;
+    cc::cocosSpine::SpineSkeletonRendererUI *arg1 = (cc::cocosSpine::SpineSkeletonRendererUI *) NULL ;
     int arg2 ;
     cc::RenderDrawInfo *result = 0 ;
     
@@ -357,7 +357,7 @@ static bool js_cc_cocosSpine_SpinePartialRendererUI_requestDrawInfo(se::State& s
         SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
         return false;
     }
-    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpinePartialRendererUI>(s);
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonRendererUI>(s);
     if (nullptr == arg1) return true;
     
     ok &= sevalue_to_native(args[0], &arg2, s.thisObject());
@@ -371,23 +371,23 @@ static bool js_cc_cocosSpine_SpinePartialRendererUI_requestDrawInfo(se::State& s
     
     return true;
 }
-SE_BIND_FUNC(js_cc_cocosSpine_SpinePartialRendererUI_requestDrawInfo) 
+SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonRendererUI_requestDrawInfo) 
 
-static bool js_cc_cocosSpine_SpinePartialRendererUI_getMaterial(se::State& s)
+static bool js_cc_cocosSpine_SpineSkeletonRendererUI_getMaterial(se::State& s)
 {
     CC_UNUSED bool ok = true;
     const auto& args = s.args();
     size_t argc = args.size();
-    cc::cocosSpine::SpinePartialRendererUI *arg1 = (cc::cocosSpine::SpinePartialRendererUI *) NULL ;
+    cc::cocosSpine::SpineSkeletonRendererUI *arg1 = (cc::cocosSpine::SpineSkeletonRendererUI *) NULL ;
     cc::Material *result = 0 ;
     
     if(argc != 0) {
         SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
         return false;
     }
-    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpinePartialRendererUI>(s);
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonRendererUI>(s);
     if (nullptr == arg1) return true;
-    result = (cc::Material *)((cc::cocosSpine::SpinePartialRendererUI const *)arg1)->getMaterial();
+    result = (cc::Material *)((cc::cocosSpine::SpineSkeletonRendererUI const *)arg1)->getMaterial();
     
     ok &= nativevalue_to_se(result, s.rval(), s.thisObject());
     SE_PRECONDITION2(ok, false, "Error processing arguments");
@@ -396,21 +396,21 @@ static bool js_cc_cocosSpine_SpinePartialRendererUI_getMaterial(se::State& s)
     
     return true;
 }
-SE_BIND_FUNC(js_cc_cocosSpine_SpinePartialRendererUI_getMaterial) 
+SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonRendererUI_getMaterial) 
 
-static bool js_cc_cocosSpine_SpinePartialRendererUI_setMaterial(se::State& s)
+static bool js_cc_cocosSpine_SpineSkeletonRendererUI_setMaterial(se::State& s)
 {
     CC_UNUSED bool ok = true;
     const auto& args = s.args();
     size_t argc = args.size();
-    cc::cocosSpine::SpinePartialRendererUI *arg1 = (cc::cocosSpine::SpinePartialRendererUI *) NULL ;
+    cc::cocosSpine::SpineSkeletonRendererUI *arg1 = (cc::cocosSpine::SpineSkeletonRendererUI *) NULL ;
     cc::Material *arg2 = (cc::Material *) NULL ;
     
     if(argc != 1) {
         SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
         return false;
     }
-    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpinePartialRendererUI>(s);
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonRendererUI>(s);
     if (nullptr == arg1) return true;
     
     ok &= sevalue_to_native(args[0], &arg2, s.thisObject());
@@ -420,23 +420,23 @@ static bool js_cc_cocosSpine_SpinePartialRendererUI_setMaterial(se::State& s)
     
     return true;
 }
-SE_BIND_FUNC(js_cc_cocosSpine_SpinePartialRendererUI_setMaterial) 
+SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonRendererUI_setMaterial) 
 
-static bool js_cc_cocosSpine_SpinePartialRendererUI_getTexture(se::State& s)
+static bool js_cc_cocosSpine_SpineSkeletonRendererUI_getTexture(se::State& s)
 {
     CC_UNUSED bool ok = true;
     const auto& args = s.args();
     size_t argc = args.size();
-    cc::cocosSpine::SpinePartialRendererUI *arg1 = (cc::cocosSpine::SpinePartialRendererUI *) NULL ;
+    cc::cocosSpine::SpineSkeletonRendererUI *arg1 = (cc::cocosSpine::SpineSkeletonRendererUI *) NULL ;
     cc::Texture2D *result = 0 ;
     
     if(argc != 0) {
         SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 0);
         return false;
     }
-    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpinePartialRendererUI>(s);
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonRendererUI>(s);
     if (nullptr == arg1) return true;
-    result = (cc::Texture2D *)((cc::cocosSpine::SpinePartialRendererUI const *)arg1)->getTexture();
+    result = (cc::Texture2D *)((cc::cocosSpine::SpineSkeletonRendererUI const *)arg1)->getTexture();
     
     ok &= nativevalue_to_se(result, s.rval(), s.thisObject());
     SE_PRECONDITION2(ok, false, "Error processing arguments");
@@ -445,21 +445,21 @@ static bool js_cc_cocosSpine_SpinePartialRendererUI_getTexture(se::State& s)
     
     return true;
 }
-SE_BIND_FUNC(js_cc_cocosSpine_SpinePartialRendererUI_getTexture) 
+SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonRendererUI_getTexture) 
 
-static bool js_cc_cocosSpine_SpinePartialRendererUI_setTexture(se::State& s)
+static bool js_cc_cocosSpine_SpineSkeletonRendererUI_setTexture(se::State& s)
 {
     CC_UNUSED bool ok = true;
     const auto& args = s.args();
     size_t argc = args.size();
-    cc::cocosSpine::SpinePartialRendererUI *arg1 = (cc::cocosSpine::SpinePartialRendererUI *) NULL ;
+    cc::cocosSpine::SpineSkeletonRendererUI *arg1 = (cc::cocosSpine::SpineSkeletonRendererUI *) NULL ;
     cc::Texture2D *arg2 = (cc::Texture2D *) NULL ;
     
     if(argc != 1) {
         SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
         return false;
     }
-    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpinePartialRendererUI>(s);
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonRendererUI>(s);
     if (nullptr == arg1) return true;
     
     ok &= sevalue_to_native(args[0], &arg2, s.thisObject());
@@ -469,32 +469,32 @@ static bool js_cc_cocosSpine_SpinePartialRendererUI_setTexture(se::State& s)
     
     return true;
 }
-SE_BIND_FUNC(js_cc_cocosSpine_SpinePartialRendererUI_setTexture) 
+SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonRendererUI_setTexture) 
 
-bool js_register_cc_cocosSpine_SpinePartialRendererUI(se::Object* obj) {
-    auto* cls = se::Class::create("SpinePartialRendererUI", obj, nullptr, _SE(js_new_cc_cocosSpine_SpinePartialRendererUI)); 
+bool js_register_cc_cocosSpine_SpineSkeletonRendererUI(se::Object* obj) {
+    auto* cls = se::Class::create("SpineSkeletonRendererUI", obj, nullptr, _SE(js_new_cc_cocosSpine_SpineSkeletonRendererUI)); 
     
     cls->defineStaticProperty("__isJSB", se::Value(true), se::PropertyAttribute::READ_ONLY | se::PropertyAttribute::DONT_ENUM | se::PropertyAttribute::DONT_DELETE);
     
-    cls->defineFunction("setRenderEntity", _SE(js_cc_cocosSpine_SpinePartialRendererUI_setRenderEntity)); 
-    cls->defineFunction("updateMeshData", _SE(js_cc_cocosSpine_SpinePartialRendererUI_updateMeshData)); 
-    cls->defineFunction("requestDrawInfo", _SE(js_cc_cocosSpine_SpinePartialRendererUI_requestDrawInfo)); 
-    cls->defineFunction("getMaterial", _SE(js_cc_cocosSpine_SpinePartialRendererUI_getMaterial)); 
-    cls->defineFunction("setMaterial", _SE(js_cc_cocosSpine_SpinePartialRendererUI_setMaterial)); 
-    cls->defineFunction("getTexture", _SE(js_cc_cocosSpine_SpinePartialRendererUI_getTexture)); 
-    cls->defineFunction("setTexture", _SE(js_cc_cocosSpine_SpinePartialRendererUI_setTexture)); 
+    cls->defineFunction("setRenderEntity", _SE(js_cc_cocosSpine_SpineSkeletonRendererUI_setRenderEntity)); 
+    cls->defineFunction("updateMeshData", _SE(js_cc_cocosSpine_SpineSkeletonRendererUI_updateMeshData)); 
+    cls->defineFunction("requestDrawInfo", _SE(js_cc_cocosSpine_SpineSkeletonRendererUI_requestDrawInfo)); 
+    cls->defineFunction("getMaterial", _SE(js_cc_cocosSpine_SpineSkeletonRendererUI_getMaterial)); 
+    cls->defineFunction("setMaterial", _SE(js_cc_cocosSpine_SpineSkeletonRendererUI_setMaterial)); 
+    cls->defineFunction("getTexture", _SE(js_cc_cocosSpine_SpineSkeletonRendererUI_getTexture)); 
+    cls->defineFunction("setTexture", _SE(js_cc_cocosSpine_SpineSkeletonRendererUI_setTexture)); 
     
     
     
     
-    cls->defineFinalizeFunction(_SE(js_delete_cc_cocosSpine_SpinePartialRendererUI));
+    cls->defineFinalizeFunction(_SE(js_delete_cc_cocosSpine_SpineSkeletonRendererUI));
     
     
     cls->install();
-    JSBClassType::registerClass<cc::cocosSpine::SpinePartialRendererUI>(cls);
+    JSBClassType::registerClass<cc::cocosSpine::SpineSkeletonRendererUI>(cls);
     
-    __jsb_cc_cocosSpine_SpinePartialRendererUI_proto = cls->getProto();
-    __jsb_cc_cocosSpine_SpinePartialRendererUI_class = cls;
+    __jsb_cc_cocosSpine_SpineSkeletonRendererUI_proto = cls->getProto();
+    __jsb_cc_cocosSpine_SpineSkeletonRendererUI_class = cls;
     se::ScriptEngine::getInstance()->clearException();
     return true;
 }
@@ -526,6 +526,54 @@ static bool js_delete_cc_cocosSpine_SpineSkeletonUI(se::State& s)
 }
 SE_BIND_FINALIZE_FUNC(js_delete_cc_cocosSpine_SpineSkeletonUI) 
 
+static bool js_cc_cocosSpine_SpineSkeletonUI_setSkeletonInstance(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cocosSpine::SpineSkeletonUI *arg1 = (cc::cocosSpine::SpineSkeletonUI *) NULL ;
+    cc::cocosSpine::SpineSkeletonInstance *arg2 = (cc::cocosSpine::SpineSkeletonInstance *) NULL ;
+    
+    if(argc != 1) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonUI>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    (arg1)->setSkeletonInstance(arg2);
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonUI_setSkeletonInstance) 
+
+static bool js_cc_cocosSpine_SpineSkeletonUI_setSkeletonRendererer(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cocosSpine::SpineSkeletonUI *arg1 = (cc::cocosSpine::SpineSkeletonUI *) NULL ;
+    cc::cocosSpine::SpineSkeletonRendererUI *arg2 = (cc::cocosSpine::SpineSkeletonRendererUI *) NULL ;
+    
+    if(argc != 1) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonUI>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    (arg1)->setSkeletonRendererer(arg2);
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonUI_setSkeletonRendererer) 
+
 static bool js_cc_cocosSpine_SpineSkeletonUI_updateRenderData(se::State& s)
 {
     CC_UNUSED bool ok = true;
@@ -551,6 +599,8 @@ bool js_register_cc_cocosSpine_SpineSkeletonUI(se::Object* obj) {
     
     cls->defineStaticProperty("__isJSB", se::Value(true), se::PropertyAttribute::READ_ONLY | se::PropertyAttribute::DONT_ENUM | se::PropertyAttribute::DONT_DELETE);
     
+    cls->defineFunction("setSkeletonInstance", _SE(js_cc_cocosSpine_SpineSkeletonUI_setSkeletonInstance)); 
+    cls->defineFunction("setSkeletonRendererer", _SE(js_cc_cocosSpine_SpineSkeletonUI_setSkeletonRendererer)); 
     cls->defineFunction("updateRenderData", _SE(js_cc_cocosSpine_SpineSkeletonUI_updateRenderData)); 
     
     
@@ -696,21 +746,33 @@ static bool js_cc_cocosSpine_SpineSkeletonInstance_setAnimation(se::State& s)
     const auto& args = s.args();
     size_t argc = args.size();
     cc::cocosSpine::SpineSkeletonInstance *arg1 = (cc::cocosSpine::SpineSkeletonInstance *) NULL ;
-    ccstd::string *arg2 = 0 ;
-    ccstd::string temp2 ;
+    uint32_t arg2 ;
+    ccstd::string *arg3 = 0 ;
+    bool arg4 ;
+    ccstd::string temp3 ;
+    bool result;
     
-    if(argc != 1) {
-        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+    if(argc != 3) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 3);
         return false;
     }
     arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonInstance>(s);
     if (nullptr == arg1) return true;
     
-    ok &= sevalue_to_native(args[0], &temp2, s.thisObject());
+    ok &= sevalue_to_native(args[0], &arg2, s.thisObject());
     SE_PRECONDITION2(ok, false, "Error processing arguments");
-    arg2 = &temp2;
     
-    (arg1)->setAnimation(*arg2);
+    
+    ok &= sevalue_to_native(args[1], &temp3, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments");
+    arg3 = &temp3;
+    
+    
+    ok &= sevalue_to_native(args[2], &arg4);
+    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    result = (bool)(arg1)->setAnimation(arg2,*arg3,arg4);
+    
+    ok &= nativevalue_to_se(result, s.rval(), s.thisObject());
     
     
     return true;
@@ -740,6 +802,30 @@ static bool js_cc_cocosSpine_SpineSkeletonInstance_updateAnimation(se::State& s)
     return true;
 }
 SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonInstance_updateAnimation) 
+
+static bool js_cc_cocosSpine_SpineSkeletonInstance_setTimeScale(se::State& s)
+{
+    CC_UNUSED bool ok = true;
+    const auto& args = s.args();
+    size_t argc = args.size();
+    cc::cocosSpine::SpineSkeletonInstance *arg1 = (cc::cocosSpine::SpineSkeletonInstance *) NULL ;
+    float arg2 ;
+    
+    if(argc != 1) {
+        SE_REPORT_ERROR("wrong number of arguments: %d, was expecting %d", (int)argc, 1);
+        return false;
+    }
+    arg1 = SE_THIS_OBJECT<cc::cocosSpine::SpineSkeletonInstance>(s);
+    if (nullptr == arg1) return true;
+    
+    ok &= sevalue_to_native(args[0], &arg2, s.thisObject());
+    SE_PRECONDITION2(ok, false, "Error processing arguments"); 
+    (arg1)->setTimeScale(arg2);
+    
+    
+    return true;
+}
+SE_BIND_FUNC(js_cc_cocosSpine_SpineSkeletonInstance_setTimeScale) 
 
 static bool js_cc_cocosSpine_SpineSkeletonInstance_updateRenderData(se::State& s)
 {
@@ -776,6 +862,7 @@ bool js_register_cc_cocosSpine_SpineSkeletonInstance(se::Object* obj) {
     cls->defineFunction("setSkin", _SE(js_cc_cocosSpine_SpineSkeletonInstance_setSkin)); 
     cls->defineFunction("setAnimation", _SE(js_cc_cocosSpine_SpineSkeletonInstance_setAnimation)); 
     cls->defineFunction("updateAnimation", _SE(js_cc_cocosSpine_SpineSkeletonInstance_updateAnimation)); 
+    cls->defineFunction("setTimeScale", _SE(js_cc_cocosSpine_SpineSkeletonInstance_setTimeScale)); 
     cls->defineFunction("updateRenderData", _SE(js_cc_cocosSpine_SpineSkeletonInstance_updateRenderData)); 
     
     
@@ -808,7 +895,7 @@ bool register_all_cocosSpine(se::Object* obj) {
     se::Object* ns = nsVal.toObject();
     /* Register classes */
     js_register_cc_cocosSpine_Skeleton2DMesh(ns); 
-    js_register_cc_cocosSpine_SpinePartialRendererUI(ns); 
+    js_register_cc_cocosSpine_SpineSkeletonRendererUI(ns); 
     js_register_cc_cocosSpine_SpineSkeletonUI(ns); 
     js_register_cc_cocosSpine_SpineSkeletonInstance(ns); 
     

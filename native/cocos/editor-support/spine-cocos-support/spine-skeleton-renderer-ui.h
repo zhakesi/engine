@@ -20,13 +20,13 @@ class UIMeshBuffer;
 namespace cc {
 namespace cocosSpine {
 
-class SpinePartialRendererUI {
+class SpineSkeletonRendererUI {
 public:
-    SpinePartialRendererUI();
-    ~SpinePartialRendererUI();
+    SpineSkeletonRendererUI();
+    ~SpineSkeletonRendererUI();
     void setRenderEntity(cc::RenderEntity* entity);
     void updateMeshData(std::vector<Skeleton2DMesh *> &meshes);
-    cc::RenderDrawInfo *SpinePartialRendererUI::requestDrawInfo(int idx);
+    cc::RenderDrawInfo *requestDrawInfo(int idx);
 
     inline Material *getMaterial() const { return _material; }
     inline void setMaterial(Material *material) {

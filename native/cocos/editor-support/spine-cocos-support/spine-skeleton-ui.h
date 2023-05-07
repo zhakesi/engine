@@ -9,7 +9,7 @@
 #include "cocos/editor-support/spine/spine.h"
 #include "spine-mesh-data.h"
 #include "spine-skeleton-instance.h"
-#include "spine-partial-renderer-ui.h"
+#include "spine-skeleton-renderer-ui.h"
 
 namespace cc {
 namespace cocosSpine {
@@ -18,13 +18,13 @@ class SpineSkeletonUI {
 public:
     SpineSkeletonUI();
     ~SpineSkeletonUI();
-    //void setSkeletonInstance(cc::cocosSpine::Skeleton2D* obj);
+    void setSkeletonInstance(cc::cocosSpine::SpineSkeletonInstance* obj);
+    void setSkeletonRendererer(cc::cocosSpine::SpineSkeletonRendererUI* rendererUI);
     void updateRenderData();
-    //void setPartialRenderer(cc::cocosSpine::SpinePartialRendererUI* rendererUI);
 
 private:
-    //cc::cocosSpine::Skeleton2D* skeletonInstance = nullptr;
-    //cc::cocosSpine::SpinePartialRendererUI* renderer = nullptr;
+    cc::cocosSpine::SpineSkeletonInstance* _skeletonInstance = nullptr;
+    cc::cocosSpine::SpineSkeletonRendererUI* _renderer = nullptr;
 }; // class SpineSkeletonUI
 
 } // namespace cocosSpine

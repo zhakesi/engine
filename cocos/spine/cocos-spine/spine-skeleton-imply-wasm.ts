@@ -167,6 +167,10 @@ export class SpineSkeletonInstance {
         this._objID = _wasmInstance.createSkeletonObject();
     }
 
+    public getNativeObject (): any {
+        return null;
+    }
+
     public setSkeletonData (data: SkeletonData) {
         const uuid = data.uuid;
         const encoder = new TextEncoder();

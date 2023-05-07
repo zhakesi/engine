@@ -1,4 +1,4 @@
-#include "spine-partial-renderer-ui.h"
+#include "spine-skeleton-renderer-ui.h"
 #include "2d/renderer/RenderDrawInfo.h"
 #include "2d/renderer/RenderEntity.h"
 #include "2d/renderer/UIMeshBuffer.h"
@@ -14,19 +14,19 @@ static const std::vector<gfx::Attribute> ATTRIBUTES_V3F_T2F_C4B{
     gfx::Attribute{gfx::ATTR_NAME_COLOR, gfx::Format::RGBA8, true},
 };
 
-SpinePartialRendererUI::SpinePartialRendererUI() {
+SpineSkeletonRendererUI::SpineSkeletonRendererUI() {
 
 }
 
-SpinePartialRendererUI::~SpinePartialRendererUI() {
+SpineSkeletonRendererUI::~SpineSkeletonRendererUI() {
 
 }
 
-void SpinePartialRendererUI::setRenderEntity(cc::RenderEntity *entity) {
+void SpineSkeletonRendererUI::setRenderEntity(cc::RenderEntity *entity) {
     _entity = entity;
 }
 
-void SpinePartialRendererUI::updateMeshData(std::vector<Skeleton2DMesh *> &meshes) {
+void SpineSkeletonRendererUI::updateMeshData(std::vector<Skeleton2DMesh *> &meshes) {
     if (!_uiMesh) {
         _uiMesh = new UIMeshBuffer();
         ccstd::vector<gfx::Attribute> attrs = ATTRIBUTES_V3F_T2F_C4B;
@@ -86,7 +86,7 @@ void SpinePartialRendererUI::updateMeshData(std::vector<Skeleton2DMesh *> &meshe
     _entity->addDynamicRenderDrawInfo(curDrawInfo);
 }
 
-cc::RenderDrawInfo *SpinePartialRendererUI::requestDrawInfo(int idx) {
+cc::RenderDrawInfo *SpineSkeletonRendererUI::requestDrawInfo(int idx) {
     if (_drawInfoArray.size() < idx + 1) {
         cc::RenderDrawInfo *draw = new cc::RenderDrawInfo();
         draw->setDrawInfoType(static_cast<uint32_t>(RenderDrawInfoType::MIDDLEWARE));

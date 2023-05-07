@@ -18,8 +18,9 @@ public:
     void initSkeletonData(ccstd::string &jsonStr, ccstd::string &atlasText);
     void initSkeletonDataBinary(ccstd::string &datPath, ccstd::string &atlasText);
     void setSkin(ccstd::string &name);
-    void setAnimation (ccstd::string &name);
+    bool setAnimation(uint32_t trackIndex, ccstd::string &name, bool loop);
     void updateAnimation(float dltTime);
+    void setTimeScale(float scale);
     std::vector<Skeleton2DMesh *>& updateRenderData();
 
 private:

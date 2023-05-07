@@ -2380,12 +2380,12 @@ if(USE_MIDDLEWARE)
         cocos_source_files(
             cocos/editor-support/spine-cocos-support/spine-mesh-data.cpp
             cocos/editor-support/spine-cocos-support/spine-mesh-data.h
-            cocos/editor-support/spine-cocos-support/spine-partial-renderer-ui.cpp
-            cocos/editor-support/spine-cocos-support/spine-partial-renderer-ui.h
-            cocos/editor-support/spine-cocos-support/spine-skeleton-ui.cpp
-            cocos/editor-support/spine-cocos-support/spine-skeleton-ui.h
             cocos/editor-support/spine-cocos-support/spine-skeleton-instance.cpp
             cocos/editor-support/spine-cocos-support/spine-skeleton-instance.h
+            cocos/editor-support/spine-cocos-support/spine-skeleton-renderer-ui.cpp
+            cocos/editor-support/spine-cocos-support/spine-skeleton-renderer-ui.h
+            cocos/editor-support/spine-cocos-support/spine-skeleton-ui.cpp
+            cocos/editor-support/spine-cocos-support/spine-skeleton-ui.h
             cocos/bindings/auto/jsb_cocos-spine_auto.cpp
             cocos/bindings/auto/jsb_cocos-spine_auto.h
         )

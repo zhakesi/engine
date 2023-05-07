@@ -12,6 +12,7 @@ import { StaticVBAccessor } from '../../2d/renderer/static-vb-accessor';
 import { Batcher2D } from '../../2d/renderer/batcher-2d';
 import { MaterialInstance } from '../../render-scene';
 import { RenderEntity, RenderEntityType } from '../../2d/renderer/render-entity';
+import { NativeSpineSkeletonRendererUI } from './spine-skeleton-native-type';
 import { SpineSkeletonMesh } from './spine-skeleton-imply-wasm';
 
 let _accessor: StaticVBAccessor = null!;
@@ -96,15 +97,27 @@ export class SpineSkeletonRendererUI extends UIRenderable {
     private _mesh: SpineSkeletonMesh = null!;
     private _drawList: SpineSkeletonUIDraw[] = [];
     private _premultipliedAlpha = true;
+    private _nativeObj: NativeSpineSkeletonRendererUI = null!;
 
     constructor () {
         super();
+        if (JSB) {
+            this._nativeObj = new NativeSpineSkeletonRendererUI();
+            this._nativeObj.setRenderEntity(this._renderEntity.nativeObj);
+        }
         this._assembler = simple;
         this._useVertexOpacity = true;
     }
 
+    public nativeObject () {
+        return this._nativeObj;
+    }
+
     public setTexture (tex: Texture2D | null) {
         this._texture = tex;
+        if (this._nativeObj && tex) {
+            this._nativeObj.setTexture(tex);
+        }
     }
     set premultipliedAlpha (v: boolean) {
         this._premultipliedAlpha = v;
@@ -139,6 +152,9 @@ export class SpineSkeletonRendererUI extends UIRenderable {
             mat = builtinResMgr.get<Material>('default-spine-material');
             this.setMaterial(mat, 0);
         }
+        if (JSB) {
+            this._nativeObj.setMaterial(mat);
+        }
     }
 
     public updateRenderer () {
@@ -154,7 +170,7 @@ export class SpineSkeletonRendererUI extends UIRenderable {
         const rd = this._renderData;
         const chunk = rd.chunk;
         const accessor = chunk.vertexAccessor;
-        const indicesCount = rd.indexCount;
+        //const indicesCount = rd.indexCount;
         const meshBuffer = rd.getMeshBuffer()!;
         meshBuffer.setDirty();
         const drawList = this._drawList;
@@ -206,6 +222,7 @@ export class SpineSkeletonRendererUI extends UIRenderable {
     }
 
     private createRenderData () {
+        if (JSB) return;
         let accessor = _accessor;
         const attributes = vfmtPosUvColor4B;
         if (!accessor) {

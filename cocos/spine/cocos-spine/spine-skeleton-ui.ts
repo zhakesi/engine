@@ -31,6 +31,8 @@ import { SpineSkinEnum, SpineAnimationEnum, setEnumAttr } from './spine-define';
 import { SpineSocket } from '../skeleton';
 import { SpineSkeletonCache, SpineAnimationCache } from './spine-skeleton-cache';
 import { SpineSkeletonInstance, SpineSkeletonMesh, SpineJitterVertexEffect, SpineSwirlVertexEffect } from './spine-skeleton-imply-wasm';
+import { NativeSpineSkeletonUI } from './spine-skeleton-native-type';
+
 
 const attachMat4 = new Mat4();
 
@@ -94,19 +96,24 @@ export class SpineSkeletonUI extends Component {
     private _skinName = '';
     private _animationName = '';
     private _renderer: SpineSkeletonRendererUI | null = null;
-    declare private _skeletonInstance: SpineSkeletonInstance;
+    private _skeletonInstance: SpineSkeletonInstance = null!;
     declare private _slotTable: Map<number, string | null>;
     protected _cachedSockets: Map<string, number> = new Map<string, number>();
     protected _socketNodes: Map<number, Node> = new Map();
     protected _effect: SpineJitterVertexEffect | SpineSwirlVertexEffect | null = null;
     private _cacheInfo: SpineAnimationCacheInfo = null!;
     private _animationCache: SpineAnimationCache = null!;
+    private _nativeObj: NativeSpineSkeletonUI = null!;
 
     constructor () {
         super();
         setEnumAttr(this, 'defaultSkinIndex', Enum({}));
         setEnumAttr(this, 'animationIndex', Enum({}));
         this._skeletonInstance = new SpineSkeletonInstance();
+        if (JSB) {
+            this._nativeObj = new NativeSpineSkeletonUI();
+            this._nativeObj.setSkeletonInstance(this._skeletonInstance.getNativeObject());
+        }
     }
 
     @type(SkeletonData)
@@ -240,7 +247,7 @@ export class SpineSkeletonUI extends Component {
         return this._loop;
     }
     set loop (val) {
-        this._loop = this.loop;
+        this._loop = val;
     }
 
     /**
@@ -336,8 +343,7 @@ export class SpineSkeletonUI extends Component {
     }
 
     public onRestore () {
-        // if (!this._wasmObj) return;
-        // console.log('onRestore');
+
     }
 
     public update (dt: number) {
@@ -347,7 +353,7 @@ export class SpineSkeletonUI extends Component {
     }
 
     public onEnable () {
-        //console.log('xxx onEnable');
+
     }
 
     public onDisable () {
@@ -431,6 +437,11 @@ export class SpineSkeletonUI extends Component {
 
     private _updateRenderData () {
         if (!this._renderer) return;
+        if (JSB) {
+            this._nativeObj.updateRenderData();
+            this._renderer.markForUpdateRenderData();
+            return;
+        }
         this.updateColor();
         let mesh: SpineSkeletonMesh = null!;
         if (this._cacheMode && this._animationCache) {
@@ -455,6 +466,10 @@ export class SpineSkeletonUI extends Component {
         if (!render) {
             render = this.node.addComponent(SpineSkeletonRendererUI);
         }
+        if (JSB) {
+            this._nativeObj.setSkeletonRendererer(render.nativeObject());
+        }
+
         render.setTexture(this._texture);
         this._renderer = render;
     }
@@ -509,7 +524,7 @@ export class SpineSkeletonUI extends Component {
     }
 
     private _updateUseTint () {
-        console.log('xxx- updateUseTint');
+
     }
 
     private _updateUITransform () {
