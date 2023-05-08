@@ -48,6 +48,9 @@ export * from './skeleton-data';
 export * from './skeleton-texture';
 export * from './vertex-effect-delegate';
 export * from './assembler';
+export { waitForSpineWasmInstantiation as default } from './cocos-spine/instantiated';
+export * from './cocos-spine/spine-skeleton-ui';
+export * from './cocos-spine/spine-skeleton-renderer-ui';
 
 export { spine };
 
