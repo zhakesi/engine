@@ -1,5 +1,5 @@
 import { SkeletonData } from '../skeleton-data';
-import { getSpineSpineWasmInstance, wasmResourceInstance } from './instantiated';
+import { getSpineWasmInstance, wasmResourceInstance, getSpineWasmMemory } from './instantiated';
 import { Mat4, Color } from '../../core';
 import { ccclass } from '../../core/data/decorators';
 
@@ -72,7 +72,7 @@ class SpineVertexEffectDelegate {
     constructor () {
         this.handle = -1;
         if (!_wasmInstance) {
-            _wasmInstance = getSpineSpineWasmInstance();
+            _wasmInstance = getSpineWasmInstance();
         }
     }
     public getHandle () {
@@ -162,8 +162,8 @@ export class SpineSwirlVertexEffect extends SpineVertexEffectDelegate {
 
 export class SpineSkeletonInstance {
     constructor () {
-        if (!_wasmInstance) _wasmInstance = getSpineSpineWasmInstance();
-        if (!_wasmHEAPU8) _wasmHEAPU8 = new Uint8Array(_wasmInstance.memory.buffer);
+        if (!_wasmInstance) _wasmInstance = getSpineWasmInstance();
+        if (!_wasmHEAPU8) _wasmHEAPU8 = getSpineWasmMemory();
         this._objID = _wasmInstance.createSkeletonObject();
     }
 

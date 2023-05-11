@@ -34,10 +34,10 @@ const pageSize = 65536; // 64KiB
 
 // How many pages of the wasm memory
 // TODO: let this can be canfiguable by user.
-const pageCount = 250;
+const pageCount = 250 * 16;
 
 // How mush memory size of the wasm memory
-const memorySize = pageSize * pageCount; // 16 MiB
+//const memorySize = 16 * pageSize * pageCount; // 16 MiB
 
 let btInstance: SpineWasm.instance = {} as any;
 
@@ -132,6 +132,8 @@ function _jsReadFile (start: number, length: number): number {
     return dataSize;
 }
 
+// const wasmMemory: any = {};
+// wasmMemory.buffer = new ArrayBuffer(pageSize * pageCount);
 const asmLibraryArg = {
     __assert_fail: _assert_fail,
     consoleInfo: _consoleInfo,
@@ -149,6 +151,7 @@ const asmLibraryArg = {
     fd_read: _reportError,
     fd_write: _reportError,
     jsReadFile: _jsReadFile,
+    memory: null,
 };
 
 function initWasm (wasmUrl: string) {
@@ -168,38 +171,44 @@ function initWasm (wasmUrl: string) {
 
 function initAsm (resolve) {
     console.log('[Spine]: Using asmjs libs.');
-    const factory = asmFactory;
-    // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-    true && factory().then((Instance: any) => {
-        btInstance = Instance;
-        _HEAPU8 = (btInstance as any).HEAPU8;
-        console.log('xxxx');
+    const wasmMemory: any = {};
+    wasmMemory.buffer = new ArrayBuffer(pageSize * pageCount);
+    asmLibraryArg.memory = wasmMemory;
+    const module = {
+        asmLibraryArg1: asmLibraryArg,
+        wasmMemory,
+    };
+    return asmFactory(module).then((instance: any) => {
+        btInstance = (instance).asm;
+        btInstance.spineWasmInstanceInit();
+        _HEAPU8 = instance.HEAPU8;
     });
 }
 
 export function waitForSpineWasmInstantiation () {
     return new Promise<void>((resolve) => {
         const errorReport = (msg: any) => { console.error(msg); };
-        // if (WASM_SUPPORT_MODE === WebAssemblySupportMode.MAYBE_SUPPORT) {
-        //     if (sys.hasFeature(sys.Feature.WASM)) {
-        //         initWasm(spineWasmUrl).then(resolve).catch(errorReport);
-        //     } else {
-        //         initAsm(resolve);
-        //     }
-        // } else if (WASM_SUPPORT_MODE === WebAssemblySupportMode.SUPPORT) {
-        //     initWasm(spineWasmUrl).then(resolve).catch(errorReport);
-        // } else {
-        //     initAsm(resolve);
-        // }
-        initAsm(resolve);
-    }).then(() => {
-        btInstance.spineWasmInstanceInit();
+        if (WASM_SUPPORT_MODE === WebAssemblySupportMode.MAYBE_SUPPORT) {
+            if (sys.hasFeature(sys.Feature.WASM)) {
+                initWasm(spineWasmUrl).then(resolve).catch(errorReport);
+            } else {
+                initAsm(resolve).then(resolve).catch(errorReport);
+            }
+        } else if (WASM_SUPPORT_MODE === WebAssemblySupportMode.SUPPORT) {
+            initWasm(spineWasmUrl).then(resolve).catch(errorReport);
+        } else {
+            initAsm(resolve).then(resolve).catch(errorReport);
+        }
     });
 }
+
 if (!JSB) {
     game.onPostInfrastructureInitDelegate.add(waitForSpineWasmInstantiation);
 }
 
-export function getSpineSpineWasmInstance (): SpineWasm.instance {
+export function getSpineWasmInstance (): SpineWasm.instance {
     return btInstance;
+}
+export function getSpineWasmMemory (): Uint8Array {
+    return _HEAPU8;
 }
