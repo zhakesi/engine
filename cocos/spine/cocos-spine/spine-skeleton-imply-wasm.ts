@@ -1,11 +1,14 @@
 import { SkeletonData } from '../skeleton-data';
+import { SpineSkeletonInstanceInterface } from './spine-skeleton-instance-interface';
 import { getSpineWasmInstance, wasmResourceInstance, getSpineWasmMemory } from './instantiated';
 import { Mat4, Color } from '../../core';
 import { ccclass } from '../../core/data/decorators';
 
+type WASMPtr = number;
+
 const floatStride = 6;
 
-let _wasmInstance: any = null!;
+let _wasmInstance: SpineWasm.instance = null!;
 let _wasmHEAPU8: Uint8Array = null!;
 
 function alignedBytes (address: number, bytes: number) {
@@ -160,11 +163,11 @@ export class SpineSwirlVertexEffect extends SpineVertexEffectDelegate {
     }
 }
 
-export class SpineSkeletonInstance {
+export class SpineSkeletonInstance implements SpineSkeletonInstanceInterface {
     constructor () {
         if (!_wasmInstance) _wasmInstance = getSpineWasmInstance();
         if (!_wasmHEAPU8) _wasmHEAPU8 = getSpineWasmMemory();
-        this._objID = _wasmInstance.createSkeletonObject();
+        this._objPtr = _wasmInstance.createSkeletonObject();
     }
 
     public getNativeObject (): any {
@@ -188,7 +191,7 @@ export class SpineSkeletonInstance {
                 _wasmInstance.recordSkeletonDataUUID(length, datPtr);
             }
         }
-        _wasmInstance.setSkeletonData(this._objID, datPtr);
+        _wasmInstance.setSkeletonData(this._objPtr, datPtr);
     }
 
     private initSkeletonData (data: SkeletonData): number {
@@ -220,7 +223,7 @@ export class SpineSkeletonInstance {
     }
 
     public updateRenderData (): SpineSkeletonMesh {
-        const address = _wasmInstance.updateRenderData(this._objID);
+        const address = _wasmInstance.updateRenderData(this._objPtr);
         let uint32Ptr = alignedBytes(address, 4);
         const heap32 = new Uint32Array(_wasmHEAPU8.buffer);
         const vc = heap32[uint32Ptr++];
@@ -259,7 +262,7 @@ export class SpineSkeletonInstance {
         const local = _wasmInstance.queryStoreMemory();
         const array = _wasmHEAPU8.subarray(local, local + length);
         array.set(encoded);
-        _wasmInstance.setSkin(this._objID, length);
+        _wasmInstance.setSkin(this._objPtr, length);
         return true;
     }
 
@@ -271,29 +274,29 @@ export class SpineSkeletonInstance {
         const local = _wasmInstance.queryStoreMemory();
         const array = _wasmHEAPU8.subarray(local, local + length);
         array.set(encoded);
-        const ret = _wasmInstance.setAnimation(this._objID, length, trackIndex, loop);
+        const ret = _wasmInstance.setAnimation(this._objPtr, length, trackIndex, loop);
         return ret;
     }
 
     public clearTrack (trackIndex: number) {
-        _wasmInstance.clearTrack(this._objID, trackIndex);
+        _wasmInstance.clearTrack(this._objPtr, trackIndex);
     }
 
     public clearTracks () {
-        _wasmInstance.clearTracks(this._objID);
+        _wasmInstance.clearTracks(this._objPtr);
     }
 
     public setToSetupPose () {
-        _wasmInstance.setToSetupPose(this._objID);
+        _wasmInstance.setToSetupPose(this._objPtr);
     }
 
     public setTimeScale (timeScale: number): boolean {
-        _wasmInstance.setTimeScale(this._objID, timeScale);
+        _wasmInstance.setTimeScale(this._objPtr, timeScale);
         return true;
     }
 
     public updateAnimation (dltTime: number) {
-        _wasmInstance.updateAnimation(this._objID, dltTime);
+        _wasmInstance.updateAnimation(this._objPtr, dltTime);
     }
 
     public setMix (fromAnimation: string, toAnimation: string, duration: number) {
@@ -305,17 +308,17 @@ export class SpineSkeletonInstance {
         const array = _wasmHEAPU8.subarray(local, local + length);
         array.set(fromAnimationEncode, 0);
         array.set(toAnimationEncode, fromAnimationEncode.length);
-        _wasmInstance.setMix(this._objID, local, fromAnimationEncode.length, toAnimationEncode.length, duration);
+        _wasmInstance.setMix(this._objPtr, local, fromAnimationEncode.length, toAnimationEncode.length, duration);
     }
 
     getSlotsTable (): Map<number, string | null> {
         const table = new Map<number, string>();
-        const count = _wasmInstance.getDrawOrderSize(this._objID);
+        const count = _wasmInstance.getDrawOrderSize(this._objPtr);
 
         let i = 0;
         const decoder = new TextDecoder();
         for (i = 0; i < count; i++) {
-            const address = _wasmInstance.getSlotNameByOrder(this._objID, i);
+            const address = _wasmInstance.getSlotNameByOrder(this._objPtr, i);
             const start = alignedBytes(address, 4);
             const heap32 = new Uint32Array(_wasmHEAPU8.buffer);
             const length = heap32[start];
@@ -332,7 +335,7 @@ export class SpineSkeletonInstance {
     }
 
     public getBoneMatrix (index: number, mat: Mat4) {
-        const address = _wasmInstance.getBoneMatrix(this._objID, index);
+        const address = _wasmInstance.getBoneMatrix(this._objPtr, index);
         const start = address / 4;
         const floatArray = new Float32Array(_wasmHEAPU8.buffer);
         mat.m00 = floatArray[start];
@@ -344,7 +347,7 @@ export class SpineSkeletonInstance {
     }
 
     public setDefaultScale (scale: number) {
-        _wasmInstance.setDefaultScale(this._objID, scale);
+        _wasmInstance.setDefaultScale(this._objPtr, scale);
     }
 
     public setVertexEffect (effect: SpineJitterVertexEffect | SpineSwirlVertexEffect | null) {
@@ -352,11 +355,11 @@ export class SpineSkeletonInstance {
         if (effect) {
             effectHandle = effect.getHandle();
         }
-        _wasmInstance.setVertexEffect(this._objID, effectHandle, 0);
+        _wasmInstance.setVertexEffect(this._objPtr, effectHandle, 0);
     }
 
     public setPremultipliedAlpha (premultipliedAlpha: boolean) {
-        _wasmInstance.setPremultipliedAlpha(this._objID, premultipliedAlpha);
+        _wasmInstance.setPremultipliedAlpha(this._objPtr, premultipliedAlpha);
     }
 
     public setColor (color: Color) {
@@ -364,12 +367,20 @@ export class SpineSkeletonInstance {
         const g = color.g / 255.0;
         const b = color.b / 255.0;
         const a = color.a / 255.0;
-        _wasmInstance.setColor(this._objID, r, g, b, a);
+        _wasmInstance.setColor(this._objPtr, r, g, b, a);
     }
 
     public onDestroy () {
-        _wasmInstance.destroyInstance(this._objID);
+        _wasmInstance.destroyInstance(this._objPtr);
     }
 
-    private _objID: number;
+    public setSlotsToSetupPose (): void {
+        _wasmInstance.setSlotsToSetupPose(this._objPtr);
+    }
+
+    public setBonesToSetupPose (): void {
+        _wasmInstance.setBonesToSetupPose(this._objPtr);
+    }
+
+    private _objPtr: WASMPtr = 0;
 }

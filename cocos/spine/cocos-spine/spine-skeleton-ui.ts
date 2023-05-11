@@ -95,7 +95,7 @@ export class SpineSkeletonUI extends Component {
     private _skinName = '';
     private _animationName = '';
     private _renderer: SpineSkeletonRendererUI | null = null;
-    private _skeletonInstance: SpineSkeletonInstance = null!;
+    private _skeleton: SpineSkeletonInstance = null!;
     declare private _slotTable: Map<number, string | null>;
     protected _cachedSockets: Map<string, number> = new Map<string, number>();
     protected _socketNodes: Map<number, Node> = new Map();
@@ -107,7 +107,7 @@ export class SpineSkeletonUI extends Component {
         super();
         setEnumAttr(this, 'defaultSkinIndex', Enum({}));
         setEnumAttr(this, 'animationIndex', Enum({}));
-        this._skeletonInstance = new SpineSkeletonInstance();
+        this._skeleton = new SpineSkeletonInstance();
     }
 
     @type(SkeletonData)
@@ -254,7 +254,7 @@ export class SpineSkeletonUI extends Component {
     set premultipliedAlpha (v: boolean) {
         if (v !== this._premultipliedAlpha) {
             this._premultipliedAlpha = v;
-            this._skeletonInstance.setPremultipliedAlpha(this._premultipliedAlpha);
+            this._skeleton.setPremultipliedAlpha(this._premultipliedAlpha);
             if (this._renderer) this._renderer.premultipliedAlpha = v;
         }
     }
@@ -290,7 +290,7 @@ export class SpineSkeletonUI extends Component {
         if (this._skinName === skinName) return;
 
         this._skinName = skinName;
-        this._skeletonInstance.setSkin(skinName);
+        this._skeleton.setSkin(skinName);
         this._updateRenderData();
     }
 
@@ -355,19 +355,19 @@ export class SpineSkeletonUI extends Component {
     }
 
     public onDestroy () {
-        if (this._skeletonInstance) {
-            this._skeletonInstance.onDestroy();
-            this._skeletonInstance = null!;
+        if (this._skeleton) {
+            this._skeleton.onDestroy();
+            this._skeleton = null!;
         }
     }
 
     protected _updateSkeletonData () {
         this._updateUITransform();
-        if (this._skeletonData === null || this._skeletonInstance === null) return;
-        this._skeletonInstance.setSkeletonData(this._skeletonData);
+        if (this._skeletonData === null || this._skeleton === null) return;
+        this._skeleton.setSkeletonData(this._skeletonData);
         this.setSkin(this._skinName);
         this.setAnimation(0, this._animationName);
-        this._slotTable = this._skeletonInstance.getSlotsTable();
+        this._slotTable = this._skeleton.getSlotsTable();
         this._indexBoneSockets();
         this._updateSocketBindings();
 
@@ -393,8 +393,8 @@ export class SpineSkeletonUI extends Component {
     public setAnimation (trackIndex: number, name: string, loop?: boolean) {
         if (loop !== undefined) this._loop = loop;
         if (trackIndex === 0) this._animationName = name;
-        this._skeletonInstance.setAnimation(trackIndex, name, this._loop);
-        this._skeletonInstance.setTimeScale(this._timeScale);
+        this._skeleton.setAnimation(trackIndex, name, this._loop);
+        this._skeleton.setTimeScale(this._timeScale);
         this._updateRenderData();
 
         if (this._cacheMode && this._cacheInfo) {
@@ -404,7 +404,7 @@ export class SpineSkeletonUI extends Component {
 
     public clearTrack (trackIndex: number) {
         if (this._cacheMode) return;
-        this._skeletonInstance.clearTrack(trackIndex);
+        this._skeleton.clearTrack(trackIndex);
     }
 
     public clearTracks () {
@@ -413,20 +413,20 @@ export class SpineSkeletonUI extends Component {
             this._cacheInfo.clear();
             return;
         }
-        this._skeletonInstance.clearTracks();
+        this._skeleton.clearTracks();
     }
 
     public setToSetupPose () {
-        this._skeletonInstance.setToSetupPose();
+        this._skeleton.setToSetupPose();
     }
 
     public setVertexEffectDelegate (effect: SpineJitterVertexEffect | SpineSwirlVertexEffect | null) {
         this._effect = effect;
-        this._skeletonInstance.setVertexEffect(this._effect);
+        this._skeleton.setVertexEffect(this._effect);
     }
 
     public updateTimeScale (val: number) {
-        this._skeletonInstance.setTimeScale(val);
+        this._skeleton.setTimeScale(val);
     }
 
     private _updateRenderData () {
@@ -439,12 +439,12 @@ export class SpineSkeletonUI extends Component {
             if (animationCache.frames[frameIdx]) {
                 mesh = animationCache.frames[frameIdx];
             } else {
-                mesh = this._skeletonInstance.updateRenderData();
+                mesh = this._skeleton.updateRenderData();
                 animationCache.frames[frameIdx] = mesh.clone();
                 animationCache.checkCompleted();
             }
         } else {
-            mesh = this._skeletonInstance.updateRenderData();
+            mesh = this._skeleton.updateRenderData();
         }
         this._renderer.mesh = mesh!;
         this._renderer.markForUpdateRenderData();
@@ -504,7 +504,7 @@ export class SpineSkeletonUI extends Component {
         for (const boneIdx of socketNodes.keys()) {
             const boneNode = socketNodes.get(boneIdx);
             if (!boneNode) continue;
-            this._skeletonInstance.getBoneMatrix(boneIdx, attachMat4);
+            this._skeleton.getBoneMatrix(boneIdx, attachMat4);
             boneNode.matrix = attachMat4;
         }
     }
@@ -533,18 +533,18 @@ export class SpineSkeletonUI extends Component {
 
     public setMix (fromAnimation: string, toAnimation: string, duration: number): void {
         if (!this._skeletonData) return;
-        this._skeletonInstance.setMix(fromAnimation, toAnimation,  duration);
+        this._skeleton.setMix(fromAnimation, toAnimation,  duration);
     }
 
     public updateColor (force?: boolean): void {
         if (force || this.node._uiProps.colorDirty) {
-            this._skeletonInstance.setColor(this._renderer!.color);
+            this._skeleton.setColor(this._renderer!.color);
         }
     }
 
     private _updateAnimation (dt: number) {
         if (!this._cacheMode) {
-            this._skeletonInstance.updateAnimation(dt);
+            this._skeleton.updateAnimation(dt);
             return;
         }
         if (!this._animationCache) return;
@@ -557,7 +557,28 @@ export class SpineSkeletonUI extends Component {
         this._cacheInfo.currFrameIdx = frameIdx;
         const frames = this._animationCache.frames;
         if (!frames[frameIdx]) {
-            this._skeletonInstance.updateAnimation(frameTime);
+            this._skeleton.updateAnimation(frameTime);
+        }
+    }
+
+    /**
+     * @en Sets the slots to the setup pose,
+     * using the values from the `SlotData` list in the `SkeletonData`.
+     * @zh 设置 slot 到起始动作。
+     * 使用 SkeletonData 中的 SlotData 列表中的值。
+     */
+    public setSlotsToSetupPose () {
+        this._skeleton.setSlotsToSetupPose();
+    }
+    /**
+     * @en Sets the bones to the setup pose,
+     * using the values from the `BoneData` list in the `SkeletonData`.
+     * @zh 设置 bone 到起始动作。
+     * 使用 SkeletonData 中的 BoneData 列表中的值。
+     */
+    public setBonesToSetupPose () {
+        if (this._skeleton) {
+            this._skeleton.setBonesToSetupPose();
         }
     }
 }
