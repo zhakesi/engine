@@ -50,22 +50,29 @@ EMSCRIPTEN_KEEPALIVE bool setAnimation(uint32_t objPtr, uint32_t length, uint32_
     return handle->setAnimation(trackIndex, animation, loop);
 }
 
-EMSCRIPTEN_KEEPALIVE bool clearTrack(uint32_t objPtr, uint32_t trackIndex) {
+EMSCRIPTEN_KEEPALIVE void clearTrack(uint32_t objPtr, uint32_t trackIndex) {
     auto handle = (SkeletonHandle)objPtr;
     handle->clearTrack(trackIndex);
-    return true;
 }
 
-EMSCRIPTEN_KEEPALIVE bool clearTracks(uint32_t objPtr) {
+EMSCRIPTEN_KEEPALIVE void clearTracks(uint32_t objPtr) {
     auto handle = (SkeletonHandle)objPtr;
     handle->clearTracks();
-    return true;
 }
 
-EMSCRIPTEN_KEEPALIVE bool setToSetupPose(uint32_t objPtr) {
+EMSCRIPTEN_KEEPALIVE void setToSetupPose(uint32_t objPtr) {
     auto handle = (SkeletonHandle)objPtr;
     handle->setToSetupPose();
-    return true;
+}
+
+EMSCRIPTEN_KEEPALIVE void setSlotsToSetupPose(uint32_t objPtr) {
+    auto handle = (SkeletonHandle)objPtr;
+    handle->setSlotsToSetupPose();
+}
+
+EMSCRIPTEN_KEEPALIVE void setBonesToSetupPose(uint32_t objPtr) {
+    auto handle = (SkeletonHandle)objPtr;
+    handle->setBonesToSetupPose();
 }
 
 EMSCRIPTEN_KEEPALIVE bool setTimeScale(uint32_t objPtr, float timeScale) {

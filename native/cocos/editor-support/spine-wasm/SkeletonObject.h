@@ -30,11 +30,14 @@ public:
     uint32_t updateRenderData();
     uint32_t setSkin(std::string& skinName);
     bool     setAnimation(uint32_t trackIndex, std::string &animationName, bool loop);
+    uint32_t updateAnimation(float dltTime);
+    void     setAttachment(uint32_t start, uint32_t slotLength, uint32_t attachLength);
     void     clearTrack(uint32_t trackIndex);
     void     clearTracks();
     void     setToSetupPose();
+    void     setSlotsToSetupPose();
+    void     setBonesToSetupPose();
     uint32_t setTimeScale(float timeScale);
-    uint32_t updateAnimation(float dltTime);
     void     setMix(uint32_t start, uint32_t fromLength, uint32_t toLength, float duration);
     uint32_t getDrawOrderSize();
     uint32_t getSlotNameByOrder(uint32_t index);

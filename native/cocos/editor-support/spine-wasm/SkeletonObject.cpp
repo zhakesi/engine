@@ -319,8 +319,18 @@ void SkeletonObject::clearTracks() {
     _animState->clearTracks();
 }
 
-void SkeletonObject::setToSetupPose(){
+void SkeletonObject::setToSetupPose() {
     _skeleton->setToSetupPose();
+}
+
+void SkeletonObject::setSlotsToSetupPose() {
+    _skeleton->setSlotsToSetupPose();
+    LogUtil::PrintToJs("setSlotsToSetupPose");
+}
+
+void SkeletonObject::setBonesToSetupPose() {
+    _skeleton->setBonesToSetupPose();
+    LogUtil::PrintToJs("setBonesToSetupPose");
 }
 
 uint32_t SkeletonObject::setTimeScale(float timeScale)
@@ -331,8 +341,15 @@ uint32_t SkeletonObject::setTimeScale(float timeScale)
     return true;
 }
 
+void SkeletonObject::setAttachment(uint32_t start, uint32_t slotLength, uint32_t attachLength) {
+    spine::String slotName = DataConvert::Convert2SpineString(start, slotLength);
+    spine::String attachName = DataConvert::Convert2SpineString(start + slotLength, attachLength);
+    _skeleton->setAttachment(slotName, attachName);
+    LogUtil::PrintToJs(slotName);
+    LogUtil::PrintToJs(attachName);
+}
+
 uint32_t SkeletonObject::updateAnimation(float dltTime) {
-    if (!_skeleton) return false;
     _skeleton->update(dltTime);
     _animState->update(dltTime);
     _animState->apply(*_skeleton);
