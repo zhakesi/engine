@@ -136,7 +136,7 @@ export class SpineSkeletonRendererUI extends UIRenderable {
         super.onDisable();
     }
 
-    protected updateMaterial () {
+    public updateMaterial () {
         let mat;
         if (this._customMaterial) {
             mat = this._customMaterial;

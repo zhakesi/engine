@@ -51,6 +51,8 @@ export * from './assembler';
 export { waitForSpineWasmInstantiation as default } from './cocos-spine/instantiated';
 export * from './cocos-spine/spine-skeleton-ui';
 export * from './cocos-spine/spine-skeleton-renderer-ui';
+export * from './cocos-spine/spine-skeleton-animation';
+export * from './cocos-spine/spine-skeleton-model-renderer';
 
 export { spine };
 
