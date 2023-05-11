@@ -96,7 +96,7 @@ export class SpineSkeletonRendererUI extends UIRenderable {
     private _mesh: SpineSkeletonMesh = null!;
     private _drawList: SpineSkeletonUIDraw[] = [];
     private _premultipliedAlpha = true;
-    private _nativeObj: NativeSpineSkeletonRendererUI = null!;
+    //private _nativeObj: NativeSpineSkeletonRendererUI = null!;
 
     constructor () {
         super();
@@ -105,14 +105,14 @@ export class SpineSkeletonRendererUI extends UIRenderable {
     }
 
     public nativeObject () {
-        return this._nativeObj;
+        //return this._nativeObj;
     }
 
     public setTexture (tex: Texture2D | null) {
         this._texture = tex;
-        if (this._nativeObj && tex) {
-            this._nativeObj.setTexture(tex);
-        }
+        // if (this._nativeObj && tex) {
+        //     this._nativeObj.setTexture(tex);
+        // }
     }
     set premultipliedAlpha (v: boolean) {
         this._premultipliedAlpha = v;

@@ -254,7 +254,7 @@ export class SpineSkeletonInstance implements SpineSkeletonInstanceInterface {
         return mesh;
     }
 
-    public setSkin (name: string): boolean {
+    public setSkin (name: string) {
         const encoder = new TextEncoder();
         const encoded = encoder.encode(name);
         const length = encoded.length;
@@ -263,10 +263,9 @@ export class SpineSkeletonInstance implements SpineSkeletonInstanceInterface {
         const array = _wasmHEAPU8.subarray(local, local + length);
         array.set(encoded);
         _wasmInstance.setSkin(this._objPtr, length);
-        return true;
     }
 
-    public setAnimation (trackIndex: number, name: string, loop: boolean): boolean {
+    public setAnimation (trackIndex: number, name: string, loop: boolean) {
         const encoder = new TextEncoder();
         const encoded = encoder.encode(name);
         const length = encoded.length;
@@ -290,9 +289,8 @@ export class SpineSkeletonInstance implements SpineSkeletonInstanceInterface {
         _wasmInstance.setToSetupPose(this._objPtr);
     }
 
-    public setTimeScale (timeScale: number): boolean {
+    public setTimeScale (timeScale: number) {
         _wasmInstance.setTimeScale(this._objPtr, timeScale);
-        return true;
     }
 
     public updateAnimation (dltTime: number) {
@@ -374,12 +372,24 @@ export class SpineSkeletonInstance implements SpineSkeletonInstanceInterface {
         _wasmInstance.destroyInstance(this._objPtr);
     }
 
-    public setSlotsToSetupPose (): void {
+    public setSlotsToSetupPose () {
         _wasmInstance.setSlotsToSetupPose(this._objPtr);
     }
 
     public setBonesToSetupPose (): void {
         _wasmInstance.setBonesToSetupPose(this._objPtr);
+    }
+
+    public setAttachment (slotName: string, attachmentName: string): void {
+        const encoder = new TextEncoder();
+        const slotEncode = encoder.encode(slotName);
+        const attachEncode = encoder.encode(attachmentName);
+        const length = slotEncode.length + attachEncode.length;
+        const local = _wasmInstance.queryStoreMemory();
+        const array = _wasmHEAPU8.subarray(local, local + length);
+        array.set(slotEncode, 0);
+        array.set(attachEncode, slotEncode.length);
+        _wasmInstance.setAttachment(this._objPtr, local, slotEncode.length, attachEncode.length);
     }
 
     private _objPtr: WASMPtr = 0;

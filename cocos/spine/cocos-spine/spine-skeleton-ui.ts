@@ -35,26 +35,6 @@ import { UITransform } from '../../2d';
 
 const attachMat4 = new Mat4();
 
-// eslint-disable-next-line dot-notation
-SkeletonData.prototype['init'] = function () {
-    console.log('SkeletonData.prototype init');
-    const uuid = this._uuid;
-    if (!uuid) {
-        errorID(7504);
-        return;
-    }
-    const atlasText = this.atlasText;
-    if (!atlasText) {
-        errorID(7508, this.name);
-        return;
-    }
-    const textures = this.textures;
-    const textureNames = this.textureNames;
-    if (!(textures && textures.length > 0 && textureNames && textureNames.length > 0)) {
-        errorID(7507, this.name);
-    }
-};
-
 class SpineAnimationCacheInfo {
     public playTime = -1.0 / 60.0;
     public currFrameIdx = -1;
@@ -411,7 +391,7 @@ export class SpineSkeletonUI extends Component {
         this._animationName = '<None>';
         if (this._cacheMode) {
             this._cacheInfo.clear();
-            return;
+            this._animationCache = null!;
         }
         this._skeleton.clearTracks();
     }
@@ -543,11 +523,10 @@ export class SpineSkeletonUI extends Component {
     }
 
     private _updateAnimation (dt: number) {
-        if (!this._cacheMode) {
+        if (!this._cacheMode || !this._animationCache) {
             this._skeleton.updateAnimation(dt);
             return;
         }
-        if (!this._animationCache) return;
         const frameTime = 1.0 / 60.0;
         this._cacheInfo.playTime += frameTime;
         if (this._cacheInfo.playTime > this._animationCache.totalTime) {
@@ -579,6 +558,17 @@ export class SpineSkeletonUI extends Component {
     public setBonesToSetupPose () {
         if (this._skeleton) {
             this._skeleton.setBonesToSetupPose();
+        }
+    }
+    /**
+     * @en Sets the attachment for the slot and attachment name.
+     * The skeleton looks first in its skin, then in the skeleton data’s default skin.
+     * @zh 通过 slot 和 attachment 的名字来设置 attachment。
+     * Skeleton 优先查找它的皮肤，然后才是 Skeleton Data 中默认的皮肤。
+     */
+    public setAttachment (slotName: string, attachmentName: string) {
+        if (this._skeletonData) {
+            this._skeleton.setAttachment(slotName, attachmentName);
         }
     }
 }

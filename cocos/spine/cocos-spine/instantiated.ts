@@ -30,14 +30,14 @@ import { game } from '../../game';
 import { sys } from '../../core';
 import { WebAssemblySupportMode } from '../../misc/webassembly-support';
 
-const pageSize = 65536; // 64KiB
+const PAGESIZE = 65536; // 64KiB
 
 // How many pages of the wasm memory
 // TODO: let this can be canfiguable by user.
-const pageCount = 250 * 16;
+const PAGECOUNT = 64 * 16;
 
 // How mush memory size of the wasm memory
-//const memorySize = 16 * pageSize * pageCount; // 16 MiB
+const MEMORYSIZE = PAGESIZE * PAGECOUNT; // 64 MiB
 
 let btInstance: SpineWasm.instance = {} as any;
 
@@ -132,8 +132,6 @@ function _jsReadFile (start: number, length: number): number {
     return dataSize;
 }
 
-// const wasmMemory: any = {};
-// wasmMemory.buffer = new ArrayBuffer(pageSize * pageCount);
 const asmLibraryArg = {
     __assert_fail: _assert_fail,
     consoleInfo: _consoleInfo,
@@ -151,7 +149,6 @@ const asmLibraryArg = {
     fd_read: _reportError,
     fd_write: _reportError,
     jsReadFile: _jsReadFile,
-    memory: null,
 };
 
 function initWasm (wasmUrl: string) {
@@ -172,10 +169,10 @@ function initWasm (wasmUrl: string) {
 function initAsm (resolve) {
     console.log('[Spine]: Using asmjs libs.');
     const wasmMemory: any = {};
-    wasmMemory.buffer = new ArrayBuffer(pageSize * pageCount);
-    asmLibraryArg.memory = wasmMemory;
+    wasmMemory.buffer = new ArrayBuffer(MEMORYSIZE);
+    const asmLibraryArg2 = { memory: wasmMemory };
     const module = {
-        asmLibraryArg1: asmLibraryArg,
+        asmLibraryArg1: { ...asmLibraryArg, ...asmLibraryArg2 },
         wasmMemory,
     };
     return asmFactory(module).then((instance: any) => {
