@@ -345,8 +345,8 @@ void SkeletonObject::setAttachment(uint32_t start, uint32_t slotLength, uint32_t
     spine::String slotName = DataConvert::Convert2SpineString(start, slotLength);
     spine::String attachName = DataConvert::Convert2SpineString(start + slotLength, attachLength);
     _skeleton->setAttachment(slotName, attachName);
-    LogUtil::PrintToJs(slotName);
-    LogUtil::PrintToJs(attachName);
+    LogUtil::PrintToJs(slotName.buffer());
+    LogUtil::PrintToJs(attachName.buffer());
 }
 
 uint32_t SkeletonObject::updateAnimation(float dltTime) {
@@ -405,7 +405,7 @@ uint32_t SkeletonObject::getBoneMatrix(uint32_t boneIdx) {
 
 bool SkeletonObject::setDefualtScale(float scale) {
     _userData.scale = scale;
-    if (scale - 1.0 > 0.1F || scale - 1.0 < -0.1F) {
+    if (scale - 1.0 > 0.01F || scale - 1.0 < -0.01F) {
         _userData.doScale = true;
     }
     return true;

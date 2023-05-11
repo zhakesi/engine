@@ -177,6 +177,11 @@ EMSCRIPTEN_KEEPALIVE void setColor(uint32_t objPtr, float r, float g, float b, f
     return handle->setColor(r, g, b, a);
 }
 
+EMSCRIPTEN_KEEPALIVE void setAttachment(uint32_t objPtr, uint32_t start, uint32_t length1, uint32_t length2) {
+    auto handle = (SkeletonHandle)objPtr;
+    return handle->setAttachment(start, length1, length2);
+}
+
 EMSCRIPTEN_KEEPALIVE void destroyInstance(uint32_t objPtr) {
     auto handle = (SkeletonHandle)objPtr;
     delete handle;
