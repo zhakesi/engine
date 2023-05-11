@@ -10,35 +10,13 @@
 using namespace spine;
 extern void consoleLog(uint32_t start, uint32_t length);
 
-static std::map<uint32_t, SkeletonHandle> handleTable {};
 static std::map<std::string, spine::SkeletonData*> skeletonDataTable {};
 
-static uint32_t generateID() {
-    static uint32_t id = 0;
-    return id++;
-}
-
-SkeletonHandle getSkeletonHandle(uint32_t objID) {
-    if (handleTable.find(objID) == handleTable.end()) return nullptr;
-    return handleTable[objID];
-}
-
-void removeSkeletonHandle(uint32_t objID) {
-    if (handleTable.find(objID) == handleTable.end()) return;
-    handleTable.erase(objID);
-}
-
 SkeletonObject::SkeletonObject() {
-    _objID = generateID();
-    handleTable[_objID] = this;
 }
 
 SkeletonObject::~SkeletonObject() {
     releaseMeshData();
-}
-
-uint32_t SkeletonObject::ObjectID() {
-    return _objID;
 }
 
 void SkeletonObject::setSkeletonData(uint32_t datPtr)

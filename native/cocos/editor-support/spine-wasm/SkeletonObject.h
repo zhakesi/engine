@@ -26,7 +26,6 @@ struct SpineMeshBlendInfo {
 public:
     SkeletonObject();
     ~SkeletonObject();
-    uint32_t ObjectID();
     void     setSkeletonData(uint32_t datPtr);
     uint32_t updateRenderData();
     uint32_t setSkin(std::string& skinName);
@@ -66,8 +65,6 @@ private:
 };
 
 typedef SkeletonObject* SkeletonHandle;
-SkeletonHandle getSkeletonHandle(uint32_t objID);
-void           removeSkeletonHandle(uint32_t objID);
 
 uint32_t       createSkeletonData(std::string& name, bool isJson);
 uint32_t       retainSkeletonData(std::string& uuid);

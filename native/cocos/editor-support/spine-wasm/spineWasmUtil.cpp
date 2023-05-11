@@ -33,87 +33,88 @@ EMSCRIPTEN_KEEPALIVE uint8_t* queryStoreMemory() {
 }
 
 EMSCRIPTEN_KEEPALIVE uint32_t createSkeletonObject() {
-    auto* obj = new SkeletonObject;
-    return obj->ObjectID();
+    auto* objPtr = new SkeletonObject;
+    uint32_t address = (uint32_t)objPtr;
+    return address;
 }
 
-EMSCRIPTEN_KEEPALIVE void setSkeletonData(uint32_t objID, uint32_t datPtr) {
-    auto handle = getSkeletonHandle(objID);
+EMSCRIPTEN_KEEPALIVE void setSkeletonData(uint32_t objPtr, uint32_t datPtr) {
+    auto handle = (SkeletonHandle)objPtr;
     handle->setSkeletonData(datPtr);
 }
 
-EMSCRIPTEN_KEEPALIVE bool setAnimation(uint32_t objID, uint32_t length, uint32_t trackIndex, bool loop) {
-    auto handle = getSkeletonHandle(objID);
+EMSCRIPTEN_KEEPALIVE bool setAnimation(uint32_t objPtr, uint32_t length, uint32_t trackIndex, bool loop) {
+    auto handle = (SkeletonHandle)objPtr;
     char* data = (char*)getStoreMemory();
     std::string animation(data, length);
     return handle->setAnimation(trackIndex, animation, loop);
 }
 
-EMSCRIPTEN_KEEPALIVE bool clearTrack(uint32_t objID, uint32_t trackIndex) {
-    auto handle = getSkeletonHandle(objID);
+EMSCRIPTEN_KEEPALIVE bool clearTrack(uint32_t objPtr, uint32_t trackIndex) {
+    auto handle = (SkeletonHandle)objPtr;
     handle->clearTrack(trackIndex);
     return true;
 }
 
-EMSCRIPTEN_KEEPALIVE bool clearTracks(uint32_t objID) {
-    auto handle = getSkeletonHandle(objID);
+EMSCRIPTEN_KEEPALIVE bool clearTracks(uint32_t objPtr) {
+    auto handle = (SkeletonHandle)objPtr;
     handle->clearTracks();
     return true;
 }
 
-EMSCRIPTEN_KEEPALIVE bool setToSetupPose(uint32_t objID) {
-    auto handle = getSkeletonHandle(objID);
+EMSCRIPTEN_KEEPALIVE bool setToSetupPose(uint32_t objPtr) {
+    auto handle = (SkeletonHandle)objPtr;
     handle->setToSetupPose();
     return true;
 }
 
-EMSCRIPTEN_KEEPALIVE bool setTimeScale(uint32_t objID, float timeScale) {
-    auto handle = getSkeletonHandle(objID);
+EMSCRIPTEN_KEEPALIVE bool setTimeScale(uint32_t objPtr, float timeScale) {
+    auto handle = (SkeletonHandle)objPtr;
     handle->setTimeScale(timeScale);
     return true;
 }
 
-EMSCRIPTEN_KEEPALIVE uint32_t setSkin(uint32_t objID, uint32_t length) {
+EMSCRIPTEN_KEEPALIVE uint32_t setSkin(uint32_t objPtr, uint32_t length) {
     char* data = (char*)getStoreMemory();
     std::string skin(data, length);
-    auto handle = getSkeletonHandle(objID);
+    auto handle = (SkeletonHandle)objPtr;
     handle->setSkin(skin);
     return true;
 }
 
-EMSCRIPTEN_KEEPALIVE uint32_t updateAnimation(uint32_t objID, float dltTime) {
-    auto handle = getSkeletonHandle(objID);
+EMSCRIPTEN_KEEPALIVE uint32_t updateAnimation(uint32_t objPtr, float dltTime) {
+    auto handle = (SkeletonHandle)objPtr;
     handle->updateAnimation(dltTime);
     return true;
 }
 
-EMSCRIPTEN_KEEPALIVE uint32_t updateRenderData(uint32_t objID) {
-    auto handle = getSkeletonHandle(objID);
+EMSCRIPTEN_KEEPALIVE uint32_t updateRenderData(uint32_t objPtr) {
+    auto handle = (SkeletonHandle)objPtr;
     return handle->updateRenderData();
 }
 
-EMSCRIPTEN_KEEPALIVE uint32_t getDrawOrderSize(uint32_t objID) {
-    auto handle = getSkeletonHandle(objID);
+EMSCRIPTEN_KEEPALIVE uint32_t getDrawOrderSize(uint32_t objPtr) {
+    auto handle = (SkeletonHandle)objPtr;
     return handle->getDrawOrderSize();
 }
 
-EMSCRIPTEN_KEEPALIVE uint32_t getSlotNameByOrder(uint32_t objID, uint32_t index) {
-    auto handle = getSkeletonHandle(objID);
+EMSCRIPTEN_KEEPALIVE uint32_t getSlotNameByOrder(uint32_t objPtr, uint32_t index) {
+    auto handle = (SkeletonHandle)objPtr;
     return handle->getSlotNameByOrder(index);
 }
 
-EMSCRIPTEN_KEEPALIVE uint32_t getBoneMatrix(uint32_t objID, uint32_t index) {
-    auto handle = getSkeletonHandle(objID);
+EMSCRIPTEN_KEEPALIVE uint32_t getBoneMatrix(uint32_t objPtr, uint32_t index) {
+    auto handle = (SkeletonHandle)objPtr;
     return handle->getBoneMatrix(index);
 }
 
-EMSCRIPTEN_KEEPALIVE bool setDefaultScale(uint32_t objID, float scale) {
-    auto handle = getSkeletonHandle(objID);
+EMSCRIPTEN_KEEPALIVE bool setDefaultScale(uint32_t objPtr, float scale) {
+    auto handle = (SkeletonHandle)objPtr;
     return handle->setDefualtScale(scale);
 }
 
-EMSCRIPTEN_KEEPALIVE bool setVertexEffect(uint32_t objID, uint32_t effectHandle, uint32_t effectType) {
-    auto handle = getSkeletonHandle(objID);
+EMSCRIPTEN_KEEPALIVE bool setVertexEffect(uint32_t objPtr, uint32_t effectHandle, uint32_t effectType) {
+    auto handle = (SkeletonHandle)objPtr;
     spine::VertexEffect* effect = nullptr;
     if (effectHandle > 0) effect = (spine::VertexEffect*)effectHandle;
     handle->setVertexEffect(effect);
@@ -154,27 +155,24 @@ EMSCRIPTEN_KEEPALIVE bool updateSwirlParameters(uint32_t ptr, float x, float y, 
     return true;
 }
 
-EMSCRIPTEN_KEEPALIVE void setMix(uint32_t objID, uint32_t start, uint32_t fromLength, uint32_t toLength, float duration) {
-    auto handle = getSkeletonHandle(objID);
+EMSCRIPTEN_KEEPALIVE void setMix(uint32_t objPtr, uint32_t start, uint32_t fromLength, uint32_t toLength, float duration) {
+    auto handle = (SkeletonHandle)objPtr;
     return handle->setMix(start, fromLength, toLength, duration);
 }
 
-EMSCRIPTEN_KEEPALIVE void setPremultipliedAlpha(uint32_t objID, bool premultipliedAlpha) {
-    auto handle = getSkeletonHandle(objID);
+EMSCRIPTEN_KEEPALIVE void setPremultipliedAlpha(uint32_t objPtr, bool premultipliedAlpha) {
+    auto handle = (SkeletonHandle)objPtr;
     return handle->setPremultipliedAlpha(premultipliedAlpha);
 }
 
-EMSCRIPTEN_KEEPALIVE void setColor(uint32_t objID, float r, float g, float b, float a) {
-    auto handle = getSkeletonHandle(objID);
+EMSCRIPTEN_KEEPALIVE void setColor(uint32_t objPtr, float r, float g, float b, float a) {
+    auto handle = (SkeletonHandle)objPtr;
     return handle->setColor(r, g, b, a);
 }
 
-EMSCRIPTEN_KEEPALIVE void destroyInstance(uint32_t objID) {
-    auto handle = getSkeletonHandle(objID);
-    if (handle) {
-        removeSkeletonHandle(objID);
-        delete handle;
-    }
+EMSCRIPTEN_KEEPALIVE void destroyInstance(uint32_t objPtr) {
+    auto handle = (SkeletonHandle)objPtr;
+    delete handle;
 }
 
 EMSCRIPTEN_KEEPALIVE uint32_t initSkeletonData(uint32_t length, bool isJosn) {
