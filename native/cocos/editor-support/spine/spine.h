@@ -108,5 +108,6 @@
 #include <spine/VertexAttachment.h>
 #include <spine/VertexEffect.h>
 #include <spine/Vertices.h>
+#include <spine/Vector2.h>
 
 #endif

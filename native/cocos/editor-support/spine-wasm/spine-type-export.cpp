@@ -94,37 +94,47 @@ EMSCRIPTEN_BINDINGS(spine) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     class_<Color>("Color")
-    .constructor<>()
-    .constructor<float, float, float, float>()
-    .function("set", static_cast<Color&(Color::*)(float, float, float, float)>(&Color::set))
-    .function("setFromColor", static_cast<Color&(Color::*)(const Color&)>(&Color::set))
-    .function("add", static_cast<Color&(Color::*)(float, float, float, float)>(&Color::add))
-    .function("clamp", &Color::clamp)
-    .property("r", &Color::r)
-    .property("g", &Color::g)
-    .property("b", &Color::b)
-    .property("a", &Color::a);
+        .constructor<>()
+        .constructor<float, float, float, float>()
+        .function("set", static_cast<Color&(Color::*)(float, float, float, float)>(&Color::set))
+        .function("setFromColor", static_cast<Color&(Color::*)(const Color&)>(&Color::set))
+        .function("add", static_cast<Color&(Color::*)(float, float, float, float)>(&Color::add))
+        .function("clamp", &Color::clamp)
+        .property("r", &Color::r)
+        .property("g", &Color::g)
+        .property("b", &Color::b)
+        .property("a", &Color::a);
+
+    class_<PowInterpolation>("Pow")
+        .constructor<int>()
+        .function("apply", &PowInterpolation::apply);
+ 
+    class_<Vector2>("Vector2")
+        .constructor<float, float>()
+        .function("set", static_cast<Vector2&(Vector2::*)(float, float)>(&Vector2::set))
+        .function("length", &Vector2::length)
+        .function("normalize", static_cast<Vector2&(Vector2::*)()>(&Vector2::normalize))
+        .property("x", &Vector2::x)
+        .property("y", &Vector2::y);
 
     class_<JitterVertexEffect>("JitterEffect")
-    .constructor<float, float>()
-    // .function("begin", &JitterVertexEffect::begin, allow_raw_pointers())
-    //.function("transform", &JitterVertexEffect::transform)
-    .function("end", &JitterVertexEffect::end)
-    .property("jitterX", &JitterVertexEffect::_jitterX)
-    .property("jitterY", &JitterVertexEffect::_jitterY);
-}
+        .constructor<float, float>()
+        .function("jitterX", select_overload<float()>(&JitterVertexEffect::getJitterX))
+        .function("jitterX", select_overload<void(float)>(&JitterVertexEffect::setJitterX))
+        .function("jitterY", select_overload<float()>(&JitterVertexEffect::getJitterY))
+        .function("jitterY", select_overload<void(float)>(&JitterVertexEffect::setJitterY))
+        .function("end", &JitterVertexEffect::end);
 
-class MyClass {
-public:
-    void transform(float& x, float& y) {
-        x *= 2;
-        y *= 2;
-    }
-};
+    class_<SwirlVertexEffect>("SwirlEffect")
+        .function("centerX", select_overload<float()>(&SwirlVertexEffect::getCenterX))
+        .function("centerX", select_overload<void(float)>(&SwirlVertexEffect::setCenterX))
+        .function("centerY", select_overload<float()>(&SwirlVertexEffect::getCenterY))
+        .function("centerY", select_overload<void(float)>(&SwirlVertexEffect::setCenterY))
+        .function("radius", select_overload<float()>(&SwirlVertexEffect::getRadius))
+        .function("radius", select_overload<void(float)>(&SwirlVertexEffect::setRadius))
+        .function("angle", select_overload<float()>(&SwirlVertexEffect::getAngle))
+        .function("angle", select_overload<void(float)>(&SwirlVertexEffect::setAngle))
+        .function("end", &SwirlVertexEffect::end);
 
-EMSCRIPTEN_BINDINGS(my_module) {
-    class_<MyClass>("MyClass")
-        .function("transform", optional_override([](MyClass& self, float& x, float& y){
-            return self.transform(x, y);
-        }));
+
 }
