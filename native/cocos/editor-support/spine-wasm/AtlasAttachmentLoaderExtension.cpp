@@ -1,6 +1,6 @@
 #include "AtlasAttachmentLoaderExtension.h"
 #include "MeshDataDef.h"
-#include "LogUtil.h"
+//#include "LogUtil.h"
 using namespace spine;
 
 static uint16_t quadTriangles[6] = {0, 1, 2, 2, 3, 0};

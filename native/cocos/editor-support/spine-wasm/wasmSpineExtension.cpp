@@ -1,7 +1,7 @@
 #include "wasmSpineExtension.h"
-#include "share-mem.h"
-#include "ImportDef.h"
-#include "LogUtil.h"
+// #include "share-mem.h"
+// #include "ImportDef.h"
+// #include "LogUtil.h"
 using namespace spine;
 
 
@@ -13,15 +13,16 @@ WasmSpineExtension::~WasmSpineExtension() {
 
 char *WasmSpineExtension::_readFile(const String &path, int *length)
 {
-    size_t pathSize = path.length();
-	uint8_t* uint8Ptr = getStoreMemory();
-    char* shareBuffer = (char*)uint8Ptr;
-    memcpy(shareBuffer, path.buffer(), pathSize);
-    uint32_t resultSize = jsReadFile(shareBuffer, pathSize);
-    *length = (int)resultSize;
-    uint8_t *data = new uint8_t[resultSize];
-    memcpy(data, shareBuffer, resultSize);
-	return (char*)data;
+    // size_t pathSize = path.length();
+	// uint8_t* uint8Ptr = getStoreMemory();
+    // char* shareBuffer = (char*)uint8Ptr;
+    // memcpy(shareBuffer, path.buffer(), pathSize);
+    // uint32_t resultSize = jsReadFile(shareBuffer, pathSize);
+    // *length = (int)resultSize;
+    // uint8_t *data = new uint8_t[resultSize];
+    // memcpy(data, shareBuffer, resultSize);
+	//return (char*)data;
+	return nullptr;
 }
 
 void *WasmSpineExtension::_alloc(size_t size, const char *file, int line)

@@ -59,7 +59,7 @@ public:
     void setJitterY(float jitterY);
     float getJitterY();
 
-protected:
+public:
     float _jitterX;
     float _jitterY;
 };
