@@ -167,7 +167,7 @@ Vector<PathConstraintData *> &SkeletonData::getPathConstraints() {
     return _pathConstraints;
 }
 
-float SkeletonData::getX() {
+float SkeletonData::getX() const {
     return _x;
 }
 
@@ -175,7 +175,7 @@ void SkeletonData::setX(float inValue) {
     _x = inValue;
 }
 
-float SkeletonData::getY() {
+float SkeletonData::getY() const {
     return _y;
 }
 
@@ -183,7 +183,7 @@ void SkeletonData::setY(float inValue) {
     _y = inValue;
 }
 
-float SkeletonData::getWidth() {
+float SkeletonData::getWidth() const {
     return _width;
 }
 
@@ -191,7 +191,7 @@ void SkeletonData::setWidth(float inValue) {
     _width = inValue;
 }
 
-float SkeletonData::getHeight() {
+float SkeletonData::getHeight() const {
     return _height;
 }
 

@@ -8,15 +8,20 @@ class SpineSkeletonInstance {
 public:
     SpineSkeletonInstance();
     ~SpineSkeletonInstance();
-    bool initSkeletonDataJson(const std::string& jsonStr, const std::string& altasStr);
+    SkeletonData *initSkeletonDataJson(const std::string& jsonStr, const std::string& altasStr);
+    Skeleton *initSkeleton();
+    void setAnimation(float trackIndex, const std::string& name, bool loop);
+    void setSkin(const std::string& name);
+    void updateAnimation(float dltTime);
+    void updateRenderData();
 
 private:
-    spine::Skeleton *_skeleton = nullptr;
-    spine::SkeletonData *_skeletonData = nullptr;
-    spine::AnimationStateData* _animStateData = nullptr;
-    spine::AnimationState* _animState = nullptr;
-    spine::SkeletonClipping* _clipper = nullptr;
-    spine::VertexEffect *_effect = nullptr;
+    Skeleton *_skeleton = nullptr;
+    SkeletonData *_skeletonData = nullptr;
+    AnimationStateData* _animStateData = nullptr;
+    AnimationState* _animState = nullptr;
+    SkeletonClipping* _clipper = nullptr;
+    VertexEffect *_effect = nullptr;
 };
 
 #endif

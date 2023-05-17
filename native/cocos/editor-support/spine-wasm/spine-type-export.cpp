@@ -176,26 +176,15 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("attachment", select_overload<Attachment *()>(&Skin::AttachmentMap::Entry::getAttachment), allow_raw_pointers())
         .function("attachment", select_overload<void(Attachment *)>(&Skin::AttachmentMap::Entry::setAttachment), allow_raw_pointers());
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    //         export class TextureRegion {
-    //             renderObject: any;
-    //             u: number;
-    //             v: number;
-    //             u2: number;
-    //             v2: number;
-    //             width: number;
-    //             height: number;
-    //             rotate: boolean;
-    //             offsetX: number;
-    //             offsetY: number;
-    //             originalWidth: number;
-    //             originalHeight: number;
-    //         }
-    // class_<TextureRegion>("TextureRegion")
-    //     .constructor<size_t, const String &, Attachment *>()
-    //     .property("slotIndex", &Skin::AttachmentMap::Entry::_slotIndex)
-    //     .property("name", &Skin::AttachmentMap::Entry::_name)
-    //     .function("attachment", select_overload<Attachment *()>(&Skin::AttachmentMap::Entry::getAttachment), allow_raw_pointers())
-    //     .function("attachment", select_overload<void(Attachment *)>(&Skin::AttachmentMap::Entry::setAttachment), allow_raw_pointers());    
+    class_<SkeletonData>("SkeletonData")
+        .constructor<>()
+        .property("width",&spine::SkeletonData::getWidth, &spine::SkeletonData::setWidth)
+        .property("height",&spine::SkeletonData::getHeight, &spine::SkeletonData::setHeight);
+    
+    class_<Skeleton>("Skeleton")
+        .constructor<SkeletonData *>()
+        .function("data", &Skeleton::getData, allow_raw_pointer<SkeletonData>());
+   
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
     class_<JitterVertexEffect>("JitterEffect")
         .constructor<float, float>()
@@ -218,6 +207,29 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<SpineSkeletonInstance>("SkeletonInstance")
         .constructor<>()
-        .function("initSkeletonDataJson", &SpineSkeletonInstance::initSkeletonDataJson);
+        .function("initSkeletonDataJson", &SpineSkeletonInstance::initSkeletonDataJson, allow_raw_pointer<SkeletonData>())
+        .function("initSkeleton", &SpineSkeletonInstance::initSkeleton, allow_raw_pointer<Skeleton>())
+        .function("setAnimation", &SpineSkeletonInstance::setAnimation)
+        .function("setSkin", &SpineSkeletonInstance::setSkin)
+        .function("updateAnimation", &SpineSkeletonInstance::updateAnimation)
+        .function("updateRenderData", &SpineSkeletonInstance::updateRenderData);
 
 }
+
+// class MyClass {
+// public:
+//     float getValue() const {
+//         return value;
+//     }
+//     void setValue(float v) {
+//         value =v;
+//     }
+// private:
+//     float value;
+// };
+
+// EMSCRIPTEN_BINDINGS(szzpine) {
+//     class_<MyClass>("MyClass")
+//         .constructor<>()
+//         .property("value", &MyClass::getValue, &MyClass::setValue); 
+// }

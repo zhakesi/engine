@@ -127,19 +127,19 @@ public:
 
     Vector<PathConstraintData *> &getPathConstraints();
 
-    float getX();
+    float getX() const;
 
     void setX(float inValue);
 
-    float getY();
+    float getY() const;
 
     void setY(float inValue);
 
-    float getWidth();
+    float getWidth() const;
 
     void setWidth(float inValue);
 
-    float getHeight();
+    float getHeight() const;
 
     void setHeight(float inValue);
 
