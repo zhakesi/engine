@@ -1,0 +1,25 @@
+#include <emscripten/emscripten.h>
+#include "wasmSpineExtension.h"
+#include "log-util.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+EMSCRIPTEN_KEEPALIVE void spineWasmInit() {
+    LogUtil::Initialize();
+    spine::SpineExtension* tension = new WasmSpineExtension();
+    WasmSpineExtension::RTTI_INIT();
+    spine::SpineExtension::setInstance(tension);
+    LogUtil::PrintToJs("spineWasmInit");
+}
+
+EMSCRIPTEN_KEEPALIVE void spineWasmInstanceDestroy() {
+    auto* extension = spine::SpineExtension::getInstance();
+    delete extension;
+    LogUtil::ReleaseBuffer();
+}
+
+#ifdef __cplusplus 		  
+}
+#endif

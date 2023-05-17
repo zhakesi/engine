@@ -60,6 +60,12 @@ public:
                                                                                   _name(name),
                                                                                   _attachment(attachment) {
             }
+            Attachment *getAttachment() {
+                return _attachment;
+            }
+            void setAttachment(Attachment *attach) {
+                _attachment = attach;
+            }
         };
 
         class SP_API Entries {
@@ -148,7 +154,7 @@ public:
     Vector<BoneData *> &getBones();
 
     Vector<ConstraintData *> &getConstraints();
-
+    void attachAll(Skeleton &skeleton, Skin &oldSkin);
 private:
     const String _name;
     AttachmentMap _attachments;
@@ -156,7 +162,6 @@ private:
     Vector<ConstraintData *> _constraints;
 
     /// Attach all attachments from this skin if the corresponding attachment from the old skin is currently attached.
-    void attachAll(Skeleton &skeleton, Skin &oldSkin);
 };
 } // namespace spine
 

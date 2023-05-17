@@ -1,3 +1,6 @@
+#ifndef __SPINE_ATLAS_ATTACHMENT_LOADER_EXT_H
+#define __SPINE_ATLAS_ATTACHMENT_LOADER_EXT_H
+
 #include "spine/spine.h"
 #include "MeshDataDef.h"
 
@@ -5,7 +8,6 @@ class AttachmentVertices {
 public:
     AttachmentVertices(int verticesCount, uint16_t *triangles, int trianglesCount);
     virtual ~AttachmentVertices();
-    //cc::middleware::Texture2D *_texture = nullptr;
     Triangles *_triangles = nullptr;
 };
 
@@ -15,3 +17,5 @@ public:
     virtual ~AtlasAttachmentLoaderExtension();
     virtual void configureAttachment(spine::Attachment *attachment);
 };
+
+#endif

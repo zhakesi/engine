@@ -1,4 +1,5 @@
 #include <spine/spine.h>
+#include "spine-skeleton-instance.h"
 #include <emscripten/bind.h>
 
 using namespace emscripten;
@@ -117,9 +118,88 @@ EMSCRIPTEN_BINDINGS(spine) {
         .property("x", &Vector2::x)
         .property("y", &Vector2::y);
 
+    class_<BoneData>("BoneData")
+        .constructor<int, const String&, BoneData *>()
+        .function("index", select_overload<int()>(&BoneData::getIndex))
+        .function("name", select_overload<const String &()>(&BoneData::getName))
+        .function("parent", select_overload<BoneData *()>(&BoneData::getParent), allow_raw_pointers())
+        .function("length", select_overload<float()>(&BoneData::getLength))
+        .function("x", select_overload<float()>(&BoneData::getX))
+        .function("x", select_overload<void(float)>(&BoneData::setX))
+        .function("y", select_overload<float()>(&BoneData::getY))
+        .function("y", select_overload<void(float)>(&BoneData::setY))
+        .function("rotation", select_overload<float()>(&BoneData::getRotation))
+        .function("rotation", select_overload<void(float)>(&BoneData::setRotation))
+        .function("scaleX", select_overload<float()>(&BoneData::getScaleX))
+        .function("scaleX", select_overload<void(float)>(&BoneData::setScaleX))
+        .function("scaleY", select_overload<float()>(&BoneData::getScaleY))
+        .function("scaleY", select_overload<void(float)>(&BoneData::setScaleY))
+        .function("shearX", select_overload<float()>(&BoneData::getShearX))
+        .function("shearX", select_overload<void(float)>(&BoneData::setShearX))
+        .function("shearY", select_overload<float()>(&BoneData::getShearY))
+        .function("shearY", select_overload<void(float)>(&BoneData::setShearY))
+        .function("transformMode", select_overload<TransformMode()>(&BoneData::getTransformMode))
+        .function("transformMode", select_overload<void(TransformMode)>(&BoneData::setTransformMode))
+        .function("skinRequired", select_overload<bool()>(&BoneData::isSkinRequired))
+        .function("skinRequired", select_overload<void(bool)>(&BoneData::setSkinRequired));
+    
+    class_<SlotData>("SlotData")
+        .constructor<int, const String&, BoneData &>()
+        .function("index", select_overload<int()>(&SlotData::getIndex))
+        .function("name", select_overload<const String &()>(&SlotData::getName))
+        .function("boneData", select_overload<BoneData &()>(&SlotData::getBoneData))
+        .function("color", select_overload<Color &()>(&SlotData::getColor))
+        .function("darkColor", select_overload<Color &()>(&SlotData::getDarkColor))
+        .function("attachmentName", select_overload<const String &()>(&SlotData::getAttachmentName))
+        .function("attachmentName", select_overload<void(const String &)>(&SlotData::setAttachmentName))
+        .function("blendMode", select_overload<BlendMode()>(&SlotData::getBlendMode))
+        .function("blendMode", select_overload<void (BlendMode)>(&SlotData::setBlendMode));
+
+    class_<Skin>("Skin")
+        .constructor<const String&>()
+        .function("name", select_overload<const String &()>(&Skin::getName))
+        .function("attachments", select_overload<Skin::AttachmentMap::Entries()>(&Skin::getAttachments))
+        .function("bones", select_overload<Vector<BoneData *> &()>(&Skin::getBones))
+        .function("constraints", select_overload<Vector<ConstraintData *> &()>(&Skin::getConstraints))
+        .function("setAttachment", select_overload<void(size_t, const String &, Attachment *)>(&Skin::setAttachment), allow_raw_pointers())
+        .function("addSkin", select_overload<void(Skin *)>(&Skin::addSkin), allow_raw_pointers())
+        .function("copySkin", select_overload<void(Skin *)>(&Skin::copySkin), allow_raw_pointers())
+        .function("getAttachments", select_overload<Skin::AttachmentMap::Entries ()>(&Skin::getAttachments))
+        .function("removeAttachment", select_overload<void(size_t, const String &)>(&Skin::removeAttachment))
+        .function("getAttachmentsForSlot", select_overload<void(size_t, Vector<Attachment *> &)>(&Skin::findAttachmentsForSlot), allow_raw_pointers())
+        .function("attachAll", select_overload<void(Skeleton &skeleton, Skin &oldSkin)>(&Skin::attachAll));
+
+    class_<Skin::AttachmentMap::Entry>("SkinEntry")
+        .constructor<size_t, const String &, Attachment *>()
+        .property("slotIndex", &Skin::AttachmentMap::Entry::_slotIndex)
+        .property("name", &Skin::AttachmentMap::Entry::_name)
+        .function("attachment", select_overload<Attachment *()>(&Skin::AttachmentMap::Entry::getAttachment), allow_raw_pointers())
+        .function("attachment", select_overload<void(Attachment *)>(&Skin::AttachmentMap::Entry::setAttachment), allow_raw_pointers());
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //         export class TextureRegion {
+    //             renderObject: any;
+    //             u: number;
+    //             v: number;
+    //             u2: number;
+    //             v2: number;
+    //             width: number;
+    //             height: number;
+    //             rotate: boolean;
+    //             offsetX: number;
+    //             offsetY: number;
+    //             originalWidth: number;
+    //             originalHeight: number;
+    //         }
+    // class_<TextureRegion>("TextureRegion")
+    //     .constructor<size_t, const String &, Attachment *>()
+    //     .property("slotIndex", &Skin::AttachmentMap::Entry::_slotIndex)
+    //     .property("name", &Skin::AttachmentMap::Entry::_name)
+    //     .function("attachment", select_overload<Attachment *()>(&Skin::AttachmentMap::Entry::getAttachment), allow_raw_pointers())
+    //     .function("attachment", select_overload<void(Attachment *)>(&Skin::AttachmentMap::Entry::setAttachment), allow_raw_pointers());    
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
     class_<JitterVertexEffect>("JitterEffect")
         .constructor<float, float>()
-        .function("jitterX", select_overload<float()>(&JitterVertexEffect::getJitterX))
+        .function("index", select_overload<float()>(&JitterVertexEffect::getJitterX))
         .function("jitterX", select_overload<void(float)>(&JitterVertexEffect::setJitterX))
         .function("jitterY", select_overload<float()>(&JitterVertexEffect::getJitterY))
         .function("jitterY", select_overload<void(float)>(&JitterVertexEffect::setJitterY))
@@ -136,5 +216,8 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("angle", select_overload<void(float)>(&SwirlVertexEffect::setAngle))
         .function("end", &SwirlVertexEffect::end);
 
+    class_<SpineSkeletonInstance>("SkeletonInstance")
+        .constructor<>()
+        .function("initSkeletonDataJson", &SpineSkeletonInstance::initSkeletonDataJson);
 
 }
