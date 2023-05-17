@@ -38,6 +38,7 @@ export class SpineSkeleton extends Component {
     @serializable
     protected _skeletonData: SkeletonData | null = null;
 
+    private _runtimeData: any = null;
     public _skeleton: any = null;
     private _instance: any = null;
 
@@ -57,9 +58,6 @@ export class SpineSkeleton extends Component {
         this._updateSkeletonData();
     }
 
-    public setSkin (skinName: string) {
-    }
-
     public __preload () {
         this._updateSkeletonData();
     }
@@ -69,7 +67,8 @@ export class SpineSkeleton extends Component {
     }
 
     public update (dt: number) {
-        this._updateAnimation(dt);
+        this.updateAnimation(dt);
+        this.updateRenderData();
     }
 
     public onEnable () {
@@ -82,15 +81,30 @@ export class SpineSkeleton extends Component {
     }
 
     protected _updateSkeletonData () {
-        const jsonStr = this._skeletonData!.skeletonJsonStr;
-        const altasStr = this._skeletonData!.atlasText;
-        this._skeleton = this._instance.initSkeletonDataJson(jsonStr, altasStr);
+        if (!this._skeletonData) return;
+        const jsonStr = this._skeletonData.skeletonJsonStr;
+        const altasStr = this._skeletonData.atlasText;
+        this._runtimeData = this._instance.initSkeletonDataJson(jsonStr, altasStr);
+        if (!this._runtimeData) return;
+        console.log(this._runtimeData.width);
+        console.log(this._runtimeData.height);
+        this._skeleton = this._instance.initSkeleton();
     }
 
     public setAnimation (trackIndex: number, name: string, loop?: boolean) {
+        if (loop === undefined) loop = true;
+        this._instance.setAnimation(trackIndex, name, loop);
     }
 
-    public _updateAnimation (dt: number) {
+    public setSkin (name: string) {
+        this._instance.setSkin(name);
+    }
 
+    public updateAnimation (dt: number) {
+        this._instance.updateAnimation(dt);
+    }
+
+    public updateRenderData () {
+        this._instance.updateRenderData();
     }
 }
