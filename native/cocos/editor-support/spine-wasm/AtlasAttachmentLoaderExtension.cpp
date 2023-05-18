@@ -1,5 +1,5 @@
 #include "AtlasAttachmentLoaderExtension.h"
-#include "MeshDataDef.h"
+#include "mesh-type-define.h"
 //#include "LogUtil.h"
 using namespace spine;
 

@@ -2,7 +2,7 @@
 #define __SPINE_ATLAS_ATTACHMENT_LOADER_EXT_H
 
 #include "spine/spine.h"
-#include "MeshDataDef.h"
+#include "mesh-type-define.h"
 
 class AttachmentVertices {
 public:

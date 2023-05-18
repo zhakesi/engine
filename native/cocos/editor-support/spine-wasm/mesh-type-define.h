@@ -1,5 +1,5 @@
-#ifndef __MESH_DATA_DEF_H__
-#define __MESH_DATA_DEF_H__
+#ifndef __MESH_TYPE_DEF_H__
+#define __MESH_TYPE_DEF_H__
 #include <stdint.h>
 
 struct Vec3 {
@@ -43,6 +43,20 @@ struct V3F_T2F_C4B {
     Tex2F texCoord;
 
     Color4B color;
+};
+
+struct V3F_T2F_C4B_C4B { // NOLINT
+    // vertices (3F)
+    Vec3 vertex;
+
+    // tex coords (2F)
+    Tex2F texCoord;
+
+    // colors (4F)
+    Color4B color;
+
+    // colors (4F)
+    Color4B color2;
 };
 
 struct Triangles {
