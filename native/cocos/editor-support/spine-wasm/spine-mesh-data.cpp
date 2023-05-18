@@ -44,10 +44,10 @@ void SpineMeshData::moveIB(uint32_t count) {
     iPtr += count;
 }
 
-uint8_t* SpineMeshData::queryVBuffer() {
+uint8_t* SpineMeshData::queryVBuffer(uint32_t count) {
     return vPtr;
 }
 
-uint16_t* SpineMeshData::queryIBuffer() {
+uint16_t* SpineMeshData::queryIBuffer(uint32_t count) {
     return iPtr;
 }

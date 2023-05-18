@@ -1,6 +1,7 @@
-#ifndef __SPINE_LOG_H__
-#define __SPINE_LOG_H__
+#ifndef __UTIL_FUNCTION_H__
+#define __UTIL_FUNCTION_H__
 #include <string>
+#include <stdint.h>
 class LogUtil {
 public:
     static void Initialize();
@@ -10,4 +11,13 @@ public:
     static void PrintIntValue(int value, const char* message);
     static void ReleaseBuffer();
 };
+
+class StoreMemory {
+public:
+    static uint8_t* getStoreMemory();
+    static void     freeStoreMemory();
+    static uint32_t storeMemorySize();
+};
+
+
 #endif

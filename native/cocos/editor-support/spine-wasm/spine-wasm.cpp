@@ -1,6 +1,6 @@
 #include <emscripten/emscripten.h>
 #include "wasmSpineExtension.h"
-#include "log-util.h"
+#include "util-function.h"
 #include "spine-mesh-data.h"
 
 #ifdef __cplusplus
