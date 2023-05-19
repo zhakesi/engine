@@ -26,15 +26,14 @@ import { Enum } from '../../core/value-types/enum';
 import { Component, Node } from '../../scene-graph';
 import { CCBoolean, CCFloat, Mat4 } from '../../core';
 import { SkeletonData } from '../skeleton-data';
-import { UITransform } from '../../2d';
+import { UIRenderer, UITransform } from '../../2d';
 import { spineX } from './spine-define';
 
 @ccclass('sp.SpineSkeleton')
 @help('i18n:sp.SpineSkeleton')
-@executionOrder(99)
 @menu('Spine/SpineSkeleton')
 @executeInEditMode
-export class SpineSkeleton extends Component {
+export class SpineSkeleton extends UIRenderer {
     @serializable
     protected _skeletonData: SkeletonData | null = null;
 
@@ -67,11 +66,13 @@ export class SpineSkeleton extends Component {
     }
 
     public update (dt: number) {
+        if (!this._skeletonData) return;
         this.updateAnimation(dt);
-        this.updateRenderData();
     }
 
     public onEnable () {
+        super.onEnable();
+        this._flushAssembler();
     }
 
     public onDisable () {
@@ -102,9 +103,23 @@ export class SpineSkeleton extends Component {
 
     public updateAnimation (dt: number) {
         this._instance.updateAnimation(dt);
+        this.markForUpdateRenderData();
     }
 
-    public updateRenderData () {
-        this._instance.updateRenderData();
+    public updateRenderData (): any {
+        const model = this._instance.updateRenderData();
+        return model;
+    }
+
+    protected _flushAssembler () {
+        const assembler = SpineSkeleton.Assembler.getAssembler(this);
+        if (this._assembler !== assembler) {
+            this._assembler = assembler;
+        }
+        if (this._skeleton && this._assembler) {
+            this._renderData = this._assembler.createData(this);
+            this.markForUpdateRenderData();
+            this._updateColor();
+        }
     }
 }
