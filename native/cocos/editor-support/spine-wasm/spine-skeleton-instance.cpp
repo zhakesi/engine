@@ -8,7 +8,7 @@
 using namespace spine;
 SpineSkeletonInstance::SpineSkeletonInstance()
 {
-
+    _model = new SpineModel();
 }
 
 SpineSkeletonInstance::~SpineSkeletonInstance()
@@ -18,6 +18,7 @@ SpineSkeletonInstance::~SpineSkeletonInstance()
     if (_animStateData) delete _animStateData;
     if (_skeleton) delete _skeleton;
     if (_skeletonData) delete _skeletonData;
+    if (_model) delete _model;
 }
 
 spine::SkeletonData *SpineSkeletonInstance::initSkeletonDataJson(const std::string& jsonStr, const std::string& altasStr)
@@ -80,8 +81,9 @@ void SpineSkeletonInstance::updateAnimation(float dltTime) {
     LogUtil::PrintToJs("updateAnimation");
 }
 
-void SpineSkeletonInstance::updateRenderData() {
+SpineModel* SpineSkeletonInstance::updateRenderData() {
     SpineMeshData::reset();
+    _model->clearMeshes();
 
     uint32_t byteStrideOneColor = sizeof(V3F_T2F_C4B);
     uint32_t byteStrideTwoColor = sizeof(V3F_T2F_C4B_C4B);
@@ -90,7 +92,6 @@ void SpineSkeletonInstance::updateRenderData() {
     auto &slotArray = _skeleton->getDrawOrder();
     uint32_t slotCount = slotArray.size();
 
-    std::vector<SlotMesh> meshArray;
     SlotMesh currMesh;
     if (_effect) {
         _effect->begin(*_skeleton);
@@ -121,7 +122,7 @@ void SpineSkeletonInstance::updateRenderData() {
             auto *vertices = SpineMeshData::queryVBuffer(vbSize);
             auto *indices = attachmentVertices->_triangles->indices;
             attachment->computeWorldVertices(slot->getBone(), (float*)vertices, 0, byteStrideOneColor / sizeof(float));
-            currMesh = SlotMesh((uint8_t*)vertices, indices, vertCount, indexCount, byteStrideOneColor, slot->getData().getBlendMode());
+            currMesh = SlotMesh((uint8_t*)vertices, indices, vertCount, indexCount, slot->getData().getBlendMode());
 
             color.r *= attachment->getColor().r;
             color.g *= attachment->getColor().g;
@@ -140,7 +141,7 @@ void SpineSkeletonInstance::updateRenderData() {
             auto *indices = attachmentVertices->_triangles->indices;
             attachment->computeWorldVertices(*slot, 0, attachment->getWorldVerticesLength(), (float*)vertices, 0, byteStrideOneColor / sizeof(float));
             
-            currMesh = SlotMesh((uint8_t*)vertices, indices, vertCount, indexCount, byteStrideOneColor, slot->getData().getBlendMode());
+            currMesh = SlotMesh((uint8_t*)vertices, indices, vertCount, indexCount, slot->getData().getBlendMode());
             color.r *= attachment->getColor().r;
             color.g *= attachment->getColor().g;
             color.b *= attachment->getColor().b;
@@ -176,7 +177,7 @@ void SpineSkeletonInstance::updateRenderData() {
                 auto vbSize = vertCount * byteStrideOneColor;
                 uint8_t* vPtr = SpineMeshData::queryVBuffer(vbSize);
                 uint16_t* iPtr = SpineMeshData::queryIBuffer(indexCount);
-                currMesh = SlotMesh(vPtr, iPtr, vertCount, indexCount, byteStrideOneColor, slot->getData().getBlendMode());
+                currMesh = SlotMesh(vPtr, iPtr, vertCount, indexCount, slot->getData().getBlendMode());
                 memcpy(iPtr, _clipper->getClippedTriangles().buffer(), sizeof(uint16_t) * indexCount);
                 
                 float *verts = _clipper->getClippedVertices().buffer();
@@ -206,7 +207,7 @@ void SpineSkeletonInstance::updateRenderData() {
                 uint8_t* vPtr = SpineMeshData::queryVBuffer(vertCount);
                 uint16_t* iPtr = SpineMeshData::queryIBuffer(indexCount);
                 memcpy(iPtr, currMesh.iBuf, sizeof(uint16_t) * indexCount);
-                currMesh = SlotMesh(vPtr, iPtr, vertCount, indexCount, byteStrideOneColor, slot->getData().getBlendMode());
+                currMesh = SlotMesh(vPtr, iPtr, vertCount, indexCount, slot->getData().getBlendMode());
 
                 V3F_T2F_C4B *vertex = (V3F_T2F_C4B *)currMesh.vBuf;
                 uint32_t* uPtr = (uint32_t*)currMesh.vBuf;
@@ -225,9 +226,14 @@ void SpineSkeletonInstance::updateRenderData() {
         auto stride = _userData.useTint ? byteStrideTwoColor : byteStrideOneColor;
         SpineMeshData::moveVB(currMesh.vCount * stride);
         SpineMeshData::moveIB(currMesh.iCount);
+        
+        _model->addSlotMesh(currMesh);
 
         _clipper->clipEnd(*slot);
     }
     _clipper->clipEnd();
     if (_effect) _effect->end();
+
+    _model->setBufferPtr(SpineMeshData::vb(), SpineMeshData::ib());
+    return _model;
 }

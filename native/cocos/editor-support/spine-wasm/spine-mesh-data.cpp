@@ -51,3 +51,11 @@ uint8_t* SpineMeshData::queryVBuffer(uint32_t count) {
 uint16_t* SpineMeshData::queryIBuffer(uint32_t count) {
     return iPtr;
 }
+
+uint8_t* SpineMeshData::vb() {
+    return vBuf;
+}
+
+uint16_t* SpineMeshData::ib() {
+    return iBuf;
+}

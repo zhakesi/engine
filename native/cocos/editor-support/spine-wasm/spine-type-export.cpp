@@ -205,6 +205,21 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("angle", select_overload<void(float)>(&SwirlVertexEffect::setAngle))
         .function("end", &SwirlVertexEffect::end);
 
+    class_<SlotMesh>("SlotMesh")
+        .property("vCount", &SlotMesh::vCount)
+        .property("iCount", &SlotMesh::iCount)
+        .property("blendMode", &SlotMesh::blendMode);
+
+    register_vector<SlotMesh>("vector<SlotMesh>");
+
+    class_<SpineModel>("SpineModel")
+        .property("vCount", &SpineModel::vCount)
+        .property("iCount", &SpineModel::iCount)
+        .property("vPtr", &SpineModel::vPtr)
+        .property("iPtr", &SpineModel::iPtr)
+        .function("getMeshes", &SpineModel::getMeshes);
+
+
     class_<SpineSkeletonInstance>("SkeletonInstance")
         .constructor<>()
         .function("initSkeletonDataJson", &SpineSkeletonInstance::initSkeletonDataJson, allow_raw_pointer<SkeletonData>())
@@ -212,8 +227,7 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("setAnimation", &SpineSkeletonInstance::setAnimation)
         .function("setSkin", &SpineSkeletonInstance::setSkin)
         .function("updateAnimation", &SpineSkeletonInstance::updateAnimation)
-        .function("updateRenderData", &SpineSkeletonInstance::updateRenderData);
-
+        .function("updateRenderData", &SpineSkeletonInstance::updateRenderData, allow_raw_pointer<SpineModel>());
 }
 
 // class MyClass {

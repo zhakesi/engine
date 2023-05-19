@@ -11,6 +11,8 @@ public:
     static void moveIB(uint32_t count);
     static uint8_t* queryVBuffer(uint32_t count);
     static uint16_t* queryIBuffer(uint32_t count);
+    static uint8_t* vb();
+    static uint16_t* ib();
 
 private:
     static uint8_t     *vBuf;
