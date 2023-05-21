@@ -25,7 +25,7 @@
 import { Mat4 } from '../core';
 import { Skeleton } from './skeleton';
 import spine from './lib/spine-core.js';
-import { FrameBoneInfo } from './skeleton-cache';
+//import { FrameBoneInfo } from './skeleton-cache';
 import { Node } from '../scene-graph';
 
 const tempMat4 = new Mat4();
@@ -63,48 +63,48 @@ export class AttachUtil {
     }
 
     _syncAttachedNode () {
-        if (!this._inited) return;
+        // if (!this._inited) return;
 
-        const socketNodes = this._skeletonComp!.socketNodes;
-        if (socketNodes.size === 0) return;
+        // const socketNodes = this._skeletonComp!.socketNodes;
+        // if (socketNodes.size === 0) return;
 
-        let boneInfos: FrameBoneInfo[]|null = null;
-        const isCached = this._skeletonComp!.isAnimationCached();
-        if (isCached) {
-            boneInfos = this._skeletonComp!._curFrame && this._skeletonComp!._curFrame.boneInfos;
-        } else {
-            boneInfos = this._skeleton!.bones;
-        }
+        // let boneInfos: FrameBoneInfo[]|null = null;
+        // const isCached = this._skeletonComp!.isAnimationCached();
+        // if (isCached) {
+        //     boneInfos = this._skeletonComp!._curFrame && this._skeletonComp!._curFrame.boneInfos;
+        // } else {
+        //     boneInfos = this._skeleton!.bones;
+        // }
 
-        if (!boneInfos) return;
+        // if (!boneInfos) return;
 
-        const matrixHandle = (node: Node, bone: FrameBoneInfo) => {
-            const tm = tempMat4;
-            tm.m00 = bone.a;
-            tm.m01 = bone.c;
-            tm.m04 = bone.b;
-            tm.m05 = bone.d;
-            tm.m12 = bone.worldX;
-            tm.m13 = bone.worldY;
-            node.matrix = tempMat4;
-        };
+        // const matrixHandle = (node: Node, bone: FrameBoneInfo) => {
+        //     const tm = tempMat4;
+        //     tm.m00 = bone.a;
+        //     tm.m01 = bone.c;
+        //     tm.m04 = bone.b;
+        //     tm.m05 = bone.d;
+        //     tm.m12 = bone.worldX;
+        //     tm.m13 = bone.worldY;
+        //     node.matrix = tempMat4;
+        // };
 
-        for (const boneIdx of socketNodes.keys()) {
-            const boneNode = socketNodes.get(boneIdx);
-            // Node has been destroy
-            if (!boneNode || !boneNode.isValid) {
-                socketNodes.delete(boneIdx);
-                continue;
-            }
-            const bone = boneInfos[boneIdx];
-            // Bone has been destroy
-            if (!bone) {
-                boneNode.removeFromParent();
-                boneNode.destroy();
-                socketNodes.delete(boneIdx);
-                continue;
-            }
-            matrixHandle(boneNode, bone);
-        }
+        // for (const boneIdx of socketNodes.keys()) {
+        //     const boneNode = socketNodes.get(boneIdx);
+        //     // Node has been destroy
+        //     if (!boneNode || !boneNode.isValid) {
+        //         socketNodes.delete(boneIdx);
+        //         continue;
+        //     }
+        //     const bone = boneInfos[boneIdx];
+        //     // Bone has been destroy
+        //     if (!bone) {
+        //         boneNode.removeFromParent();
+        //         boneNode.destroy();
+        //         socketNodes.delete(boneIdx);
+        //         continue;
+        //     }
+        //     matrixHandle(boneNode, bone);
+        // }
     }
 }
