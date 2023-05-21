@@ -24,7 +24,7 @@ import { Material, Texture2D } from '../asset/assets';
 import { errorID, warn } from '../core/platform/debug';
 import { Enum, ccenum } from '../core/value-types/enum';
 import { Component, Node } from '../scene-graph';
-import { CCBoolean, CCClass, CCFloat, Color, Mat4, RecyclePool, js } from '../core';
+import { CCBoolean, CCClass, CCFloat, CCObject, Color, Mat4, RecyclePool, js } from '../core';
 import { SkeletonData } from './skeleton-data';
 import { UIRenderer, UITransform } from '../2d';
 import { spineX } from './cocos-spine/spine-define';
@@ -142,6 +142,7 @@ js.setClassAlias(SpineSocket, 'sp.Skeleton.SpineSocket');
 @menu('Spine/Skeleton')
 @executeInEditMode
 export class Skeleton extends UIRenderer {
+    public static SpineSocket = SpineSocket;
     public static AnimationCacheMode = AnimationCacheMode;
 
     @serializable
@@ -169,6 +170,16 @@ export class Skeleton extends UIRenderer {
     protected _defaultCacheMode: AnimationCacheMode = AnimationCacheMode.REALTIME;
     @serializable
     protected _sockets: SpineSocket[] = [];
+    @serializable
+    protected _useTint = false;
+    @serializable
+    protected _debugMesh = false;
+    @serializable
+    protected _debugBones = false;
+    @serializable
+    protected _debugSlots = false;
+    @serializable
+    protected _enableBatch = false;
 
     private _runtimeData: any = null;
     public _skeleton: any = null;
@@ -376,7 +387,34 @@ export class Skeleton extends UIRenderer {
             this._timeScale = value;
         }
     }
+    /**
+     * @en Enabled two color tint.
+     * @zh 是否启用染色效果。
+     */
+    @editable
+    @tooltip('i18n:COMPONENT.skeleton.use_tint')
+    get useTint () { return this._useTint; }
+    set useTint (value) {
+        if (value !== this._useTint) {
+            this._useTint = value;
+            this._updateUseTint();
+        }
+    }
 
+    /**
+     * @en If rendering a large number of identical textures and simple skeletal animations,
+     * enabling batching can reduce the number of draw calls and improve rendering performance.
+     * @zh 如果渲染大量相同纹理，且结构简单的骨骼动画，开启合批可以降低 draw call 数量提升渲染性能。
+     */
+    @editable
+    @tooltip('i18n:COMPONENT.skeleton.enabled_batch')
+    get enableBatch () { return this._enableBatch; }
+    set enableBatch (value) {
+        if (value !== this._enableBatch) {
+            this._enableBatch = value;
+            this._updateBatch();
+        }
+    }
     /**
      * @en
      * The bone sockets this animation component maintains.<br>
@@ -389,7 +427,6 @@ export class Skeleton extends UIRenderer {
     get sockets (): SpineSocket[] {
         return this._sockets;
     }
-
     set sockets (val: SpineSocket[]) {
         if (EDITOR && !legacyCC.GAME_VIEW) {
             this._verifySockets(val);
@@ -397,6 +434,51 @@ export class Skeleton extends UIRenderer {
         this._sockets = val;
         this._updateSocketBindings();
         this.attachUtil._syncAttachedNode();
+    }
+
+    /**
+     * @en Indicates whether open debug slots.
+     * @zh 是否显示 slot 的 debug 信息。
+     */
+    @editable
+    @tooltip('i18n:COMPONENT.skeleton.debug_slots')
+    get debugSlots () { return this._debugSlots; }
+    set debugSlots (v: boolean) {
+        if (v !== this._debugSlots) {
+            this._debugSlots = v;
+            this._updateDebugDraw();
+            this.markForUpdateRenderData();
+        }
+    }
+
+    /**
+     * @en Indicates whether open debug bones.
+     * @zh 是否显示 bone 的 debug 信息。
+     */
+    @editable
+    @tooltip('i18n:COMPONENT.skeleton.debug_bones')
+    get debugBones () { return this._debugBones; }
+    set debugBones (v: boolean) {
+        if (v !== this._debugBones) {
+            this._debugBones = v;
+            this._updateDebugDraw();
+            this.markForUpdateRenderData();
+        }
+    }
+
+    /**
+     * @en Indicates whether open debug mesh.
+     * @zh 是否显示 mesh 的 debug 信息。
+     */
+    @editable
+    @tooltip('i18n:COMPONENT.skeleton.debug_mesh')
+    get debugMesh () { return this._debugMesh; }
+    set debugMesh (value) {
+        if (value !== this._debugMesh) {
+            this._debugMesh = value;
+            this._updateDebugDraw();
+            this.markForUpdateRenderData();
+        }
     }
 
     @type(Texture2D)
@@ -410,6 +492,10 @@ export class Skeleton extends UIRenderer {
 
     public __preload () {
         super.__preload();
+        if (EDITOR && !legacyCC.GAME_VIEW) {
+            const Flags = CCObject.Flags;
+            this._objFlags |= (Flags.IsAnchorLocked | Flags.IsSizeLocked);
+        }
         this._updateSkeletonData();
     }
 
@@ -976,6 +1062,46 @@ export class Skeleton extends UIRenderer {
             return Array.from(this._cachedSockets.keys()).sort();
         }
         return [];
+    }
+
+    // if change use tint mode, just clear material cache
+    protected _updateUseTint () {
+        this._cleanMaterialCache();
+        this.destroyRenderData();
+        if (this._assembler && this._skeleton) {
+            this._renderData = this._assembler.createData(this);
+            this.markForUpdateRenderData();
+        }
+    }
+
+    // if change use batch mode, just clear material cache
+    protected _updateBatch () {
+        this._cleanMaterialCache();
+        this.markForUpdateRenderData();
+    }
+
+    protected _updateDebugDraw () {
+    //     if (this.debugBones || this.debugSlots || this.debugMesh) {
+    //         if (!this._debugRenderer) {
+    //             const debugDrawNode = new Node('DEBUG_DRAW_NODE');
+    //             debugDrawNode.hideFlags |= CCObject.Flags.DontSave | CCObject.Flags.HideInHierarchy;
+    //             const debugDraw = debugDrawNode.addComponent(Graphics);
+    //             debugDraw.lineWidth = 1;
+    //             debugDraw.strokeColor = new Color(255, 0, 0, 255);
+
+        //             this._debugRenderer = debugDraw;
+        //             debugDrawNode.parent = this.node;
+        //         }
+        //         // this._debugRenderer.node.active = true;
+
+    //         if (this.isAnimationCached()) {
+    //             warn('Debug bones or slots is invalid in cached mode');
+    //         }
+    //     } else if (this._debugRenderer) {
+    //         this._debugRenderer.node.destroy();
+    //         this._debugRenderer = null;
+    //         // this._debugRenderer.node.active = false;
+    //     }
     }
 }
 
