@@ -9,7 +9,7 @@ using namespace spine;
 class SpineSkeletonInstance {
     struct UserData {
         bool useTint = false;
-        bool premultipliedAlpha = true;
+        bool premultipliedAlpha = false;
         Color4F color = Color4F(1.0F, 1.0F, 1.0F, 1.0F);
     };
 
@@ -22,7 +22,8 @@ public:
     void setSkin(const std::string& name);
     void updateAnimation(float dltTime);
     SpineModel* updateRenderData();
-
+private:
+    void collectMeshData();
 private:
     Skeleton *_skeleton = nullptr;
     SkeletonData *_skeletonData = nullptr;

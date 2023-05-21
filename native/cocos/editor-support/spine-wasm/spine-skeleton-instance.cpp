@@ -23,15 +23,15 @@ SpineSkeletonInstance::~SpineSkeletonInstance()
 
 spine::SkeletonData *SpineSkeletonInstance::initSkeletonDataJson(const std::string& jsonStr, const std::string& altasStr)
 {
-    auto* atlas = new Atlas(altasStr.c_str(), altasStr.length(),"", nullptr);
+    auto* atlas = new Atlas(altasStr.c_str(), altasStr.size(),"", nullptr, false);
     if (!atlas) {
         LogUtil::PrintToJs("create atlas failed!!!");
         return nullptr;
     }
     AttachmentLoader *attachmentLoader = new AtlasAttachmentLoaderExtension(atlas);
-    SkeletonJson* json = new SkeletonJson(attachmentLoader);
-    _skeletonData = json->readSkeletonData(jsonStr.c_str());
-    delete json;
+    spine::SkeletonJson json(attachmentLoader);
+    json.setScale(1.0F);
+    _skeletonData = json.readSkeletonData(jsonStr.c_str());
     LogUtil::PrintToJs("initWithSkeletonData ok.");
     return _skeletonData;
 }
@@ -78,13 +78,21 @@ void SpineSkeletonInstance::updateAnimation(float dltTime) {
     _animState->update(dltTime);
     _animState->apply(*_skeleton);
     _skeleton->updateWorldTransform();
-    LogUtil::PrintToJs("updateAnimation");
 }
 
 SpineModel* SpineSkeletonInstance::updateRenderData() {
+    _skeleton->updateWorldTransform();
     SpineMeshData::reset();
     _model->clearMeshes();
 
+    collectMeshData();
+
+    _model->setBufferPtr(SpineMeshData::vb(), SpineMeshData::ib());
+    return _model;
+}
+
+
+void SpineSkeletonInstance::collectMeshData() {
     uint32_t byteStrideOneColor = sizeof(V3F_T2F_C4B);
     uint32_t byteStrideTwoColor = sizeof(V3F_T2F_C4B_C4B);
 
@@ -120,7 +128,9 @@ SpineModel* SpineSkeletonInstance::updateRenderData() {
             auto ibSize = indexCount * sizeof(uint16_t);
 
             auto *vertices = SpineMeshData::queryVBuffer(vbSize);
-            auto *indices = attachmentVertices->_triangles->indices;
+            auto *indices = SpineMeshData::queryIBuffer(indexCount);
+            memcpy(static_cast<void *>(vertices), static_cast<void *>(attachmentVertices->_triangles->verts), vbSize);
+            memcpy(indices, attachmentVertices->_triangles->indices, ibSize);
             attachment->computeWorldVertices(slot->getBone(), (float*)vertices, 0, byteStrideOneColor / sizeof(float));
             currMesh = SlotMesh((uint8_t*)vertices, indices, vertCount, indexCount, slot->getData().getBlendMode());
 
@@ -138,9 +148,10 @@ SpineModel* SpineSkeletonInstance::updateRenderData() {
             auto ibSize = indexCount * sizeof(uint16_t);
 
             auto *vertices = SpineMeshData::queryVBuffer(vbSize);
-            auto *indices = attachmentVertices->_triangles->indices;
+            auto *indices = SpineMeshData::queryIBuffer(indexCount);
+            memcpy(static_cast<void *>(vertices), static_cast<void *>(attachmentVertices->_triangles->verts), vbSize);
+            memcpy(indices, attachmentVertices->_triangles->indices, ibSize);
             attachment->computeWorldVertices(*slot, 0, attachment->getWorldVerticesLength(), (float*)vertices, 0, byteStrideOneColor / sizeof(float));
-            
             currMesh = SlotMesh((uint8_t*)vertices, indices, vertCount, indexCount, slot->getData().getBlendMode());
             color.r *= attachment->getColor().r;
             color.g *= attachment->getColor().g;
@@ -155,7 +166,7 @@ SpineModel* SpineSkeletonInstance::updateRenderData() {
             continue;
         }
 
-        uint32_t uintA = (uint32_t)(255* _skeleton->getColor().a * slot->getColor().a * color.a);
+        uint32_t uintA = (uint32_t)(255 * _skeleton->getColor().a * slot->getColor().a * color.a);
         uint32_t multiplier = _userData.premultipliedAlpha ? uintA : 255;
         uint32_t uintR = (uint32_t)(_skeleton->getColor().r * slot->getColor().r * color.r * multiplier);
         uint32_t uintG = (uint32_t)(_skeleton->getColor().g * slot->getColor().g * color.g * multiplier);
@@ -202,13 +213,7 @@ SpineModel* SpineSkeletonInstance::updateRenderData() {
                     }
                 }
             } else {
-                auto indexCount = currMesh.iCount;
                 auto vertCount = currMesh.vCount;
-                uint8_t* vPtr = SpineMeshData::queryVBuffer(vertCount);
-                uint16_t* iPtr = SpineMeshData::queryIBuffer(indexCount);
-                memcpy(iPtr, currMesh.iBuf, sizeof(uint16_t) * indexCount);
-                currMesh = SlotMesh(vPtr, iPtr, vertCount, indexCount, slot->getData().getBlendMode());
-
                 V3F_T2F_C4B *vertex = (V3F_T2F_C4B *)currMesh.vBuf;
                 uint32_t* uPtr = (uint32_t*)currMesh.vBuf;
                 if (_effect) {
@@ -223,6 +228,7 @@ SpineModel* SpineSkeletonInstance::updateRenderData() {
                 }
             }
         }
+
         auto stride = _userData.useTint ? byteStrideTwoColor : byteStrideOneColor;
         SpineMeshData::moveVB(currMesh.vCount * stride);
         SpineMeshData::moveIB(currMesh.iCount);
@@ -233,7 +239,4 @@ SpineModel* SpineSkeletonInstance::updateRenderData() {
     }
     _clipper->clipEnd();
     if (_effect) _effect->end();
-
-    _model->setBufferPtr(SpineMeshData::vb(), SpineMeshData::ib());
-    return _model;
 }
