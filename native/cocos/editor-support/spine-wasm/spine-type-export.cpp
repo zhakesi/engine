@@ -109,6 +109,10 @@ EMSCRIPTEN_BINDINGS(spine) {
     class_<PowInterpolation>("Pow")
         .constructor<int>()
         .function("apply", &PowInterpolation::apply);
+    
+    class_<PowOutInterpolation>("PowOut")
+        .constructor<int>()
+        .function("apply", &PowInterpolation::apply);
  
     class_<Vector2>("Vector2")
         .constructor<float, float>()
@@ -157,7 +161,7 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<Skin>("Skin")
         .constructor<const String&>()
-        .function("name", select_overload<const String &()>(&Skin::getName))
+        .property("name", &Skin::getName_Export)
         .function("attachments", select_overload<Skin::AttachmentMap::Entries()>(&Skin::getAttachments))
         .function("bones", select_overload<Vector<BoneData *> &()>(&Skin::getBones))
         .function("constraints", select_overload<Vector<ConstraintData *> &()>(&Skin::getConstraints))
@@ -191,9 +195,11 @@ EMSCRIPTEN_BINDINGS(spine) {
     
     class_<Skeleton>("Skeleton")
         .constructor<SkeletonData *>()
-        .function("data", &Skeleton::getData, allow_raw_pointer<SkeletonData>());
+        .function("data", &Skeleton::getData, allow_raw_pointer<SkeletonData>())
+        .property("skin", &Skeleton::getSkin_Export);
    
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     class_<JitterVertexEffect>("JitterEffect")
         .constructor<float, float>()
         .function("index", select_overload<float()>(&JitterVertexEffect::getJitterX))
@@ -203,14 +209,12 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("end", &JitterVertexEffect::end);
 
     class_<SwirlVertexEffect>("SwirlEffect")
-        .function("centerX", select_overload<float()>(&SwirlVertexEffect::getCenterX))
-        .function("centerX", select_overload<void(float)>(&SwirlVertexEffect::setCenterX))
-        .function("centerY", select_overload<float()>(&SwirlVertexEffect::getCenterY))
-        .function("centerY", select_overload<void(float)>(&SwirlVertexEffect::setCenterY))
-        .function("radius", select_overload<float()>(&SwirlVertexEffect::getRadius))
-        .function("radius", select_overload<void(float)>(&SwirlVertexEffect::setRadius))
-        .function("angle", select_overload<float()>(&SwirlVertexEffect::getAngle))
-        .function("angle", select_overload<void(float)>(&SwirlVertexEffect::setAngle))
+        //.constructor<float, PowInterpolation &>()
+        .constructor<float, PowOutInterpolation &>()
+        .property("centerX", &SwirlVertexEffect::getCenterX, &SwirlVertexEffect::setCenterX)
+        .property("centerY", &SwirlVertexEffect::getCenterY, &SwirlVertexEffect::setCenterY)
+        .property("radius", &SwirlVertexEffect::getRadius, &SwirlVertexEffect::setRadius)
+        .property("angle", &SwirlVertexEffect::getAngle, &SwirlVertexEffect::setAngle)
         .function("end", &SwirlVertexEffect::end);
 
     class_<SlotMesh>("SlotMesh")
@@ -236,5 +240,9 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("setSkin", &SpineSkeletonInstance::setSkin)
         .function("updateAnimation", &SpineSkeletonInstance::updateAnimation)
         .function("updateRenderData", &SpineSkeletonInstance::updateRenderData, allow_raw_pointer<SpineModel>())
-        .function("setPremultipliedAlpha", &SpineSkeletonInstance::setPremultipliedAlpha);
+        .function("setPremultipliedAlpha", &SpineSkeletonInstance::setPremultipliedAlpha)
+        .function("setColor", &SpineSkeletonInstance::setColor)
+        .function("setJitterEffect", &SpineSkeletonInstance::setJitterEffect, allow_raw_pointer<JitterVertexEffect*>())
+        .function("setSwirlEffect", &SpineSkeletonInstance::setSwirlEffect, allow_raw_pointer<SwirlVertexEffect*>())
+        .function("clearEffect", &SpineSkeletonInstance::clearEffect);
 }

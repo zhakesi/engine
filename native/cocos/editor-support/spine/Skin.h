@@ -32,6 +32,7 @@
 
 #include <spine/SpineString.h>
 #include <spine/Vector.h>
+#include <string>
 
 namespace spine {
 class Attachment;
@@ -142,6 +143,7 @@ public:
     void findAttachmentsForSlot(size_t slotIndex, Vector<Attachment *> &attachments);
 
     const String &getName();
+    const std::string getName_Export() const;
 
     /// Adds all attachments, bones, and constraints from the specified skin to this skin.
     void addSkin(Skin *other);

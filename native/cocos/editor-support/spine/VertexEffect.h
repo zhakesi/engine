@@ -66,29 +66,31 @@ protected:
 
 class SP_API SwirlVertexEffect : public VertexEffect {
 public:
-    SwirlVertexEffect(float radius, Interpolation &interpolation);
+    //SwirlVertexEffect(float radius, Interpolation &interpolation);
+    SwirlVertexEffect(float radius, PowInterpolation &interpolation);
+    SwirlVertexEffect(float radius, PowOutInterpolation &interpolation);
 
     void begin(Skeleton &skeleton);
     void transform(float &x, float &y);
     void end();
 
     void setCenterX(float centerX);
-    float getCenterX();
+    float getCenterX() const;
 
     void setCenterY(float centerY);
-    float getCenterY();
+    float getCenterY() const;
 
     void setRadius(float radius);
-    float getRadius();
+    float getRadius() const;
 
     void setAngle(float angle);
-    float getAngle();
+    float getAngle() const;
 
     void setWorldX(float worldX);
-    float getWorldX();
+    float getWorldX() const;
 
     void setWorldY(float worldY);
-    float getWorldY();
+    float getWorldY() const;
 
 protected:
     float _centerX;

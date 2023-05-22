@@ -23,6 +23,10 @@ public:
     void updateAnimation(float dltTime);
     SpineModel* updateRenderData();
     void setPremultipliedAlpha(bool val);
+    void setColor(float r, float g, float b, float a);
+    void setJitterEffect(JitterVertexEffect *effect);
+    void setSwirlEffect(SwirlVertexEffect *effect);
+    void clearEffect();
 private:
     void collectMeshData();
 private:

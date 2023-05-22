@@ -183,6 +183,7 @@ public:
     Vector<TransformConstraint *> &getTransformConstraints();
 
     Skin *getSkin();
+    Skin &getSkin_Export() const;
 
     Color &getColor();
 

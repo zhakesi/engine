@@ -505,6 +505,10 @@ Skin *Skeleton::getSkin() {
     return _skin;
 }
 
+Skin &Skeleton::getSkin_Export() const{
+    return *_skin;
+}
+
 Color &Skeleton::getColor() {
     return _color;
 }

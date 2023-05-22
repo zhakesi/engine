@@ -138,6 +138,9 @@ void Skin::findAttachmentsForSlot(size_t slotIndex, Vector<Attachment *> &attach
 const String &Skin::getName() {
     return _name;
 }
+const std::string Skin::getName_Export() const {
+    return std::string(_name.buffer());
+}
 
 Skin::AttachmentMap::Entries Skin::getAttachments() {
     return _attachments.getEntries();

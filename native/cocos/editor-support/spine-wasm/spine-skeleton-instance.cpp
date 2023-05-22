@@ -67,8 +67,8 @@ void SpineSkeletonInstance::setAnimation(float trackIndex, const std::string& na
 
 void SpineSkeletonInstance::setSkin(const std::string& name) {
     if (!_skeleton) return;
-    _skeleton->setSlotsToSetupPose();
     _skeleton->setSkin(name.c_str());
+    _skeleton->setSlotsToSetupPose();
     LogUtil::PrintToJs(name.c_str());
 }
 
@@ -243,4 +243,23 @@ void SpineSkeletonInstance::collectMeshData() {
 
 void SpineSkeletonInstance::setPremultipliedAlpha(bool val) {
     _userData.premultipliedAlpha = val;
+}
+
+void SpineSkeletonInstance::setColor(float r, float g, float b, float a) {
+    _userData.color.r = r;
+    _userData.color.g = g;
+    _userData.color.b = b;
+    _userData.color.a = a;
+}
+
+void SpineSkeletonInstance::setJitterEffect(JitterVertexEffect *effect) {
+    _effect = effect;
+}
+
+void SpineSkeletonInstance::setSwirlEffect(SwirlVertexEffect *effect) {
+    _effect = effect;
+}
+
+void SpineSkeletonInstance::clearEffect() {
+    _effect = nullptr;
 }

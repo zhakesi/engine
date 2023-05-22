@@ -74,7 +74,25 @@ float JitterVertexEffect::getJitterY() {
     return _jitterY;
 }
 
-SwirlVertexEffect::SwirlVertexEffect(float radius, Interpolation &interpolation) : _centerX(0),
+// SwirlVertexEffect::SwirlVertexEffect(float radius, Interpolation &interpolation) : _centerX(0),
+//                                                                                    _centerY(0),
+//                                                                                    _radius(radius),
+//                                                                                    _angle(0),
+//                                                                                    _worldX(0),
+//                                                                                    _worldY(0),
+//                                                                                    _interpolation(interpolation) {
+// }
+
+SwirlVertexEffect::SwirlVertexEffect(float radius, PowInterpolation &interpolation) : _centerX(0),
+                                                                                   _centerY(0),
+                                                                                   _radius(radius),
+                                                                                   _angle(0),
+                                                                                   _worldX(0),
+                                                                                   _worldY(0),
+                                                                                   _interpolation(interpolation) {
+}
+
+SwirlVertexEffect::SwirlVertexEffect(float radius, PowOutInterpolation &interpolation): _centerX(0),
                                                                                    _centerY(0),
                                                                                    _radius(radius),
                                                                                    _angle(0),
@@ -112,7 +130,7 @@ void SwirlVertexEffect::setCenterX(float centerX) {
     _centerX = centerX;
 }
 
-float SwirlVertexEffect::getCenterX() {
+float SwirlVertexEffect::getCenterX() const {
     return _centerX;
 }
 
@@ -120,7 +138,7 @@ void SwirlVertexEffect::setCenterY(float centerY) {
     _centerY = centerY;
 }
 
-float SwirlVertexEffect::getCenterY() {
+float SwirlVertexEffect::getCenterY() const {
     return _centerY;
 }
 
@@ -128,7 +146,7 @@ void SwirlVertexEffect::setRadius(float radius) {
     _radius = radius;
 }
 
-float SwirlVertexEffect::getRadius() {
+float SwirlVertexEffect::getRadius() const {
     return _radius;
 }
 
@@ -136,7 +154,7 @@ void SwirlVertexEffect::setAngle(float angle) {
     _angle = angle * MathUtil::Deg_Rad;
 }
 
-float SwirlVertexEffect::getAngle() {
+float SwirlVertexEffect::getAngle() const {
     return _angle;
 }
 
@@ -144,7 +162,7 @@ void SwirlVertexEffect::setWorldX(float worldX) {
     _worldX = worldX;
 }
 
-float SwirlVertexEffect::getWorldX() {
+float SwirlVertexEffect::getWorldX() const {
     return _worldX;
 }
 
@@ -152,6 +170,6 @@ void SwirlVertexEffect::setWorldY(float worldY) {
     _worldY = worldY;
 }
 
-float SwirlVertexEffect::getWorldY() {
+float SwirlVertexEffect::getWorldY() const {
     return _worldY;
 }
