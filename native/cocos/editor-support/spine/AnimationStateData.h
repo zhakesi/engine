@@ -51,7 +51,7 @@ public:
     SkeletonData* getSkeletonData();
 
     /// The mix duration to use when no mix duration has been specifically defined between two animations.
-    float getDefaultMix();
+    float getDefaultMix() const;
     void setDefaultMix(float inValue);
 
     /// Sets a mix duration by animation names.

@@ -11,14 +11,15 @@ SpineModel::~SpineModel() {
 void SpineModel::addSlotMesh(SlotMesh &mesh, bool needMerge) {
     bool canMerge = false;
     auto count = meshArray.size();
-    if (needMerge && count >= 1) {    
-        canMerge = true;
-    }
-    if (canMerge) {
+    if (needMerge && count >= 1) {
         auto *lastMesh = &meshArray[count - 1];
-        lastMesh->vCount += mesh.vCount;
-        lastMesh->iCount += mesh.iCount;
-    } else {
+        if (lastMesh->blendMode == mesh.blendMode) {
+            canMerge = true;
+            lastMesh->vCount += mesh.vCount;
+            lastMesh->iCount += mesh.iCount;
+        }
+    }
+    if (!canMerge) {
         meshArray.push_back(mesh);
     }
     uint16_t* iiPtr = mesh.iBuf;

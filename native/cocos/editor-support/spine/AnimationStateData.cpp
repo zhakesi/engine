@@ -69,7 +69,7 @@ SkeletonData *AnimationStateData::getSkeletonData() {
     return _skeletonData;
 }
 
-float AnimationStateData::getDefaultMix() {
+float AnimationStateData::getDefaultMix() const {
     return _defaultMix;
 }
 

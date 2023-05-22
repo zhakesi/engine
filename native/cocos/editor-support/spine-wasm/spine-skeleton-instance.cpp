@@ -240,3 +240,7 @@ void SpineSkeletonInstance::collectMeshData() {
     _clipper->clipEnd();
     if (_effect) _effect->end();
 }
+
+void SpineSkeletonInstance::setPremultipliedAlpha(bool val) {
+    _userData.premultipliedAlpha = val;
+}

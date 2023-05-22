@@ -376,7 +376,7 @@ public:
     /// A list of tracks that have animations, which may contain NULLs.
     Vector<TrackEntry*>& getTracks();
 
-    float getTimeScale();
+    float getTimeScale() const;
     void setTimeScale(float inValue);
 
     void setListener(AnimationStateListener listener);

@@ -181,6 +181,14 @@ EMSCRIPTEN_BINDINGS(spine) {
         .property("width",&spine::SkeletonData::getWidth, &spine::SkeletonData::setWidth)
         .property("height",&spine::SkeletonData::getHeight, &spine::SkeletonData::setHeight);
     
+    class_<AnimationStateData>("AnimationStateData")
+        .constructor<SkeletonData *>()
+        .property("defaultMix",&spine::AnimationStateData::getDefaultMix, &spine::AnimationStateData::setDefaultMix);
+    
+    class_<AnimationState>("AnimationState")
+        .constructor<AnimationStateData *>()
+        .property("timeScale",&spine::AnimationState::getTimeScale, &spine::AnimationState::setTimeScale);
+    
     class_<Skeleton>("Skeleton")
         .constructor<SkeletonData *>()
         .function("data", &Skeleton::getData, allow_raw_pointer<SkeletonData>());
@@ -227,23 +235,6 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("setAnimation", &SpineSkeletonInstance::setAnimation)
         .function("setSkin", &SpineSkeletonInstance::setSkin)
         .function("updateAnimation", &SpineSkeletonInstance::updateAnimation)
-        .function("updateRenderData", &SpineSkeletonInstance::updateRenderData, allow_raw_pointer<SpineModel>());
+        .function("updateRenderData", &SpineSkeletonInstance::updateRenderData, allow_raw_pointer<SpineModel>())
+        .function("setPremultipliedAlpha", &SpineSkeletonInstance::setPremultipliedAlpha);
 }
-
-// class MyClass {
-// public:
-//     float getValue() const {
-//         return value;
-//     }
-//     void setValue(float v) {
-//         value =v;
-//     }
-// private:
-//     float value;
-// };
-
-// EMSCRIPTEN_BINDINGS(szzpine) {
-//     class_<MyClass>("MyClass")
-//         .constructor<>()
-//         .property("value", &MyClass::getValue, &MyClass::setValue); 
-// }

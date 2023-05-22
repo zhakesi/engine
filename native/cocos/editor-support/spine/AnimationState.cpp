@@ -614,7 +614,7 @@ Vector<TrackEntry *> &AnimationState::getTracks() {
     return _tracks;
 }
 
-float AnimationState::getTimeScale() {
+float AnimationState::getTimeScale() const {
     return _timeScale;
 }
 

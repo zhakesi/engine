@@ -22,6 +22,7 @@ public:
     void setSkin(const std::string& name);
     void updateAnimation(float dltTime);
     SpineModel* updateRenderData();
+    void setPremultipliedAlpha(bool val);
 private:
     void collectMeshData();
 private:

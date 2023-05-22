@@ -23,7 +23,6 @@ EMSCRIPTEN_KEEPALIVE void spineWasmInstanceDestroy() {
     delete extension;
     SpineMeshData::releaseMeshMemory();
     LogUtil::ReleaseBuffer();
-
 }
 
 #ifdef __cplusplus 		  
