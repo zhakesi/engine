@@ -38,6 +38,7 @@ import { SkeletonSystem } from './skeleton-system';
 import { RenderEntity, RenderEntityType } from '../2d/renderer/render-entity';
 import { AttachUtil } from './attach-util';
 import { RenderDrawInfo } from '../2d/renderer/render-draw-info';
+import { VertexEffectDelegate } from './vertex-effect-delegate';
 /**
  * @en
  * Animation playback rate.
@@ -510,15 +511,6 @@ export class Skeleton extends UIRenderer {
             this._updateDebugDraw();
             this.markForUpdateRenderData();
         }
-    }
-
-    @type(Texture2D)
-    @displayName('Texture2D')
-    get texture () {
-        return this._texture;
-    }
-    set texture (val: Texture2D | null) {
-        this._texture = val;
     }
 
     public __preload () {
@@ -1257,6 +1249,35 @@ export class Skeleton extends UIRenderer {
         // }
         // const skeletonInfo = this._skeletonCache.getSkeletonCache((this.skeletonData as any)._uuid, this._runtimeData);
         // this._skeleton = skeletonInfo.skeleton;
+    }
+
+    protected _updateColor () {
+        this.node._uiProps.colorDirty = true;
+        const r = this._color.r / 255.0;
+        const g = this._color.g / 255.0;
+        const b = this._color.b / 255.0;
+        const a = this._color.a / 255.0;
+        this._instance.setColor(r, g, b, a);
+    }
+
+    /**
+     * @en Sets vertex effect delegate.
+     * @zh 设置顶点特效动画代理。
+     * @param effectDelegate @en Vertex effect delegate. @zh 顶点特效代理。
+     */
+    public setVertexEffectDelegate (effectDelegate: VertexEffectDelegate | null | undefined) {
+        if (!effectDelegate) {
+            this._instance.clearEffect();
+            return;
+        }
+        const effectType = effectDelegate?.getEffectType();
+        if (effectType === 'jitter') {
+            const jitterEffect = effectDelegate?.getJitterVertexEffect();
+            this._instance.setJitterEffect(jitterEffect);
+        } else if (effectType === 'swirl') {
+            const swirlEffect = effectDelegate?.getJitterVertexEffect();
+            this._instance.setSwirlEffect(swirlEffect);
+        }
     }
 }
 

@@ -22,7 +22,8 @@
  THE SOFTWARE.
 */
 
-import spine from './lib/spine-core.js';
+//import spine from './lib/spine-core.js';
+import { spineX } from './cocos-spine/spine-define';
 
 /**
  * @en
@@ -41,8 +42,8 @@ export class VertexEffectDelegate {
      * @en Spine vertex effect object instance.
      * @zh Spine 顶点特效对象实例。
      */
-    _vertexEffect: spine.VertexEffect | null = null;
-    private _interpolation: spine.Interpolation | null = null;
+    _vertexEffect: any;
+    private _interpolation: any;
     private _effectType: string;
 
     constructor () {
@@ -68,9 +69,9 @@ export class VertexEffectDelegate {
      * @param {Number} jitterY
      * @return {spine.VertexEffect} @en Return a vertex effect type of jitter. @zh 返回一个 jitter 类型的顶点特效对象实例。
      */
-    initJitter (jitterX: number, jitterY: number): spine.VertexEffect {
+    initJitter (jitterX: number, jitterY: number): spineX.JitterEffect {
         this._effectType = 'jitter';
-        this._vertexEffect = new spine.JitterEffect(jitterX, jitterY);
+        this._vertexEffect = new spineX.JitterEffect(jitterX, jitterY);
         return this._vertexEffect;
     }
 
@@ -82,10 +83,10 @@ export class VertexEffectDelegate {
      * @param {Number} power
      * @return {sp.spine.JitterEffect} @en Return a vertex effect type of swirl. @zh 返回一个 swirl 类型的顶点特效对象实例。
      */
-    initSwirlWithPow (radius: number, power: number): spine.VertexEffect {
+    initSwirlWithPow (radius: number, power: number): spineX.SwirlEffect {
         this._effectType = 'swirl';
-        this._interpolation = new spine.Pow(power);
-        this._vertexEffect = new spine.SwirlEffect(radius, this._interpolation);
+        this._interpolation = new spineX.Pow(power);
+        this._vertexEffect = new spineX.SwirlEffect(radius, this._interpolation);
         return this._vertexEffect;
     }
 
@@ -99,8 +100,8 @@ export class VertexEffectDelegate {
      */
     initSwirlWithPowOut (radius: number, power: number) {
         this._effectType = 'swirl';
-        this._interpolation = new spine.PowOut(power);
-        this._vertexEffect = new spine.SwirlEffect(radius, this._interpolation);
+        this._interpolation = new spineX.PowOut(power);
+        this._vertexEffect = new spineX.SwirlEffect(radius, this._interpolation);
         return this._vertexEffect;
     }
 
