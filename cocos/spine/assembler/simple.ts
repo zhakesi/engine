@@ -4,7 +4,7 @@ import { IAssembler, IAssemblerManager } from '../../2d/renderer/base';
 import { Batcher2D } from '../../2d/renderer/batcher-2d';
 import { StaticVBAccessor } from '../../2d/renderer/static-vb-accessor';
 import { vfmtPosUvColor4B, vfmtPosUvTwoColor4B } from '../../2d/renderer/vertex-format';
-import { Skeleton } from '../skeleton';
+import { Skeleton, SpineMaterialType } from '../skeleton';
 import { BlendFactor } from '../../gfx';
 import { legacyCC } from '../../core/global-exports';
 import { RenderData } from '../../2d/renderer/render-data';
@@ -14,7 +14,8 @@ import { spineX } from '../cocos-spine/spine-define';
 let _accessor: StaticVBAccessor = null!;
 let _tintAccessor: StaticVBAccessor = null!;
 
-const _premultipliedAlpha = false;
+let _premultipliedAlpha = false;
+let _useTint = false;
 
 function _getSlotMaterial (blendMode: number, comp: Skeleton) {
     let src: BlendFactor;
@@ -38,7 +39,7 @@ function _getSlotMaterial (blendMode: number, comp: Skeleton) {
         dst = BlendFactor.ONE_MINUS_SRC_ALPHA;
         break;
     }
-    return comp.getMaterialForBlendAndTint(src, dst);
+    return comp.getMaterialForBlendAndTint(src, dst, _useTint ? SpineMaterialType.TWO_COLORED : SpineMaterialType.COLORED_TEXTURED);
 }
 
 export const simple: IAssembler = {
@@ -92,6 +93,9 @@ export const simple: IAssembler = {
 };
 
 function updateComponentRenderData (comp: Skeleton, batcher: Batcher2D) {
+    _premultipliedAlpha = comp.premultipliedAlpha;
+    _useTint = comp.useTint;
+
     comp.drawList.reset();
     const model = comp.updateRenderData();
     const vc = model.vCount;
@@ -115,6 +119,10 @@ function updateComponentRenderData (comp: Skeleton, batcher: Batcher2D) {
     const iData = spineX.HEAP8.subarray(iPtr, iPtr + iLength);
     const iUint8Buf = new Uint8Array(ibuf.buffer);
     iUint8Buf.set(iData);
+    const chunkOffset = rd.chunk.vertexOffset;
+    for (let i = 0; i < ic; i++) {
+        rd.indices[i] += chunkOffset;
+    }
 
     const meshes = model.getMeshes();
     const count = meshes.size();

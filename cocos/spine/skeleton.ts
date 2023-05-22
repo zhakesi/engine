@@ -148,8 +148,6 @@ export class Skeleton extends UIRenderer {
     @serializable
     protected _skeletonData: SkeletonData | null = null;
     @serializable
-    protected _texture: Texture2D | null = null;
-    @serializable
     protected defaultSkin = '';
     @serializable
     protected defaultAnimation = '';
@@ -184,6 +182,7 @@ export class Skeleton extends UIRenderer {
     private _runtimeData: any = null;
     public _skeleton: any = null;
     private _instance: any = null;
+    protected _texture: Texture2D | null = null;
     // Animation name
     protected _animationName = '';
     protected _drawList = new RecyclePool<SkeletonDrawData>(() => ({
@@ -363,6 +362,7 @@ export class Skeleton extends UIRenderer {
     set premultipliedAlpha (v: boolean) {
         if (v !== this._premultipliedAlpha) {
             this._premultipliedAlpha = v;
+            this._instance.setPremultipliedAlpha(v);
             this.markForUpdateRenderData();
         }
     }
@@ -559,11 +559,14 @@ export class Skeleton extends UIRenderer {
     }
 
     protected _updateSkeletonData () {
-        if (!this._skeletonData) {
+        const skeletonData = this._skeletonData;
+        if (!skeletonData) {
+            this._texture = null;
             return;
         }
-        const jsonStr = this._skeletonData.skeletonJsonStr;
-        const altasStr = this._skeletonData.atlasText;
+        this._texture = skeletonData.textures[0];
+        const jsonStr = skeletonData.skeletonJsonStr;
+        const altasStr = skeletonData.atlasText;
         this._runtimeData = this._instance.initSkeletonDataJson(jsonStr, altasStr);
         if (!this._runtimeData) return;
         const width = this._runtimeData.width;
@@ -575,6 +578,7 @@ export class Skeleton extends UIRenderer {
             uiTrans.anchorY = 0;
         }
         this._skeleton = this._instance.initSkeleton();
+        this._instance.setPremultipliedAlpha(this._premultipliedAlpha);
         this._refreshInspector();
         if (this.defaultSkin) this.setSkin(this.defaultSkin);
         this.animation = this.defaultAnimation;
@@ -687,8 +691,8 @@ export class Skeleton extends UIRenderer {
         this._materialCache = {};
     }
 
-    public getMaterialForBlendAndTint (src: BlendFactor, dst: BlendFactor): MaterialInstance {
-        const key = `${src}/${dst}`;
+    public getMaterialForBlendAndTint (src: BlendFactor, dst: BlendFactor, type: SpineMaterialType): MaterialInstance {
+        const key = `${type}/${src}/${dst}`;
         let inst = this._materialCache[key];
         if (inst) {
             return inst;
@@ -715,8 +719,12 @@ export class Skeleton extends UIRenderer {
                 }],
             },
         });
-        const useLocal = true;
-        inst.recompileShaders({ TWO_COLORED: false, USE_LOCAL: useLocal });
+        let useTwoColor = false;
+        if (type === SpineMaterialType.TWO_COLORED) {
+            useTwoColor = true;
+        }
+        const useLocal = !this._enableBatch;
+        inst.recompileShaders({ TWO_COLORED: useTwoColor, USE_LOCAL: useLocal });
         return inst;
     }
 

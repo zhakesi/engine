@@ -39,7 +39,7 @@ CCProgram sprite-vs %{
   #endif
 
   vec4 vert () {
-    vec4 pos = vec4(a_position, 1);
+    vec4 pos = vec4(a_position.x, a_position.y, 0, 1);
 
     #if USE_LOCAL
       pos = cc_matWorld * pos;
