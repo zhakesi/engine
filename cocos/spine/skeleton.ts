@@ -26,6 +26,7 @@ import { Enum, ccenum } from '../core/value-types/enum';
 import { Component, Node } from '../scene-graph';
 import { CCBoolean, CCClass, CCFloat, CCObject, Color, Mat4, RecyclePool, js } from '../core';
 import { SkeletonData } from './skeleton-data';
+//import SkeletonCache, { AnimationCache, AnimationFrame } from './skeleton-cache';
 import { UIRenderer, UITransform } from '../2d';
 import { spineX } from './cocos-spine/spine-define';
 import { Batcher2D } from '../2d/renderer/batcher-2d';
@@ -90,6 +91,12 @@ ccenum(DefaultAnimsEnum);
 export enum SpineMaterialType {
     COLORED_TEXTURED = 0,
     TWO_COLORED = 1,
+}
+
+interface AnimationItem {
+    animationName: string;
+    loop: boolean;
+    delay: number;
 }
 
 export interface SkeletonDrawData {
@@ -198,6 +205,30 @@ export class Skeleton extends UIRenderer {
     private _drawInfoList: RenderDrawInfo[] = [];
     protected _socketNodes: Map<number, Node> = new Map();
     protected _cachedSockets: Map<string, number> = new Map<string, number>();
+    // Animation queue
+    protected _animationQueue: AnimationItem[] = [];
+    // Head animation info of
+    protected _headAniInfo: AnimationItem | null = null;
+    // Is animation complete.
+    protected _isAniComplete = true;
+
+    // Skeleton cache
+    //protected _skeletonCache: SkeletonCache | null = null;
+    // Frame cache
+    /**
+     * @internal
+     */
+    //public _frameCache: AnimationCache | null = null;
+    // Cur frame
+    /**
+     * @internal
+     */
+    //public _curFrame: AnimationFrame | null = null;
+    // Below properties will effect when cache mode is SHARED_CACHE or PRIVATE_CACHE.
+    // accumulate time
+    protected _accTime = 0;
+    // Play times counter
+    protected _playCount = 0;
 
     constructor () {
         super();
@@ -348,8 +379,8 @@ export class Skeleton extends UIRenderer {
         return this._defaultCacheMode;
     }
     set defaultCacheMode (mode: AnimationCacheMode) {
-        this._defaultCacheMode = mode;
-        this.setAnimationCacheMode(this._defaultCacheMode);
+        // this._defaultCacheMode = mode;
+        // this.setAnimationCacheMode(this._defaultCacheMode);
     }
 
     /**
@@ -502,11 +533,6 @@ export class Skeleton extends UIRenderer {
     public onRestore () {
 
     }
-
-    public update (dt: number) {
-        // if (!this._skeletonData) return;
-        // this.updateAnimation(dt);
-    }
     /**
      * @en Be called when component state becomes available.
      * @zh 组件状态变为可用时调用。
@@ -565,29 +591,49 @@ export class Skeleton extends UIRenderer {
             return;
         }
         this._texture = skeletonData.textures[0];
+
         const jsonStr = skeletonData.skeletonJsonStr;
         const altasStr = skeletonData.atlasText;
         this._runtimeData = this._instance.initSkeletonDataJson(jsonStr, altasStr);
         if (!this._runtimeData) return;
-        const width = this._runtimeData.width;
-        const height = this._runtimeData.height;
-        if (width && height) {
-            const uiTrans = this.node._uiProps.uiTransformComp!;
-            uiTrans.setContentSize(width, height);
-            uiTrans.anchorX = 0.5;
-            uiTrans.anchorY = 0;
+
+        this._updateUITransform();
+        if (this.isAnimationCached()) {
+            this._initSkeletonCache();
+        } else {
+            this._skeleton = this._instance.initSkeleton();
+            this._instance.setPremultipliedAlpha(this._premultipliedAlpha);
         }
-        this._skeleton = this._instance.initSkeleton();
-        this._instance.setPremultipliedAlpha(this._premultipliedAlpha);
         this._refreshInspector();
         if (this.defaultSkin) this.setSkin(this.defaultSkin);
-        this.animation = this.defaultAnimation;
+        if (this.defaultAnimation) this.animation = this.defaultAnimation;
+
         this._flushAssembler();
     }
 
     public setAnimation (trackIndex: number, name: string, loop?: boolean) {
         if (loop === undefined) loop = true;
-        this._instance.setAnimation(trackIndex, name, loop);
+        if (this.isAnimationCached()) {
+            // if (!this._skeletonCache) return;
+            // let cache = this._skeletonCache.getAnimationCache(this._skeletonData!._uuid, name);
+            // if (!cache) {
+            //     cache = this._skeletonCache.initAnimationCache(this._skeletonData!._uuid, name);
+            // }
+            // if (cache) {
+            //     this._animationName = name;
+            //     this._isAniComplete = false;
+            //     this._accTime = 0;
+            //     this._playCount = 0;
+            //     this._frameCache = cache;
+            //     if (this._socketNodes.size > 0) {
+            //         this._frameCache.enableCacheAttachedInfo();
+            //     }
+            //     this._frameCache.updateToFrame(0);
+            //     this._curFrame = this._frameCache.frames[0]!;
+            // }
+        } else {
+            this._instance.setAnimation(trackIndex, name, loop);
+        }
         this.markForUpdateRenderData();
     }
 
@@ -598,8 +644,33 @@ export class Skeleton extends UIRenderer {
     public updateAnimation (dt: number) {
         if (this._paused) return;
         dt *= this._timeScale * timeScale;
-        this._instance.updateAnimation(dt);
-        this.markForUpdateRenderData();
+        if (this.isAnimationCached()) {
+            // if (this._isAniComplete) {
+            //     if (this._animationQueue.length === 0 && !this._headAniInfo) {
+            //         const frameCache = this._frameCache;
+            //         if (frameCache && frameCache.isInvalid()) {
+            //             frameCache.updateToFrame();
+            //             const frames = frameCache.frames;
+            //             this._curFrame = frames[frames.length - 1]!;
+            //         }
+            //         return;
+            //     }
+            //     if (!this._headAniInfo) {
+            //         this._headAniInfo = this._animationQueue.shift()!;
+            //     }
+            //     this._accTime += dt;
+            //     if (this._accTime > this._headAniInfo.delay) {
+            //         const aniInfo = this._headAniInfo;
+            //         this._headAniInfo = null;
+            //         this.setAnimation(0, aniInfo.animationName, aniInfo.loop);
+            //     }
+            //     return;
+            // }
+            // this._updateCache(dt);
+        } else {
+            this._instance.updateAnimation(dt);
+            this.markForUpdateRenderData();
+        }
     }
 
     public updateRenderData (): any {
@@ -820,8 +891,9 @@ export class Skeleton extends UIRenderer {
      * @zh 当前是否处于缓存模式。
      */
     public isAnimationCached () {
-        if (EDITOR && !legacyCC.GAME_VIEW) return false;
-        return this._cacheMode !== AnimationCacheMode.REALTIME;
+        return false;
+        // if (EDITOR && !legacyCC.GAME_VIEW) return false;
+        // return this._cacheMode !== AnimationCacheMode.REALTIME;
     }
     /**
      * @en
@@ -1110,6 +1182,81 @@ export class Skeleton extends UIRenderer {
     //         this._debugRenderer = null;
     //         // this._debugRenderer.node.active = false;
     //     }
+    }
+
+    protected _updateCache (dt: number) {
+        // const frameCache = this._frameCache!;
+        // if (!frameCache.isInited()) {
+        //     return;
+        // }
+        // const frames = frameCache.frames;
+        // const frameTime = SkeletonCache.FrameTime;
+
+        // // Animation Start, the event different from dragonbones inner event,
+        // // It has no event object.
+        // if (this._accTime === 0 && this._playCount === 0) {
+        //     this._startEntry.animation.name = this._animationName;
+        //     if (this._listener && this._listener.start) this._listener.start(this._startEntry);
+        // }
+
+        // this._accTime += dt;
+        // let frameIdx = Math.floor(this._accTime / frameTime);
+        // if (!frameCache.isCompleted) {
+        //     frameCache.updateToFrame(frameIdx);
+        //     // Update render data size if needed
+        //     if (this.renderData
+        //         && (this.renderData.vertexCount < frameCache.maxVertexCount
+        //         || this.renderData.indexCount < frameCache.maxIndexCount)) {
+        //         this.maxVertexCount = frameCache.maxVertexCount > this.maxVertexCount ? frameCache.maxVertexCount : this.maxVertexCount;
+        //         this.maxIndexCount = frameCache.maxIndexCount > this.maxIndexCount ? frameCache.maxIndexCount : this.maxIndexCount;
+        //         this.renderData.resize(this.maxVertexCount, this.maxIndexCount);
+        //         if (!this.renderData.indices || this.maxIndexCount > this.renderData.indices.length) {
+        //             this.renderData.indices = new Uint16Array(this.maxIndexCount);
+        //         }
+        //     }
+        // }
+
+        // if (frameCache.isCompleted && frameIdx >= frames.length) {
+        //     this._playCount++;
+        //     if (this._playTimes > 0 && this._playCount >= this._playTimes) {
+        //         // set frame to end frame.
+        //         this._curFrame = frames[frames.length - 1];
+        //         this._accTime = 0;
+        //         this._playCount = 0;
+        //         this._isAniComplete = true;
+        //         this._emitCacheCompleteEvent();
+        //         return;
+        //     }
+        //     this._accTime = 0;
+        //     frameIdx = 0;
+        //     this._emitCacheCompleteEvent();
+        // }
+        // this._curFrame = frames[frameIdx];
+    }
+
+    private _updateUITransform () {
+        const width = this._runtimeData.width;
+        const height = this._runtimeData.height;
+        if (width && height) {
+            const uiTrans = this.node._uiProps.uiTransformComp!;
+            uiTrans.setContentSize(width, height);
+            uiTrans.anchorX = 0.5;
+            uiTrans.anchorY = 0;
+        }
+    }
+
+    private _initSkeletonCache () {
+        // if (this._cacheMode === AnimationCacheMode.SHARED_CACHE) {
+        //     this._skeletonCache = SkeletonCache.sharedCache;
+        // } else if (this._cacheMode === AnimationCacheMode.PRIVATE_CACHE) {
+        //     this._skeletonCache = new SkeletonCache();
+        //     this._skeletonCache.enablePrivateMode();
+        // }
+        // if (this.debugBones || this.debugSlots) {
+        //     warn('Debug bones or slots is invalid in cached mode');
+        // }
+        // const skeletonInfo = this._skeletonCache.getSkeletonCache((this.skeletonData as any)._uuid, this._runtimeData);
+        // this._skeleton = skeletonInfo.skeleton;
     }
 }
 

@@ -22,53 +22,51 @@
 //  THE SOFTWARE.
 // */
 
-// import { TrackEntryListeners } from './track-entry-listeners';
-// import spine from './lib/spine-core.js';
+// //import { TrackEntryListeners } from './track-entry-listeners';
 // import { Texture2D } from '../asset/assets';
+// import { spineX } from './cocos-spine/spine-define';
 
 // const MaxCacheTime = 30;
 // const FrameTime = 1 / 60;
 
-// /**
-//  *  0/x, 1/y, 2/u, 3/v, 4/color32, 5/color32,
-//  */
-// const _vertices: number[] = [];
-// const _indices: number[] = [];
-// let _boneInfoOffset = 0;
-// let _indexOffset = 0;
-// let _vfOffset = 0;
-// let _preTexID: string|null = null;
-// let _preBlendMode: spine.BlendMode | null = null;
-// let _segVCount = 0;
-// let _segICount = 0;
-// let _segOffset = 0;
-// let _colorOffset = 0;
-// let _preFinalColor: number | null = null;
-// let _preDarkColor: number | null = null;
-// // x y u v c1 c2
-// const PerVertexSize = 6;
-// // x y u v r1 g1 b1 a1 r2 g2 b2 a2
-// const PerClipVertexSize = 12;
-// // x y z / u v / r g b a/ r g b a
-// const ExportVertexSize = 7;
+// // /**
+// //  *  0/x, 1/y, 2/u, 3/v, 4/color32, 5/color32,
+// //  */
+// // const _vertices: number[] = [];
+// // const _indices: number[] = [];
+// // let _boneInfoOffset = 0;
+// // let _indexOffset = 0;
+// // let _vfOffset = 0;
+// // let _preTexID: string|null = null;
+// // let _preBlendMode = null;
+// // let _segVCount = 0;
+// // let _segICount = 0;
+// // let _segOffset = 0;
+// // let _colorOffset = 0;
+// // let _preFinalColor: number | null = null;
+// // let _preDarkColor: number | null = null;
+// // // x y u v c1 c2
+// // const PerVertexSize = 6;
+// // // x y u v r1 g1 b1 a1 r2 g2 b2 a2
+// // const PerClipVertexSize = 12;
+// // // x y z / u v / r g b a/ r g b a
+// // const ExportVertexSize = 7;
 
-// let _vfCount = 0;
-// let _indexCount = 0;
-// let _tempr: number;
-// let _tempg: number;
-// let _tempb: number;
-// let _tempa: number;
-// let _finalColor32: number;
-// let _darkColor32: number;
-// const _finalColor = new spine.Color(1, 1, 1, 1);
-// const _darkColor = new spine.Color(1, 1, 1, 1);
-// const _quadTriangles = [0, 1, 2, 2, 3, 0];
+// // let _vfCount = 0;
+// // let _indexCount = 0;
+// // let _tempr: number;
+// // let _tempg: number;
+// // let _tempb: number;
+// // let _tempa: number;
+// // let _finalColor32: number;
+// // let _darkColor32: number;
+// // const _finalColor = new spine.Color(1, 1, 1, 1);
+// // const _darkColor = new spine.Color(1, 1, 1, 1);
+// // const _quadTriangles = [0, 1, 2, 2, 3, 0];
 
 // export interface SkeletonCacheItemInfo {
-//     skeleton: spine.Skeleton;
-//     clipper: spine.SkeletonClipping;
-//     state: spine.AnimationState;
-//     listener: TrackEntryListeners;
+//     skeleton: spineX.Skeleton;
+//     state: spineX.AnimationState;
 //     curAnimationCache: AnimationCache | null;
 //     animationsCache: { [key: string]: AnimationCache };
 // }
@@ -90,22 +88,22 @@
 //     vfCount: number;
 //     vertexCount: number;
 //     tex?: Texture2D;
-//     blendMode?: spine.BlendMode;
+//     blendMode?: number;
 // }
 
-// export interface FrameBoneInfo extends spine.Bone {
-//     a: number;
-//     b: number;
-//     c: number;
-//     d: number;
-//     worldX: number;
-//     worldY: number;
-// }
+// // export interface FrameBoneInfo extends spine.Bone {
+// //     a: number;
+// //     b: number;
+// //     c: number;
+// //     d: number;
+// //     worldX: number;
+// //     worldY: number;
+// // }
 
 // export interface AnimationFrame {
 //     segments: FrameSegment[];
 //     colors: FrameColor[];
-//     boneInfos: FrameBoneInfo[];
+//     //boneInfos: FrameBoneInfo[];
 //     vertices: Float32Array;
 //     indices: Uint16Array;
 // }
@@ -130,7 +128,7 @@
 //     protected _animationName: string | null = null;
 //     protected _tempSegments: FrameSegment[] | null = null;
 //     protected _tempColors: FrameColor[] | null = null;
-//     protected _tempBoneInfos: FrameBoneInfo[] | null = null;
+//     //protected _tempBoneInfos: FrameBoneInfo[] | null = null;
 
 //     constructor () {
 //         this._privateMode = false;
@@ -146,7 +144,7 @@
 //         this._animationName = null;
 //         this._tempSegments = null;
 //         this._tempColors = null;
-//         this._tempBoneInfos = null;
+//         //this._tempBoneInfos = null;
 //     }
 
 //     public init (skeletonInfo: SkeletonCacheItemInfo, animationName: string) {
@@ -165,19 +163,19 @@
 //         this.invalidAllFrame();
 //     }
 
-//     public bind (listener: TrackEntryListeners) {
-//         const completeHandle = (entry: spine.TrackEntry) => {
-//             if (entry && entry.animation.name === this._animationName) {
-//                 this.isCompleted = true;
-//             }
-//         };
+//     // public bind (listener: TrackEntryListeners) {
+//     //     const completeHandle = (entry: spine.TrackEntry) => {
+//     //         if (entry && entry.animation.name === this._animationName) {
+//     //             this.isCompleted = true;
+//     //         }
+//     //     };
 
-//         listener.complete = completeHandle;
-//     }
+//     //     listener.complete = completeHandle;
+//     // }
 
-//     public unbind (listener: TrackEntryListeners) {
-//         (listener as any).complete = null;
-//     }
+//     // public unbind (listener: TrackEntryListeners) {
+//     //     (listener as any).complete = null;
+//     // }
 
 //     public begin () {
 //         if (!this._invalid) return;
@@ -196,12 +194,12 @@
 //         }
 
 //         const skeleton = skeletonInfo?.skeleton;
-//         const listener = skeletonInfo?.listener;
+//         //const listener = skeletonInfo?.listener;
 //         const state = skeletonInfo?.state;
 
 //         const animation = skeleton?.data.findAnimation(this._animationName!);
-//         state?.setAnimationWith(0, animation!, false);
-//         this.bind(listener!);
+//         state?.setAnimationWith(0, animation, false);
+//         //this.bind(listener);
 
 //         // record cur animation cache
 //         skeletonInfo!.curAnimationCache = this;
@@ -217,7 +215,7 @@
 //             this._skeletonInfo!.curAnimationCache = null;
 //             this.frames.length = this._frameIdx + 1;
 //             this.isCompleted = true;
-//             this.unbind(this._skeletonInfo!.listener);
+//             //this.unbind(this._skeletonInfo!.listener);
 //         }
 //     }
 
@@ -230,17 +228,17 @@
 
 //         const skeletonInfo = this._skeletonInfo;
 //         const skeleton = skeletonInfo?.skeleton;
-//         const clipper = skeletonInfo?.clipper;
+//         //const clipper = skeletonInfo?.clipper;
 //         const state = skeletonInfo?.state;
 
 //         do {
 //             // Solid update frame rate 1/60.
 //             skeleton?.update(FrameTime);
 //             state?.update(FrameTime);
-//             state?.apply(skeleton!);
+//             state?.apply(skeleton);
 //             skeleton?.updateWorldTransform();
 //             this._frameIdx++;
-//             this.updateFrame(skeleton!, clipper!, this._frameIdx);
+//             this.updateFrame(skeleton, clipper, this._frameIdx);
 //             this.totalTime += FrameTime;
 //         } while (this.needToUpdate(toFrameIdx));
 
@@ -495,7 +493,7 @@
 //             isClip = attachment instanceof spine.ClippingAttachment;
 
 //             if (isClip) {
-//                 clipper.clipStart(slot, attachment as spine.ClippingAttachment);
+//                 clipper.clipStart(slot, attachment);
 //                 continue;
 //             }
 
@@ -548,9 +546,9 @@
 //                 _indexCount = 6;
 
 //                 // compute vertex and fill x y
-//                 (attachment as spine.RegionAttachment).computeWorldVertices(slot.bone, _vertices, _vfOffset, PerVertexSize);
+//                 (attachment).computeWorldVertices(slot.bone, _vertices, _vfOffset, PerVertexSize);
 //             } else if (isMesh) {
-//                 const meshAttachment = (attachment as spine.MeshAttachment);
+//                 const meshAttachment = (attachment);
 //                 triangles = meshAttachment.triangles;
 
 //                 // insure capacity
@@ -572,13 +570,13 @@
 //             }
 
 //             // fill u v
-//             uvs = (attachment as spine.MeshAttachment).uvs;
+//             uvs = (attachment).uvs;
 //             for (let v = _vfOffset, n = _vfOffset + _vfCount, u = 0; v < n; v += PerVertexSize, u += 2) {
 //                 _vertices[v + 2] = uvs[u];           // u
 //                 _vertices[v + 3] = uvs[u + 1];       // v
 //             }
 
-//             attachmentColor = (attachment as spine.MeshAttachment).color;
+//             attachmentColor = (attachment).color;
 //             slotColor = slot.color;
 
 //             this.fillVertices(skeletonColor, attachmentColor, slotColor, clipper, slot);
@@ -645,7 +643,7 @@
 //         delete this._skeletonCache[uuid];
 //     }
 
-//     public getSkeletonCache (uuid: string, skeletonData: spine.SkeletonData) {
+//     public getSkeletonCache (uuid: string, skeletonData: spineX.SkeletonData) {
 //         let skeletonInfo = this._skeletonCache[uuid];
 //         if (!skeletonInfo) {
 //             const skeleton = new spine.Skeleton(skeletonData);

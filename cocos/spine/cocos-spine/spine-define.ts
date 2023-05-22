@@ -23,6 +23,7 @@ function overrideSpineDefine () {
     const wasm = getSpineWasm();
     spineX.SkeletonData = wasm.SkeletonData;
     spineX.Skeleton = wasm.Skeleton;
+    spineX.AnimationState = wasm.AnimationState;
     spineX.SkeletonInstance = wasm.SkeletonInstance;
     spineX.HEAP8 = wasm.HEAPU8;
 }
