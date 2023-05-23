@@ -13,8 +13,8 @@ void SpineMeshData::initMeshMemory() {
     if (vBuf) return;
     const auto vCount = 65535;
     const auto byteStride = 7 * sizeof(float);
-    vBuf = new uint8_t[vCount * byteStride];
-    iBuf = new uint16_t[65535];
+    vBuf = new uint8_t[2 * vCount * byteStride];
+    iBuf = new uint16_t[8 * 65535];
 
     vPtr = vBuf;
     iPtr = iBuf;

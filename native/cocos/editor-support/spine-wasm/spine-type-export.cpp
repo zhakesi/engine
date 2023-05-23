@@ -186,11 +186,15 @@ EMSCRIPTEN_BINDINGS(spine) {
         .property("name", &Skin::AttachmentMap::Entry::_name)
         .function("attachment", select_overload<Attachment *()>(&Skin::AttachmentMap::Entry::getAttachment), allow_raw_pointers())
         .function("attachment", select_overload<void(Attachment *)>(&Skin::AttachmentMap::Entry::setAttachment), allow_raw_pointers());
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     class_<SkeletonData>("SkeletonData")
         .constructor<>()
         .property("width",&spine::SkeletonData::getWidth, &spine::SkeletonData::setWidth)
         .property("height",&spine::SkeletonData::getHeight, &spine::SkeletonData::setHeight);
+
+    class_<TrackEntry>("TrackEntry")
+        .constructor<>();
+
 
     class_<AnimationStateData>("AnimationStateData")
         .constructor<SkeletonData *>()
@@ -265,10 +269,13 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("updateAnimation", &SpineSkeletonInstance::updateAnimation)
         .function("updateRenderData", &SpineSkeletonInstance::updateRenderData, allow_raw_pointer<SpineModel>())
         .function("setPremultipliedAlpha", &SpineSkeletonInstance::setPremultipliedAlpha)
+        .function("setUseTint", &SpineSkeletonInstance::setUseTint)
         .function("setColor", &SpineSkeletonInstance::setColor)
         .function("setJitterEffect", &SpineSkeletonInstance::setJitterEffect, allow_raw_pointer<JitterVertexEffect*>())
         .function("setSwirlEffect", &SpineSkeletonInstance::setSwirlEffect, allow_raw_pointer<SwirlVertexEffect*>())
         .function("clearEffect", &SpineSkeletonInstance::clearEffect)
         .function("getAnimationState", &SpineSkeletonInstance::getAnimationState, allow_raw_pointer<AnimationState>())
-        .function("setMix", &SpineSkeletonInstance::setMix);
+        .function("setMix", &SpineSkeletonInstance::setMix)
+        .function("setStartListener", &SpineSkeletonInstance::setStartListener)
+        ;
 }

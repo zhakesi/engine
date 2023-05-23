@@ -26,9 +26,10 @@ void SpineModel::addSlotMesh(SlotMesh &mesh, bool needMerge) {
     for (int i = 0; i < mesh.iCount; i++) {
         iiPtr[i] += vCount;
     }
-    float* vvPtr = (float*)mesh.vBuf;
+    float* floatPtr = (float*)mesh.vBuf;
+    int floatStride = this->byteStride / 4;
     for (int i = 0; i < mesh.vCount; i++) {
-        vvPtr[ 6 * i + 2] = 0;
+        floatPtr[ floatStride * i + 2] = 0;
     } 
     vCount += mesh.vCount;
     iCount += mesh.iCount;

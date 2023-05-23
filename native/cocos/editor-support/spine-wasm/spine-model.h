@@ -31,6 +31,7 @@ public:
     uint32_t iCount;
     uint32_t vPtr;
     uint32_t iPtr;
+    uint32_t byteStride;
     std::vector<SlotMesh> meshArray{};
 };
 

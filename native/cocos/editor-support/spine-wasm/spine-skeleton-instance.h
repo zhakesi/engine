@@ -5,8 +5,9 @@
 #include "spine-model.h"
 #include <string>
 #include <memory>
+#include <functional>
 using namespace spine;
-
+typedef std::function<void(TrackEntry *entry)> StartListener;
 class SpineSkeletonInstance {
     struct UserData {
         bool useTint = false;
@@ -24,12 +25,14 @@ public:
     void updateAnimation(float dltTime);
     SpineModel* updateRenderData();
     void setPremultipliedAlpha(bool val);
+    void setUseTint(bool useTint);
     void setColor(float r, float g, float b, float a);
     void setJitterEffect(JitterVertexEffect *effect);
     void setSwirlEffect(SwirlVertexEffect *effect);
     void clearEffect();
     AnimationState* getAnimationState();
     void setMix(const std::string& from, const std::string& to, float duration);
+    void setStartListener(const StartListener &listener);
 
 private:
     void collectMeshData();
