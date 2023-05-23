@@ -187,9 +187,10 @@ export class Skeleton extends UIRenderer {
     @serializable
     protected _enableBatch = false;
 
-    private _runtimeData: any = null;
+    protected _runtimeData: any = null;
     public _skeleton: any = null;
-    private _instance: any = null;
+    protected _instance: any = null;
+    protected _state: any = null;
     protected _texture: Texture2D | null = null;
     // Animation name
     protected _animationName = '';
@@ -465,7 +466,7 @@ export class Skeleton extends UIRenderer {
         }
         this._sockets = val;
         this._updateSocketBindings();
-        this.attachUtil._syncAttachedNode();
+        this.syncAttachedNode();
     }
 
     /**
@@ -512,6 +513,7 @@ export class Skeleton extends UIRenderer {
             this.markForUpdateRenderData();
         }
     }
+    get socketNodes () { return this._socketNodes; }
 
     public __preload () {
         super.__preload();
@@ -594,6 +596,7 @@ export class Skeleton extends UIRenderer {
             this._initSkeletonCache();
         } else {
             this._skeleton = this._instance.initSkeleton();
+            this._state = this._instance.getAnimationState();
             this._instance.setPremultipliedAlpha(this._premultipliedAlpha);
         }
         this._refreshInspector();
@@ -601,6 +604,10 @@ export class Skeleton extends UIRenderer {
         if (this.defaultAnimation) this.animation = this.defaultAnimation;
 
         this._flushAssembler();
+
+        this._indexBoneSockets();
+        this._updateSocketBindings();
+        this.attachUtil.init(this);
     }
 
     public setAnimation (trackIndex: number, name: string, loop?: boolean) {
@@ -875,7 +882,7 @@ export class Skeleton extends UIRenderer {
      */
     public syncAttachedNode () {
         // sync attached node matrix
-        //this.attachUtil._syncAttachedNode();
+        this.attachUtil._syncAttachedNode();
     }
 
     /**
@@ -1010,12 +1017,12 @@ export class Skeleton extends UIRenderer {
      * @method clearTracks
      */
     public clearTracks () {
-        // if (this.isAnimationCached()) {
-        //     warn('\'clearTracks\' interface can not be invoked in cached mode.');
-        // } else if (this._instance) {
-        //     this._instance.clearTracks();
-        //     this.setToSetupPose();
-        // }
+        if (this.isAnimationCached()) {
+            warn('\'clearTracks\' interface can not be invoked in cached mode.');
+        } else if (this._state) {
+            this._state.clearTracks();
+            this.setToSetupPose();
+        }
     }
 
     /**
@@ -1025,14 +1032,14 @@ export class Skeleton extends UIRenderer {
      * @param {number} trackIndex
      */
     public clearTrack (trackIndex: number) {
-        // if (this.isAnimationCached()) {
-        //     warn('\'clearTrack\' interface can not be invoked in cached mode.');
-        // } else if (this._state) {
-        //     this._state.clearTrack(trackIndex);
-        //     if (EDITOR && !legacyCC.GAME_VIEW/* && !cc.engine.isPlaying */) {
-        //         this._state.update(0);
-        //     }
-        // }
+        if (this.isAnimationCached()) {
+            warn('\'clearTrack\' interface can not be invoked in cached mode.');
+        } else if (this._state) {
+            this._state.clearTrack(trackIndex);
+            if (EDITOR && !legacyCC.GAME_VIEW/* && !cc.engine.isPlaying */) {
+                this._state.update(0);
+            }
+        }
     }
 
     /**
@@ -1101,20 +1108,21 @@ export class Skeleton extends UIRenderer {
     }
 
     protected _indexBoneSockets (): void {
-        // if (!this._skeleton) {
-        //     return;
-        // }
-        // this._cachedSockets.clear();
-        // const bones = this._skeleton.bones;
-        // const getBoneName = (bone: spine.Bone) => {
-        //     if (bone.parent == null) return bone.data.name || '<Unamed>';
-        //     return `${getBoneName(bones[bone.parent.data.index]) as string}/${bone.data.name}`;
-        // };
-        // for (let i = 0, l = bones.length; i < l; i++) {
-        //     const bd = bones[i].data;
-        //     const boneName = getBoneName(bones[i]);
-        //     this._cachedSockets.set(boneName, bd.index);
-        // }
+        if (!this._skeleton) {
+            return;
+        }
+        this._cachedSockets.clear();
+        const bones = this._skeleton.getBones();
+        const getBoneName = (bone: any) => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            if (bone.getParent() == null) return bone.data.name || '<Unamed>';
+            return `${getBoneName(bones.get(bone.getParent().data.index)) as string}/${bone.data.name}`;
+        };
+        for (let i = 0, l = bones.size(); i < l; i++) {
+            const bd = bones.get(i).data;
+            const boneName = getBoneName(bones.get(i));
+            this._cachedSockets.set(boneName, bd.index);
+        }
     }
 
     /**
