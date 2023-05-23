@@ -72,7 +72,7 @@ export const simple: IAssembler = {
     createData (comp: Skeleton) {
         let rd = comp.renderData;
         if (!rd) {
-            const useTint = false;
+            const useTint = comp.useTint;
             //const useTint = comp.useTint || comp.isAnimationCached();
             const accessor = this.ensureAccessor(useTint) as StaticVBAccessor;
             rd = RenderData.add(useTint ? vfmtPosUvTwoColor4B : vfmtPosUvColor4B, accessor);
@@ -96,6 +96,8 @@ function updateComponentRenderData (comp: Skeleton, batcher: Batcher2D) {
     _premultipliedAlpha = comp.premultipliedAlpha;
     _useTint = comp.useTint;
 
+    const floatStride = _useTint ? 7 : 6;
+
     comp.drawList.reset();
     const model = comp.updateRenderData();
     const vc = model.vCount;
@@ -107,7 +109,7 @@ function updateComponentRenderData (comp: Skeleton, batcher: Batcher2D) {
     const vUint8Buf = new Uint8Array(vbuf.buffer, vbuf.byteOffset, 4 * vbuf.length);
 
     const vPtr = model.vPtr;
-    const vLength = vc * 4 * 6;
+    const vLength = vc * 4 * floatStride;
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
     const vData = spineX.HEAP8.subarray(vPtr, vPtr + vLength);
     vUint8Buf.set(vData);
@@ -135,7 +137,7 @@ function updateComponentRenderData (comp: Skeleton, batcher: Batcher2D) {
         comp.requestDrawData(material, indexOffset, indexCount);
         indexOffset += indexCount;
     }
-    const accessor = _accessor;
+    const accessor = _useTint ? _tintAccessor : _accessor;
     accessor.getMeshBuffer(rd.chunk.bufferId).setDirty();
 }
 

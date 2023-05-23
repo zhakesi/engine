@@ -592,16 +592,18 @@ export class Skeleton extends UIRenderer {
         if (!this._runtimeData) return;
 
         this._updateUITransform();
-        if (this.isAnimationCached()) {
-            this._initSkeletonCache();
-        } else {
-            this._skeleton = this._instance.initSkeleton();
-            this._state = this._instance.getAnimationState();
-            this._instance.setPremultipliedAlpha(this._premultipliedAlpha);
-        }
+        //if (this.isAnimationCached()) {
+        //    this._initSkeletonCache();
+        //} else {
+        this._skeleton = this._instance.initSkeleton();
+        this._state = this._instance.getAnimationState();
+        this._instance.setPremultipliedAlpha(this._premultipliedAlpha);
+        //}
         this._refreshInspector();
         if (this.defaultSkin) this.setSkin(this.defaultSkin);
         if (this.defaultAnimation) this.animation = this.defaultAnimation;
+
+        this._updateUseTint();
 
         this._flushAssembler();
 
@@ -612,27 +614,27 @@ export class Skeleton extends UIRenderer {
 
     public setAnimation (trackIndex: number, name: string, loop?: boolean) {
         if (loop === undefined) loop = true;
-        if (this.isAnimationCached()) {
-            // if (!this._skeletonCache) return;
-            // let cache = this._skeletonCache.getAnimationCache(this._skeletonData!._uuid, name);
-            // if (!cache) {
-            //     cache = this._skeletonCache.initAnimationCache(this._skeletonData!._uuid, name);
-            // }
-            // if (cache) {
-            //     this._animationName = name;
-            //     this._isAniComplete = false;
-            //     this._accTime = 0;
-            //     this._playCount = 0;
-            //     this._frameCache = cache;
-            //     if (this._socketNodes.size > 0) {
-            //         this._frameCache.enableCacheAttachedInfo();
-            //     }
-            //     this._frameCache.updateToFrame(0);
-            //     this._curFrame = this._frameCache.frames[0]!;
-            // }
-        } else {
-            this._instance.setAnimation(trackIndex, name, loop);
-        }
+        //if (this.isAnimationCached()) {
+        // if (!this._skeletonCache) return;
+        // let cache = this._skeletonCache.getAnimationCache(this._skeletonData!._uuid, name);
+        // if (!cache) {
+        //     cache = this._skeletonCache.initAnimationCache(this._skeletonData!._uuid, name);
+        // }
+        // if (cache) {
+        //     this._animationName = name;
+        //     this._isAniComplete = false;
+        //     this._accTime = 0;
+        //     this._playCount = 0;
+        //     this._frameCache = cache;
+        //     if (this._socketNodes.size > 0) {
+        //         this._frameCache.enableCacheAttachedInfo();
+        //     }
+        //     this._frameCache.updateToFrame(0);
+        //     this._curFrame = this._frameCache.frames[0]!;
+        // }
+        //} else {
+        this._instance.setAnimation(trackIndex, name, loop);
+        //}
         this.markForUpdateRenderData();
     }
 
@@ -643,33 +645,33 @@ export class Skeleton extends UIRenderer {
     public updateAnimation (dt: number) {
         if (this._paused) return;
         dt *= this._timeScale * timeScale;
-        if (this.isAnimationCached()) {
-            // if (this._isAniComplete) {
-            //     if (this._animationQueue.length === 0 && !this._headAniInfo) {
-            //         const frameCache = this._frameCache;
-            //         if (frameCache && frameCache.isInvalid()) {
-            //             frameCache.updateToFrame();
-            //             const frames = frameCache.frames;
-            //             this._curFrame = frames[frames.length - 1]!;
-            //         }
-            //         return;
-            //     }
-            //     if (!this._headAniInfo) {
-            //         this._headAniInfo = this._animationQueue.shift()!;
-            //     }
-            //     this._accTime += dt;
-            //     if (this._accTime > this._headAniInfo.delay) {
-            //         const aniInfo = this._headAniInfo;
-            //         this._headAniInfo = null;
-            //         this.setAnimation(0, aniInfo.animationName, aniInfo.loop);
-            //     }
-            //     return;
-            // }
-            // this._updateCache(dt);
-        } else {
-            this._instance.updateAnimation(dt);
-            this.markForUpdateRenderData();
-        }
+        //if (this.isAnimationCached()) {
+        // if (this._isAniComplete) {
+        //     if (this._animationQueue.length === 0 && !this._headAniInfo) {
+        //         const frameCache = this._frameCache;
+        //         if (frameCache && frameCache.isInvalid()) {
+        //             frameCache.updateToFrame();
+        //             const frames = frameCache.frames;
+        //             this._curFrame = frames[frames.length - 1]!;
+        //         }
+        //         return;
+        //     }
+        //     if (!this._headAniInfo) {
+        //         this._headAniInfo = this._animationQueue.shift()!;
+        //     }
+        //     this._accTime += dt;
+        //     if (this._accTime > this._headAniInfo.delay) {
+        //         const aniInfo = this._headAniInfo;
+        //         this._headAniInfo = null;
+        //         this.setAnimation(0, aniInfo.animationName, aniInfo.loop);
+        //     }
+        //     return;
+        // }
+        // this._updateCache(dt);
+        //} else {
+        this._instance.updateAnimation(dt);
+        this.markForUpdateRenderData();
+        //}
     }
 
     public updateRenderData (): any {
@@ -890,9 +892,8 @@ export class Skeleton extends UIRenderer {
      * @zh 当前是否处于缓存模式。
      */
     public isAnimationCached () {
-        return false;
-        // if (EDITOR && !legacyCC.GAME_VIEW) return false;
-        // return this._cacheMode !== AnimationCacheMode.REALTIME;
+        if (EDITOR && !legacyCC.GAME_VIEW) return false;
+        return this._cacheMode !== AnimationCacheMode.REALTIME;
     }
     /**
      * @en
@@ -1148,6 +1149,7 @@ export class Skeleton extends UIRenderer {
     protected _updateUseTint () {
         this._cleanMaterialCache();
         this.destroyRenderData();
+        this._instance.setUseTint(this._useTint);
         if (this._assembler && this._skeleton) {
             this._renderData = this._assembler.createData(this);
             this.markForUpdateRenderData();
@@ -1286,6 +1288,143 @@ export class Skeleton extends UIRenderer {
             const swirlEffect = effectDelegate?.getJitterVertexEffect();
             this._instance.setSwirlEffect(swirlEffect);
         }
+    }
+
+    /**
+     * @en Sets the start event listener.
+     * @zh 用来设置开始播放动画的事件监听。
+     * @method setStartListener
+     * @param {function} listener
+     */
+    public setStartListener (listener: any) {
+        // this._ensureListener();
+        // this._listener!.start = listener;
+    }
+
+    /**
+     * @en Sets the interrupt event listener.
+     * @zh 用来设置动画被打断的事件监听。
+     * @method setInterruptListener
+     * @param {function} listener
+     */
+    public setInterruptListener (listener: any) {
+        //this._ensureListener();
+        //this._listener!.interrupt = listener;
+    }
+
+    /**
+     * @en Sets the end event listener.
+     * @zh 用来设置动画播放完后的事件监听。
+     * @method setEndListener
+     * @param {function} listener
+     */
+    public setEndListener (listener: any) {
+        // this._ensureListener();
+        // this._listener!.end = listener;
+    }
+
+    /**
+     * @en Sets the dispose event listener.
+     * @zh 用来设置动画将被销毁的事件监听。
+     * @method setDisposeListener
+     * @param {function} listener
+     */
+    public setDisposeListener (listener: any) {
+        // this._ensureListener();
+        // this._listener!.dispose = listener;
+    }
+
+    /**
+     * @en Sets the complete event listener.
+     * @zh 用来设置动画播放一次循环结束后的事件监听。
+     * @method setCompleteListener
+     * @param {function} listener
+     */
+    public setCompleteListener (listener: any) {
+        // this._ensureListener();
+        // this._listener!.complete = listener;
+    }
+
+    /**
+     * @en Sets the animation event listener.
+     * @zh 用来设置动画播放过程中帧事件的监听。
+     * @method setEventListener
+     * @param {function} listener
+     */
+    public setEventListener (listener: any) {
+        // this._ensureListener();
+        // this._listener!.event = listener;
+    }
+
+    /**
+     * @en Sets the start event listener for specified TrackEntry.
+     * @zh 用来为指定的 TrackEntry 设置动画开始播放的事件监听。
+     * @method setTrackStartListener
+     * @param {sp.spine.TrackEntry} entry
+     * @param {function} listener
+     */
+    public setTrackStartListener (entry: any, listener: any) {
+        // TrackEntryListeners.getListeners(entry).start = listener;
+    }
+
+    /**
+     * @en Sets the interrupt event listener for specified TrackEntry.
+     * @zh 用来为指定的 TrackEntry 设置动画被打断的事件监听。
+     * @method setTrackInterruptListener
+     * @param {sp.spine.TrackEntry} entry
+     * @param {function} listener
+     */
+    public setTrackInterruptListener (entry: any, listener: any) {
+        //TrackEntryListeners.getListeners(entry).interrupt = listener;
+    }
+
+    /**
+     * @en Sets the end event listener for specified TrackEntry.
+     * @zh 用来为指定的 TrackEntry 设置动画播放结束的事件监听。
+     * @method setTrackEndListener
+     * @param {sp.spine.TrackEntry} entry
+     * @param {function} listener
+     */
+    public setTrackEndListener (entry: any, listener: any) {
+        //TrackEntryListeners.getListeners(entry).end = listener;
+    }
+
+    /**
+     * @en Sets the dispose event listener for specified TrackEntry.
+     * @zh 用来为指定的 TrackEntry 设置动画即将被销毁的事件监听。
+     * @method setTrackDisposeListener
+     * @param {sp.spine.TrackEntry} entry
+     * @param {function} listener
+     */
+    public setTrackDisposeListener (entry: any, listener: any) {
+        //TrackEntryListeners.getListeners(entry).dispose = listener;
+    }
+
+    /**
+     * @en Sets the complete event listener for specified TrackEntry.
+     * @zh 用来为指定的 TrackEntry 设置动画一次循环播放结束的事件监听。
+     * @method setTrackCompleteListener
+     * @param {sp.spine.TrackEntry} entry
+     * @param {function} listener
+     * @param {sp.spine.TrackEntry} listener.entry
+     * @param {Number} listener.loopCount
+     */
+    public setTrackCompleteListener (entry: any, listener: any) {
+        // TrackEntryListeners.getListeners(entry).complete = function (trackEntry) {
+        //     const loopCount = Math.floor(trackEntry.trackTime / trackEntry.animationEnd);
+        //     listener(trackEntry, loopCount);
+        // };
+    }
+
+    /**
+     * @en Sets the event listener for specified TrackEntry.
+     * @zh 用来为指定的 TrackEntry 设置动画帧事件的监听。
+     * @method setTrackEventListener
+     * @param {sp.spine.TrackEntry} entry
+     * @param {function} listener
+     */
+    public setTrackEventListener (entry: any, listener: any) {
+        //TrackEntryListeners.getListeners(entry).event = listener;
     }
 }
 
