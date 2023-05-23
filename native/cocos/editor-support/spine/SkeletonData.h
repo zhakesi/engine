@@ -32,6 +32,7 @@
 
 #include <spine/SpineString.h>
 #include <spine/Vector.h>
+#include <string>
 
 namespace spine {
 class BoneData;
@@ -85,6 +86,7 @@ public:
 
     /// @return May be NULL.
     Animation *findAnimation(const String &animationName);
+    Animation *findAnimation_Export(const std::string &animationName);
 
     /// @return May be NULL.
     IkConstraintData *findIkConstraint(const String &constraintName);

@@ -35,6 +35,7 @@
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
 #include <spine/Vector.h>
+#include <vector>
 
 namespace spine {
 class SkeletonData;
@@ -167,8 +168,10 @@ public:
     Bone *getRootBone();
 
     SkeletonData *getData();
+    SkeletonData &getData_Export() const;
 
     Vector<Bone *> &getBones();
+    std::vector<Bone *> &getBones_Export();
 
     Vector<Updatable *> &getUpdateCacheList();
 
@@ -224,6 +227,7 @@ private:
     float _time;
     float _scaleX, _scaleY;
     float _x, _y;
+    std::vector<Bone *> _vectorBones;
 
     void sortIkConstraint(IkConstraint *constraint);
 

@@ -4,6 +4,7 @@
 #include "mesh-type-define.h"
 #include "spine-model.h"
 #include <string>
+#include <memory>
 using namespace spine;
 
 class SpineSkeletonInstance {
@@ -27,6 +28,9 @@ public:
     void setJitterEffect(JitterVertexEffect *effect);
     void setSwirlEffect(SwirlVertexEffect *effect);
     void clearEffect();
+    AnimationState* getAnimationState();
+    void setMix(const std::string& from, const std::string& to, float duration);
+
 private:
     void collectMeshData();
 private:

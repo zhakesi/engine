@@ -54,10 +54,10 @@ public:
     void end();
 
     void setJitterX(float jitterX);
-    float getJitterX();
+    float getJitterX() const;
 
     void setJitterY(float jitterY);
-    float getJitterY();
+    float getJitterY() const;
 
 protected:
     float _jitterX;
@@ -66,9 +66,7 @@ protected:
 
 class SP_API SwirlVertexEffect : public VertexEffect {
 public:
-    //SwirlVertexEffect(float radius, Interpolation &interpolation);
-    SwirlVertexEffect(float radius, PowInterpolation &interpolation);
-    SwirlVertexEffect(float radius, PowOutInterpolation &interpolation);
+    SwirlVertexEffect(float radius, Interpolation &interpolation);
 
     void begin(Skeleton &skeleton);
     void transform(float &x, float &y);

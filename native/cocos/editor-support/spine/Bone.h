@@ -106,11 +106,12 @@ public:
 
     float getWorldToLocalRotationY();
 
-    BoneData &getData();
+    BoneData &getData() const;
 
     Skeleton &getSkeleton();
 
-    Bone *getParent();
+    Bone *getParent() ;
+    Bone *getParent_Export() const;
 
     Vector<Bone *> &getChildren();
 
@@ -184,27 +185,27 @@ public:
 
     void setAShearY(float inValue);
 
-    float getA();
+    float getA() const;
 
     void setA(float inValue);
 
-    float getB();
+    float getB() const;
 
     void setB(float inValue);
 
-    float getC();
+    float getC() const;
 
     void setC(float inValue);
 
-    float getD();
+    float getD() const;
 
     void setD(float inValue);
 
-    float getWorldX();
+    float getWorldX() const;
 
     void setWorldX(float inValue);
 
-    float getWorldY();
+    float getWorldY() const;
 
     void setWorldY(float inValue);
 

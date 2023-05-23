@@ -610,6 +610,11 @@ AnimationStateData *AnimationState::getData() {
     return _data;
 }
 
+std::shared_ptr<AnimationStateData> AnimationState::getData_Export() const {
+    std::shared_ptr<AnimationStateData> ptr(_data);
+    return ptr;
+}
+
 Vector<TrackEntry *> &AnimationState::getTracks() {
     return _tracks;
 }

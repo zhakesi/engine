@@ -298,7 +298,7 @@ float Bone::getWorldToLocalRotationY() {
     return MathUtil::atan2(pa * d - pc * b, pd * b - pb * d) * MathUtil::Rad_Deg;
 }
 
-BoneData &Bone::getData() {
+BoneData &Bone::getData() const {
     return _data;
 }
 
@@ -307,6 +307,10 @@ Skeleton &Bone::getSkeleton() {
 }
 
 Bone *Bone::getParent() {
+    return _parent;
+}
+
+Bone* Bone::getParent_Export() const {
     return _parent;
 }
 
@@ -426,7 +430,7 @@ void Bone::setAShearY(float inValue) {
     _ashearY = inValue;
 }
 
-float Bone::getA() {
+float Bone::getA() const {
     return _a;
 }
 
@@ -434,7 +438,7 @@ void Bone::setA(float inValue) {
     _a = inValue;
 }
 
-float Bone::getB() {
+float Bone::getB() const {
     return _b;
 }
 
@@ -442,7 +446,7 @@ void Bone::setB(float inValue) {
     _b = inValue;
 }
 
-float Bone::getC() {
+float Bone::getC() const {
     return _c;
 }
 
@@ -450,7 +454,7 @@ void Bone::setC(float inValue) {
     _c = inValue;
 }
 
-float Bone::getD() {
+float Bone::getD() const {
     return _d;
 }
 
@@ -458,7 +462,7 @@ void Bone::setD(float inValue) {
     _d = inValue;
 }
 
-float Bone::getWorldX() {
+float Bone::getWorldX() const {
     return _worldX;
 }
 
@@ -466,7 +470,7 @@ void Bone::setWorldX(float inValue) {
     _worldX = inValue;
 }
 
-float Bone::getWorldY() {
+float Bone::getWorldY() const {
     return _worldY;
 }
 

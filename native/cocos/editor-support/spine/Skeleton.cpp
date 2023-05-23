@@ -473,8 +473,21 @@ SkeletonData *Skeleton::getData() {
     return _data;
 }
 
+SkeletonData& Skeleton::getData_Export() const {
+    return *_data;
+}
+
 Vector<Bone *> &Skeleton::getBones() {
     return _bones;
+}
+
+std::vector<Bone *> &Skeleton::getBones_Export() {
+    _vectorBones.clear();
+    int count = _bones.size();
+    for (int i = 0; i < count; i++) {
+        _vectorBones.push_back(_bones[i]);
+    }
+    return _vectorBones;
 }
 
 Vector<Updatable *> &Skeleton::getUpdateCacheList() {

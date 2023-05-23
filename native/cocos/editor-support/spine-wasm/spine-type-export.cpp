@@ -1,6 +1,7 @@
 #include <spine/spine.h>
 #include "spine-skeleton-instance.h"
 #include <emscripten/bind.h>
+#include <memory>
 
 using namespace emscripten;
 using namespace spine;
@@ -106,11 +107,14 @@ EMSCRIPTEN_BINDINGS(spine) {
         .property("b", &Color::b)
         .property("a", &Color::a);
 
-    class_<PowInterpolation>("Pow")
+    class_<Interpolation>("Interpolation")
+        .function("apply", &Interpolation::apply, pure_virtual());
+
+    class_<PowInterpolation, base<Interpolation>>("Pow")
         .constructor<int>()
         .function("apply", &PowInterpolation::apply);
     
-    class_<PowOutInterpolation>("PowOut")
+    class_<PowOutInterpolation, base<Interpolation>>("PowOut")
         .constructor<int>()
         .function("apply", &PowInterpolation::apply);
  
@@ -124,28 +128,19 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<BoneData>("BoneData")
         .constructor<int, const String&, BoneData *>()
-        .function("index", select_overload<int()>(&BoneData::getIndex))
-        .function("name", select_overload<const String &()>(&BoneData::getName))
-        .function("parent", select_overload<BoneData *()>(&BoneData::getParent), allow_raw_pointers())
-        .function("length", select_overload<float()>(&BoneData::getLength))
-        .function("x", select_overload<float()>(&BoneData::getX))
-        .function("x", select_overload<void(float)>(&BoneData::setX))
-        .function("y", select_overload<float()>(&BoneData::getY))
-        .function("y", select_overload<void(float)>(&BoneData::setY))
-        .function("rotation", select_overload<float()>(&BoneData::getRotation))
-        .function("rotation", select_overload<void(float)>(&BoneData::setRotation))
-        .function("scaleX", select_overload<float()>(&BoneData::getScaleX))
-        .function("scaleX", select_overload<void(float)>(&BoneData::setScaleX))
-        .function("scaleY", select_overload<float()>(&BoneData::getScaleY))
-        .function("scaleY", select_overload<void(float)>(&BoneData::setScaleY))
-        .function("shearX", select_overload<float()>(&BoneData::getShearX))
-        .function("shearX", select_overload<void(float)>(&BoneData::setShearX))
-        .function("shearY", select_overload<float()>(&BoneData::getShearY))
-        .function("shearY", select_overload<void(float)>(&BoneData::setShearY))
-        .function("transformMode", select_overload<TransformMode()>(&BoneData::getTransformMode))
-        .function("transformMode", select_overload<void(TransformMode)>(&BoneData::setTransformMode))
-        .function("skinRequired", select_overload<bool()>(&BoneData::isSkinRequired))
-        .function("skinRequired", select_overload<void(bool)>(&BoneData::setSkinRequired));
+        .property("index", &BoneData::getIndex)
+        .property("name", &BoneData::getName_Export)
+        .property("parent", &BoneData::getParent_Export)
+        .property("length", &BoneData::getLength, &BoneData::setLength)
+        .property("x", &BoneData::getX, &BoneData::setX)
+        .property("y", &BoneData::getY, &BoneData::setY)
+        .property("rotation", &BoneData::getRotation, &BoneData::setRotation)
+        .property("scaleX", &BoneData::getScaleX, &BoneData::setScaleX)
+        .property("scaleY", &BoneData::getScaleY, &BoneData::setScaleY)
+        .property("shearX", &BoneData::getShearX, &BoneData::setShearX)
+        .property("shearY", &BoneData::getShearY, &BoneData::setShearY)
+        .property("transformMode", &BoneData::getTransformMode, &BoneData::setTransformMode)
+        .property("skinRequired", &BoneData::isSkinRequired, &BoneData::setSkinRequired);
     
     class_<SlotData>("SlotData")
         .constructor<int, const String&, BoneData &>()
@@ -158,6 +153,18 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("attachmentName", select_overload<void(const String &)>(&SlotData::setAttachmentName))
         .function("blendMode", select_overload<BlendMode()>(&SlotData::getBlendMode))
         .function("blendMode", select_overload<void (BlendMode)>(&SlotData::setBlendMode));
+
+    class_<Bone>("Bone")
+        .constructor<BoneData &, Skeleton &, Bone *>()
+        .property("a", &Bone::getA, &Bone::setA)
+        .property("b", &Bone::getB, &Bone::setB)
+        .property("c", &Bone::getC, &Bone::setC)
+        .property("d", &Bone::getD, &Bone::setD)
+        .property("worldX", &Bone::getWorldX, &Bone::setWorldX)
+        .property("worldY", &Bone::getWorldY, &Bone::setWorldY)
+        .property("data", &Bone::getData)
+        .function("getParent", &Bone::getParent_Export, allow_raw_pointer<Bone>());
+
 
     class_<Skin>("Skin")
         .constructor<const String&>()
@@ -184,37 +191,55 @@ EMSCRIPTEN_BINDINGS(spine) {
         .constructor<>()
         .property("width",&spine::SkeletonData::getWidth, &spine::SkeletonData::setWidth)
         .property("height",&spine::SkeletonData::getHeight, &spine::SkeletonData::setHeight);
-    
+
     class_<AnimationStateData>("AnimationStateData")
         .constructor<SkeletonData *>()
-        .property("defaultMix",&spine::AnimationStateData::getDefaultMix, &spine::AnimationStateData::setDefaultMix);
+        .property("skeletonData", &AnimationStateData::getSkeletonData_Export)
+        .property("defaultMix",&spine::AnimationStateData::getDefaultMix, &spine::AnimationStateData::setDefaultMix)
+        .function("setMix", &AnimationStateData::setMix_Export);
+        // .function("setMixWith", &Skeleton::setMixWith_Export)
+        //.function("getMix", &Skeleton::setMix_Export);
     
     class_<AnimationState>("AnimationState")
         .constructor<AnimationStateData *>()
-        .property("timeScale",&spine::AnimationState::getTimeScale, &spine::AnimationState::setTimeScale);
+        .property("data",&AnimationState::getData_Export)
+        .property("timeScale",&AnimationState::getTimeScale, &AnimationState::setTimeScale)
+        .function("update", &AnimationState::update)
+        .function("clearTrack", &AnimationState::clearTrack)
+        .function("clearTracks", &AnimationState::clearTracks);
     
+    register_vector<Bone *>("vector<Bone*>");
     class_<Skeleton>("Skeleton")
         .constructor<SkeletonData *>()
-        .function("data", &Skeleton::getData, allow_raw_pointer<SkeletonData>())
-        .property("skin", &Skeleton::getSkin_Export);
-   
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        .property("skin", &Skeleton::getSkin_Export)
+        .property("data", &Skeleton::getData_Export)
+        .function("getBones", &Skeleton::getBones_Export)
+        .function("setToSetupPose", &Skeleton::setToSetupPose)
+        .function("setBonesToSetupPose", &Skeleton::setBonesToSetupPose)
+        .function("setSlotsToSetupPose", &Skeleton::setSlotsToSetupPose)
+        .function("updateWorldTransform", &Skeleton::updateWorldTransform);
 
-    class_<JitterVertexEffect>("JitterEffect")
+    class_<VertexEffect>("VertexEffect")
+        .function("begin", &VertexEffect::begin, pure_virtual())
+        //.function("transform", &VertexEffect::transform, pure_virtual())
+        .function("end", &VertexEffect::end, pure_virtual());
+
+    class_<JitterVertexEffect, base<VertexEffect>>("JitterEffect")
         .constructor<float, float>()
-        .function("index", select_overload<float()>(&JitterVertexEffect::getJitterX))
-        .function("jitterX", select_overload<void(float)>(&JitterVertexEffect::setJitterX))
-        .function("jitterY", select_overload<float()>(&JitterVertexEffect::getJitterY))
-        .function("jitterY", select_overload<void(float)>(&JitterVertexEffect::setJitterY))
+        .property("jitterX", &JitterVertexEffect::getJitterX, &JitterVertexEffect::setJitterX)
+        .property("jitterY", &JitterVertexEffect::getJitterY, &JitterVertexEffect::setJitterY)
+        .function("begin", &JitterVertexEffect::begin)
+        //.function("transform", &JitterVertexEffect::transform)
         .function("end", &JitterVertexEffect::end);
 
-    class_<SwirlVertexEffect>("SwirlEffect")
-        //.constructor<float, PowInterpolation &>()
-        .constructor<float, PowOutInterpolation &>()
+    class_<SwirlVertexEffect, base<VertexEffect>>("SwirlEffect")
+        .constructor<float, Interpolation &>()
         .property("centerX", &SwirlVertexEffect::getCenterX, &SwirlVertexEffect::setCenterX)
         .property("centerY", &SwirlVertexEffect::getCenterY, &SwirlVertexEffect::setCenterY)
         .property("radius", &SwirlVertexEffect::getRadius, &SwirlVertexEffect::setRadius)
         .property("angle", &SwirlVertexEffect::getAngle, &SwirlVertexEffect::setAngle)
+        .function("begin", &SwirlVertexEffect::begin)
+        //.function("transform", &SwirlVertexEffect::transform)
         .function("end", &SwirlVertexEffect::end);
 
     class_<SlotMesh>("SlotMesh")
@@ -223,7 +248,6 @@ EMSCRIPTEN_BINDINGS(spine) {
         .property("blendMode", &SlotMesh::blendMode);
 
     register_vector<SlotMesh>("vector<SlotMesh>");
-
     class_<SpineModel>("SpineModel")
         .property("vCount", &SpineModel::vCount)
         .property("iCount", &SpineModel::iCount)
@@ -244,5 +268,7 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("setColor", &SpineSkeletonInstance::setColor)
         .function("setJitterEffect", &SpineSkeletonInstance::setJitterEffect, allow_raw_pointer<JitterVertexEffect*>())
         .function("setSwirlEffect", &SpineSkeletonInstance::setSwirlEffect, allow_raw_pointer<SwirlVertexEffect*>())
-        .function("clearEffect", &SpineSkeletonInstance::clearEffect);
+        .function("clearEffect", &SpineSkeletonInstance::clearEffect)
+        .function("getAnimationState", &SpineSkeletonInstance::getAnimationState, allow_raw_pointer<AnimationState>())
+        .function("setMix", &SpineSkeletonInstance::setMix);
 }

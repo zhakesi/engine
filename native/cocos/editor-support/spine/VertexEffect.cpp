@@ -62,7 +62,7 @@ void JitterVertexEffect::setJitterX(float jitterX) {
     _jitterX = jitterX;
 }
 
-float JitterVertexEffect::getJitterX() {
+float JitterVertexEffect::getJitterX() const{
     return _jitterX;
 }
 
@@ -70,29 +70,11 @@ void JitterVertexEffect::setJitterY(float jitterY) {
     _jitterY = jitterY;
 }
 
-float JitterVertexEffect::getJitterY() {
+float JitterVertexEffect::getJitterY() const {
     return _jitterY;
 }
 
-// SwirlVertexEffect::SwirlVertexEffect(float radius, Interpolation &interpolation) : _centerX(0),
-//                                                                                    _centerY(0),
-//                                                                                    _radius(radius),
-//                                                                                    _angle(0),
-//                                                                                    _worldX(0),
-//                                                                                    _worldY(0),
-//                                                                                    _interpolation(interpolation) {
-// }
-
-SwirlVertexEffect::SwirlVertexEffect(float radius, PowInterpolation &interpolation) : _centerX(0),
-                                                                                   _centerY(0),
-                                                                                   _radius(radius),
-                                                                                   _angle(0),
-                                                                                   _worldX(0),
-                                                                                   _worldY(0),
-                                                                                   _interpolation(interpolation) {
-}
-
-SwirlVertexEffect::SwirlVertexEffect(float radius, PowOutInterpolation &interpolation): _centerX(0),
+SwirlVertexEffect::SwirlVertexEffect(float radius, Interpolation &interpolation) : _centerX(0),
                                                                                    _centerY(0),
                                                                                    _radius(radius),
                                                                                    _angle(0),

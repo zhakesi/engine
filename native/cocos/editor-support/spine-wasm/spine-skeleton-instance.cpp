@@ -263,3 +263,11 @@ void SpineSkeletonInstance::setSwirlEffect(SwirlVertexEffect *effect) {
 void SpineSkeletonInstance::clearEffect() {
     _effect = nullptr;
 }
+
+AnimationState* SpineSkeletonInstance::getAnimationState() {
+    return _animState;
+}
+
+void SpineSkeletonInstance::setMix(const std::string& from, const std::string& to, float duration) {
+    _animStateData->setMix(from.c_str(), to.c_str(), duration);
+}

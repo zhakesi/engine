@@ -33,6 +33,7 @@
 #include <spine/HashMap.h>
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
+#include <memory>
 
 #include <assert.h>
 
@@ -49,6 +50,7 @@ public:
 
     /// The SkeletonData to look up animations when they are specified by name.
     SkeletonData* getSkeletonData();
+    std::shared_ptr<SkeletonData> getSkeletonData_Export() const;
 
     /// The mix duration to use when no mix duration has been specifically defined between two animations.
     float getDefaultMix() const;
@@ -56,6 +58,8 @@ public:
 
     /// Sets a mix duration by animation names.
     void setMix(const String& fromName, const String& toName, float duration);
+
+    void setMix_Export(const std::string& fromName, const std::string& toName, float duration);
 
     /// Sets a mix duration when changing from the specified animation to the other.
     /// See TrackEntry.MixDuration.

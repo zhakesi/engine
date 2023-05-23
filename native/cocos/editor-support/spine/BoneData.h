@@ -33,6 +33,7 @@
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
 #include <spine/TransformMode.h>
+#include <string>
 
 namespace spine {
 class SP_API BoneData : public SpineObject {
@@ -54,61 +55,62 @@ public:
     BoneData(int index, const String &name, BoneData *parent = NULL);
 
     /// The index of the bone in Skeleton.Bones
-    int getIndex();
+    int getIndex() const;
 
     /// The name of the bone, which is unique within the skeleton.
-    const String &getName();
+    const String &getName() const;
+    std::string getName_Export() const;
 
     /// May be NULL.
-    BoneData *getParent();
+    BoneData *getParent() const;
+    BoneData& getParent_Export() const;
 
-    float getLength();
+    float getLength() const;
 
     void setLength(float inValue);
 
     /// Local X translation.
-    float getX();
+    float getX() const;
 
     void setX(float inValue);
 
     /// Local Y translation.
-    float getY();
+    float getY() const;
 
     void setY(float inValue);
 
     /// Local rotation.
-    float getRotation();
+    float getRotation() const;
 
     void setRotation(float inValue);
 
     /// Local scaleX.
-    float getScaleX();
+    float getScaleX() const;
 
     void setScaleX(float inValue);
 
     /// Local scaleY.
-    float getScaleY();
+    float getScaleY() const;
 
     void setScaleY(float inValue);
 
     /// Local shearX.
-    float getShearX();
+    float getShearX() const;
 
     void setShearX(float inValue);
 
     /// Local shearY.
-    float getShearY();
+    float getShearY() const;
 
     void setShearY(float inValue);
 
     /// The transform mode for how parent world transforms affect this bone.
-    TransformMode getTransformMode();
+    TransformMode getTransformMode() const;
 
     void setTransformMode(TransformMode inValue);
 
-    bool isSkinRequired();
+    bool isSkinRequired() const;
     void setSkinRequired(bool inValue);
-
 private:
     const int _index;
     const String _name;

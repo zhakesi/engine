@@ -103,6 +103,10 @@ Animation *SkeletonData::findAnimation(const String &animationName) {
     return ContainerUtil::findWithName(_animations, animationName);
 }
 
+Animation *SkeletonData::findAnimation_Export(const std::string &animationName) {
+    return ContainerUtil::findWithName(_animations, animationName.c_str());
+}
+
 IkConstraintData *SkeletonData::findIkConstraint(const String &constraintName) {
     return ContainerUtil::findWithName(_ikConstraints, constraintName);
 }

@@ -36,6 +36,7 @@
 #include <spine/SpineObject.h>
 #include <spine/SpineString.h>
 #include <spine/Vector.h>
+#include <memory>
 
 #ifdef SPINE_USE_STD_FUNCTION
     #include <functional>
@@ -372,6 +373,7 @@ public:
     TrackEntry* getCurrent(size_t trackIndex);
 
     AnimationStateData* getData();
+    std::shared_ptr<AnimationStateData> getData_Export() const;
 
     /// A list of tracks that have animations, which may contain NULLs.
     Vector<TrackEntry*>& getTracks();

@@ -54,19 +54,27 @@ BoneData::BoneData(int index, const String &name, BoneData *parent) : _index(ind
     assert(_name.length() > 0);
 }
 
-int BoneData::getIndex() {
+int BoneData::getIndex() const {
     return _index;
 }
 
-const String &BoneData::getName() {
+const String &BoneData::getName() const {
     return _name;
 }
 
-BoneData *BoneData::getParent() {
+std::string BoneData::getName_Export() const {
+    return std::string(_name.buffer());
+}
+
+BoneData *BoneData::getParent() const {
     return _parent;
 }
 
-float BoneData::getLength() {
+BoneData& BoneData::getParent_Export() const {
+    return *_parent;
+}
+
+float BoneData::getLength() const {
     return _length;
 }
 
@@ -74,7 +82,7 @@ void BoneData::setLength(float inValue) {
     _length = inValue;
 }
 
-float BoneData::getX() {
+float BoneData::getX() const {
     return _x;
 }
 
@@ -82,7 +90,7 @@ void BoneData::setX(float inValue) {
     _x = inValue;
 }
 
-float BoneData::getY() {
+float BoneData::getY() const {
     return _y;
 }
 
@@ -90,7 +98,7 @@ void BoneData::setY(float inValue) {
     _y = inValue;
 }
 
-float BoneData::getRotation() {
+float BoneData::getRotation() const {
     return _rotation;
 }
 
@@ -98,7 +106,7 @@ void BoneData::setRotation(float inValue) {
     _rotation = inValue;
 }
 
-float BoneData::getScaleX() {
+float BoneData::getScaleX() const {
     return _scaleX;
 }
 
@@ -106,7 +114,7 @@ void BoneData::setScaleX(float inValue) {
     _scaleX = inValue;
 }
 
-float BoneData::getScaleY() {
+float BoneData::getScaleY() const {
     return _scaleY;
 }
 
@@ -114,7 +122,7 @@ void BoneData::setScaleY(float inValue) {
     _scaleY = inValue;
 }
 
-float BoneData::getShearX() {
+float BoneData::getShearX() const {
     return _shearX;
 }
 
@@ -122,7 +130,7 @@ void BoneData::setShearX(float inValue) {
     _shearX = inValue;
 }
 
-float BoneData::getShearY() {
+float BoneData::getShearY() const {
     return _shearY;
 }
 
@@ -130,7 +138,7 @@ void BoneData::setShearY(float inValue) {
     _shearY = inValue;
 }
 
-TransformMode BoneData::getTransformMode() {
+TransformMode BoneData::getTransformMode() const {
     return _transformMode;
 }
 
@@ -138,7 +146,7 @@ void BoneData::setTransformMode(TransformMode inValue) {
     _transformMode = inValue;
 }
 
-bool BoneData::isSkinRequired() {
+bool BoneData::isSkinRequired() const {
     return _skinRequired;
 }
 

@@ -47,6 +47,12 @@ void AnimationStateData::setMix(const String &fromName, const String &toName, fl
     setMix(from, to, duration);
 }
 
+void AnimationStateData::setMix_Export(const std::string& fromName, const std::string& toName, float duration) {
+    Animation *from = _skeletonData->findAnimation_Export(fromName);
+    Animation *to = _skeletonData->findAnimation_Export(toName);
+    setMix(from, to, duration);
+}
+
 void AnimationStateData::setMix(Animation *from, Animation *to, float duration) {
     assert(from != NULL);
     assert(to != NULL);
@@ -67,6 +73,12 @@ float AnimationStateData::getMix(Animation *from, Animation *to) {
 
 SkeletonData *AnimationStateData::getSkeletonData() {
     return _skeletonData;
+}
+
+std::shared_ptr<SkeletonData> AnimationStateData::getSkeletonData_Export() const {
+    std::shared_ptr<SkeletonData> ptr(_skeletonData);
+    return ptr;
+
 }
 
 float AnimationStateData::getDefaultMix() const {
