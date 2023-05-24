@@ -28,7 +28,7 @@ import { CCBoolean, CCClass, CCFloat, CCObject, Color, Mat4, RecyclePool, js } f
 import { SkeletonData } from './skeleton-data';
 //import SkeletonCache, { AnimationCache, AnimationFrame } from './skeleton-cache';
 import { UIRenderer, UITransform } from '../2d';
-import { spineX } from './cocos-spine/spine-define';
+import { spinex, spineWasmModule } from './cocos-spine/spine-core-x';
 import { Batcher2D } from '../2d/renderer/batcher-2d';
 import { BlendFactor, BlendOp } from '../gfx';
 import { MaterialInstance } from '../render-scene';
@@ -187,10 +187,10 @@ export class Skeleton extends UIRenderer {
     @serializable
     protected _enableBatch = false;
 
-    protected _runtimeData: any = null;
-    public _skeleton: any = null;
-    protected _instance: any = null;
-    protected _state: any = null;
+    public declare _runtimeData: spinex.SkeletonData;
+    public declare _skeleton: spinex.Skeleton;
+    protected declare _instance: spineWasmModule.SkeletonInstance;
+    protected declare _state: spinex.AnimationState;
     protected _texture: Texture2D | null = null;
     // Animation name
     protected _animationName = '';
@@ -235,7 +235,7 @@ export class Skeleton extends UIRenderer {
     constructor () {
         super();
         this._useVertexOpacity = true;
-        this._instance = new spineX.SkeletonInstance();
+        this._instance = new spineWasmModule.SkeletonInstance();
         this.attachUtil = new AttachUtil();
     }
 
@@ -676,6 +676,7 @@ export class Skeleton extends UIRenderer {
 
     public updateRenderData (): any {
         const model = this._instance.updateRenderData();
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
         return model;
     }
 

@@ -24,6 +24,7 @@
 
 import { ccenum } from '../core';
 import spine from './lib/spine-core';
+import { spinex } from './cocos-spine/spine-core-x';
 
 /**
  * @en
@@ -50,6 +51,7 @@ export * from './vertex-effect-delegate';
 export * from './assembler';
 
 export { spine };
+export { spinex };
 
 /**
 * @internal Since v3.7.2, this is an engine private type.

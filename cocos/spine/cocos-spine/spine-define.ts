@@ -1,29 +1,16 @@
 import { registerAfterWasmInit, getSpineWasm } from './instantiated';
-
-declare namespace spineDefine {
-    class SkeletonInstance {}
-    class Skeleton {}
-    class SkeletonData {}
-    class AnimationState {}
-    class JitterEffect {}
-    class SwirlEffect {}
-    class Pow {}
-    class PowOut {}
-}
-
-export const spineX: typeof spineDefine & {HEAP8: Uint8Array} = {} as any;
+import { spinex, spineWasmModule } from './spine-core-x';
 
 function overrideSpineDefine () {
     const wasm = getSpineWasm();
-    spineX.SkeletonData = wasm.SkeletonData;
-    spineX.Skeleton = wasm.Skeleton;
-    spineX.AnimationState = wasm.AnimationState;
-    spineX.JitterEffect = wasm.JitterEffect;
-    spineX.SwirlEffect = wasm.SwirlEffect;
-    spineX.Pow = wasm.Pow;
-    spineX.PowOut = wasm.PowOut;
-    spineX.SkeletonInstance = wasm.SkeletonInstance;
+    spinex.SkeletonData = wasm.SkeletonData;
+    spinex.Skeleton = wasm.Skeleton;
+    spinex.AnimationState = wasm.AnimationState;
+    spinex.JitterEffect = wasm.JitterEffect;
+    spinex.SwirlEffect = wasm.SwirlEffect;
+    spinex.Pow = wasm.Pow;
+    spinex.PowOut = wasm.PowOut;
 
-    spineX.HEAP8 = wasm.HEAPU8;
+    spineWasmModule.SkeletonInstance = wasm.SkeletonInstance;
 }
 registerAfterWasmInit(overrideSpineDefine);
