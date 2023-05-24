@@ -2,6 +2,7 @@
 #include "spine-skeleton-instance.h"
 #include <emscripten/bind.h>
 #include <memory>
+#include <spine/Vector.h>
 
 using namespace emscripten;
 using namespace spine;
@@ -94,21 +95,36 @@ EMSCRIPTEN_BINDINGS(spine) {
         .value("Clipping", AttachmentType_Clipping);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // class_<Vector>("Vector")
+    //     .constructor<>()
+    //     .constructor<const Vector &>()
+    //     .function("size", &Vector::size);
 
     class_<Color>("Color")
         .constructor<>()
         .constructor<float, float, float, float>()
         .function("set", static_cast<Color&(Color::*)(float, float, float, float)>(&Color::set))
-        .function("setFromColor", static_cast<Color&(Color::*)(const Color&)>(&Color::set))
+        //.function("setFromColor", static_cast<Color&(Color::*)(const Color&)>(&Color::set)) //no need
         .function("add", static_cast<Color&(Color::*)(float, float, float, float)>(&Color::add))
         .function("clamp", &Color::clamp)
         .property("r", &Color::r)
         .property("g", &Color::g)
         .property("b", &Color::b)
         .property("a", &Color::a);
-
+    
     class_<Interpolation>("Interpolation")
         .function("apply", &Interpolation::apply, pure_virtual());
+
+    class_<ConstraintData>("ConstraintData")
+        .constructor<const String& >()
+        .function("getProp_name", &ConstraintData::getName)
+        .function("getProp_order", &ConstraintData::getOrder)
+        .function("getProp_skinRequired", &ConstraintData::isSkinRequired);
+
+    // class_<Attachment>("Attachment")
+    //     .constructor<const String& >()
+    //     .function("getProp_name", &Attachment::getName)
+    //     .function("copy", &Attachment::copy, allow_raw_pointer<Attachment>());
 
     class_<PowInterpolation, base<Interpolation>>("Pow")
         .constructor<int>()
@@ -118,13 +134,13 @@ EMSCRIPTEN_BINDINGS(spine) {
         .constructor<int>()
         .function("apply", &PowInterpolation::apply);
  
-    class_<Vector2>("Vector2")
-        .constructor<float, float>()
-        .function("set", static_cast<Vector2&(Vector2::*)(float, float)>(&Vector2::set))
-        .function("length", &Vector2::length)
-        .function("normalize", static_cast<Vector2&(Vector2::*)()>(&Vector2::normalize))
-        .property("x", &Vector2::x)
-        .property("y", &Vector2::y);
+    // class_<Vector2>("Vector2")
+    //     .constructor<float, float>()
+    //     .function("set", static_cast<Vector2&(Vector2::*)(float, float)>(&Vector2::set))
+    //     .function("length", &Vector2::length)
+    //     .function("normalize", static_cast<Vector2&(Vector2::*)()>(&Vector2::normalize))
+    //     .property("x", &Vector2::x)
+    //     .property("y", &Vector2::y);
 
     class_<BoneData>("BoneData")
         .constructor<int, const String&, BoneData *>()
@@ -140,21 +156,37 @@ EMSCRIPTEN_BINDINGS(spine) {
         .property("shearX", &BoneData::getShearX, &BoneData::setShearX)
         .property("shearY", &BoneData::getShearY, &BoneData::setShearY)
         .property("transformMode", &BoneData::getTransformMode, &BoneData::setTransformMode)
-        .property("skinRequired", &BoneData::isSkinRequired, &BoneData::setSkinRequired);
+        .property("skinRequired", &BoneData::isSkinRequired, &BoneData::setSkinRequired)
+        //---------------------------------------------------------------------------
+        .function("getProp_index", &BoneData::getIndex)
+        .function("getProp_name", &BoneData::getName)
+        .function("getProp_parent", &BoneData::getParent, allow_raw_pointer<BoneData>())
+        .function("getProp_length", &BoneData::getLength)
+        .function("getProp_x", &BoneData::getX)
+        .function("getProp_y", &BoneData::getY)
+        .function("getProp_rotation", &BoneData::getRotation)
+        .function("getProp_scaleX", &BoneData::getScaleX)
+        .function("getProp_scaleY", &BoneData::getScaleY)
+        .function("getProp_shearX", &BoneData::getShearX)
+        .function("getProp_shearY", &BoneData::getShearY)
+        .function("getProp_transformMode", &BoneData::getTransformMode)
+        .function("getProp_skinRequired", &BoneData::isSkinRequired);
+        //.function("getProp_color", &BoneData::isSkinRequired) // have no color
     
     class_<SlotData>("SlotData")
         .constructor<int, const String&, BoneData &>()
-        .function("index", select_overload<int()>(&SlotData::getIndex))
-        .function("name", select_overload<const String &()>(&SlotData::getName))
-        .function("boneData", select_overload<BoneData &()>(&SlotData::getBoneData))
-        .function("color", select_overload<Color &()>(&SlotData::getColor))
-        .function("darkColor", select_overload<Color &()>(&SlotData::getDarkColor))
-        .function("attachmentName", select_overload<const String &()>(&SlotData::getAttachmentName))
-        .function("attachmentName", select_overload<void(const String &)>(&SlotData::setAttachmentName))
-        .function("blendMode", select_overload<BlendMode()>(&SlotData::getBlendMode))
-        .function("blendMode", select_overload<void (BlendMode)>(&SlotData::setBlendMode));
+        .function("getProp_index", &SlotData::getIndex)
+        .function("getProp_name", &SlotData::getName)
+        .function("getProp_boneData", &SlotData::getBoneData)
+        .function("getProp_color", &SlotData::getColor)
+        .function("getProp_darkColor", &SlotData::getDarkColor)
+        .function("getProp_blendMode", &SlotData::getBlendMode);
+        
+    class_<Updatable>("Updatable")
+        .function("update", &Updatable::update, pure_virtual())
+        .function("isActive", &Updatable::isActive, pure_virtual());
 
-    class_<Bone>("Bone")
+    class_<Bone, base<Updatable>>("Bone")
         .constructor<BoneData &, Skeleton &, Bone *>()
         .property("a", &Bone::getA, &Bone::setA)
         .property("b", &Bone::getB, &Bone::setB)
@@ -163,37 +195,136 @@ EMSCRIPTEN_BINDINGS(spine) {
         .property("worldX", &Bone::getWorldX, &Bone::setWorldX)
         .property("worldY", &Bone::getWorldY, &Bone::setWorldY)
         .property("data", &Bone::getData)
-        .function("getParent", &Bone::getParent_Export, allow_raw_pointer<Bone>());
+        .function("getParent", &Bone::getParent_Export, allow_raw_pointer<Bone>())
+        .function("getProp_data", &Bone::getData)
+        .function("getProp_skeleton", &Bone::getSkeleton)
+        //.function("getProp_parent", &Bone::getParent)
+        //.function("getProp_children", &Bone::getChildren)
+        .function("getProp_x", &Bone::getX)
+        .function("getProp_y", &Bone::getY)
+        .function("getProp_rotation", &Bone::getRotation)
+        .function("getProp_scaleX", &Bone::getScaleX)
+        .function("getProp_scaleY", &Bone::getScaleY)
+        .function("getProp_shearX", &Bone::getShearX)
+        .function("getProp_shearY", &Bone::getShearY)
+        .function("getProp_ax", &Bone::getAX)
+        .function("getProp_ay", &Bone::getAY)
+        .function("getProp_arotation", &Bone::getAppliedRotation)
+        .function("getProp_ascaleX", &Bone::getAScaleX)
+        .function("getProp_ascaleY", &Bone::getAScaleY)
+        .function("getProp_ashearX", &Bone::getAShearX)
+        .function("getProp_ashearY", &Bone::getAShearY)
+        .function("getProp_appliedValid", &Bone::isAppliedValid)
+        .function("getProp_a", &Bone::getA)
+        .function("getProp_b", &Bone::getB)
+        .function("getProp_c", &Bone::getC)
+        .function("getProp_d", &Bone::getD)
+        .function("getProp_worldY", &Bone::getWorldY)
+        .function("getProp_worldX", &Bone::getWorldX)
+        //.function("getProp_sorted", &Bone::getSorted)
+        .function("getProp_active", &Bone::isActive)
+        .function("isActive", &Bone::isActive)
+        .function("update", &Bone::update)
+        .function("updateWorldTransform", select_overload<void()>(&Bone::updateWorldTransform))
+        .function("updateWorldTransformWith", select_overload<void(float, float , float, float , float , float , float )>(&Bone::updateWorldTransform))
+        .function("setToSetupPose", &Bone::setToSetupPose)
+        .function("getWorldRotationX", &Bone::getWorldRotationX)
+        .function("getWorldRotationY", &Bone::getWorldRotationY)
+        .function("getWorldScaleX", &Bone::getWorldScaleX)
+        .function("getWorldScaleY", &Bone::getWorldScaleY)
+        //.function("updateAppliedTransform", &Bone::updateAppliedTransform)
+        //.function("worldToLocal", &Bone::worldToLocal)
+        //.function("localToWorld", &Bone::localToWorld)
+        .function("worldToLocalRotation", &Bone::worldToLocalRotation)
+        .function("localToWorldRotation", &Bone::localToWorldRotation)
+        .function("rotateWorld", &Bone::rotateWorld);
 
+    class_<Slot>("Slot")
+        .constructor<SlotData &, Bone &>()
+        .function("getProp_data", &Slot::getData)
+        .function("getProp_bone", &Slot::getBone)
+        .function("getProp_color", &Slot::getColor)
+        .function("getProp_darkColor", &Slot::getDarkColor)
+        //.function("getProp_attachment", &Slot::getAttachment, allow_raw_pointer<Attachment>())
+        //.function("getProp_attachmentState", &Slot::getAttachmentState, allow_raw_pointer<Attachment>())
+        .function("getProp_deform", &Slot::getDeform)
+        .function("getSkeleton", &Slot::getSkeleton)
+        //.function("getAttachment", &Slot::getAttachment)
+        //.function("setAttachment", &Slot::setAttachment)
+        .function("setAttachmentTime", &Slot::setAttachmentTime)
+        .function("getAttachmentTime", &Slot::getAttachmentTime)
+        .function("setToSetupPose", &Slot::setToSetupPose);
 
     class_<Skin>("Skin")
         .constructor<const String&>()
         .property("name", &Skin::getName_Export)
-        .function("attachments", select_overload<Skin::AttachmentMap::Entries()>(&Skin::getAttachments))
-        .function("bones", select_overload<Vector<BoneData *> &()>(&Skin::getBones))
-        .function("constraints", select_overload<Vector<ConstraintData *> &()>(&Skin::getConstraints))
+        .function("getProp_attachments", &Skin::getAttachments)
+        .function("getProp_bones", &Skin::getBones)
+        .function("getProp_constraints", &Skin::getConstraints)
         .function("setAttachment", select_overload<void(size_t, const String &, Attachment *)>(&Skin::setAttachment), allow_raw_pointers())
         .function("addSkin", select_overload<void(Skin *)>(&Skin::addSkin), allow_raw_pointers())
         .function("copySkin", select_overload<void(Skin *)>(&Skin::copySkin), allow_raw_pointers())
         .function("getAttachments", select_overload<Skin::AttachmentMap::Entries ()>(&Skin::getAttachments))
         .function("removeAttachment", select_overload<void(size_t, const String &)>(&Skin::removeAttachment))
         .function("getAttachmentsForSlot", select_overload<void(size_t, Vector<Attachment *> &)>(&Skin::findAttachmentsForSlot), allow_raw_pointers())
-        .function("attachAll", select_overload<void(Skeleton &skeleton, Skin &oldSkin)>(&Skin::attachAll));
+        //.function("clear", &Skin::clear); // have no clear
+        .function("attachAll", &Skin::attachAll);
 
     class_<Skin::AttachmentMap::Entry>("SkinEntry")
         .constructor<size_t, const String &, Attachment *>()
         .property("slotIndex", &Skin::AttachmentMap::Entry::_slotIndex)
         .property("name", &Skin::AttachmentMap::Entry::_name)
-        .function("attachment", select_overload<Attachment *()>(&Skin::AttachmentMap::Entry::getAttachment), allow_raw_pointers())
-        .function("attachment", select_overload<void(Attachment *)>(&Skin::AttachmentMap::Entry::setAttachment), allow_raw_pointers());
+        .function("getProp_attachment", &Skin::AttachmentMap::Entry::getAttachment, allow_raw_pointers());
+        // .function("attachment", select_overload<void(Attachment *)>(&Skin::AttachmentMap::Entry::setAttachment), allow_raw_pointers())
 
     class_<SkeletonData>("SkeletonData")
         .constructor<>()
         .property("width",&spine::SkeletonData::getWidth, &spine::SkeletonData::setWidth)
         .property("height",&spine::SkeletonData::getHeight, &spine::SkeletonData::setHeight);
 
+
+    // class_<Timeline>("Timeline")
+    //     .constructor<>()
+    //     .function("apply", &Timeline::apply, allow_raw_pointers())
+    //     .function("getPropertyId", &Timeline::getPropertyId, allow_raw_pointers());
+
     class_<TrackEntry>("TrackEntry")
-        .constructor<>();
+        .constructor<>()
+        .function("getProp_animation", &TrackEntry::getAnimation, allow_raw_pointer<Animation>())
+        .function("getProp_next", &TrackEntry::getNext, allow_raw_pointer<TrackEntry>())
+        .function("getProp_mixingFrom", &TrackEntry::getMixingFrom, allow_raw_pointer<TrackEntry>())
+        .function("getProp_mixingTo", &TrackEntry::getMixingTo, allow_raw_pointer<TrackEntry>())
+        //.function("getProp_listener", &TrackEntry::listener)
+        .function("getProp_trackIndex", &TrackEntry::getTrackIndex)
+        .function("getProp_loop", &TrackEntry::getLoop)
+        .function("getProp_holdPrevious", &TrackEntry::getHoldPrevious)
+        .function("getProp_eventThreshold", &TrackEntry::getEventThreshold)
+        .function("getProp_attachmentThreshold", &TrackEntry::getAttachmentThreshold)
+        .function("getProp_drawOrderThreshold", &TrackEntry::getDrawOrderThreshold)
+        .function("getProp_animationStart", &TrackEntry::getAnimationStart)
+        .function("getProp_animationEnd", &TrackEntry::getAnimationEnd)
+        .function("getProp_animationLast", &TrackEntry::getAnimationLast)
+        //.function("getProp_nextAnimationLast", &TrackEntry::nextAnimationLast)
+        .function("getProp_delay", &TrackEntry::getDelay)
+        .function("getProp_trackTime", &TrackEntry::getTrackTime)
+        //.function("getProp_trackLast", &TrackEntry::trackLast)
+        //.function("getProp_nextTrackLast", &TrackEntry::nextTrackLast)
+        .function("getProp_trackEnd", &TrackEntry::getTrackEnd)
+        .function("getProp_timeScale", &TrackEntry::getTimeScale)
+        .function("getProp_alpha", &TrackEntry::getAlpha)
+        .function("getProp_mixTime", &TrackEntry::getMixTime)
+        .function("getProp_mixDuration", &TrackEntry::getMixDuration)
+        //.function("getProp_interruptAlpha", &TrackEntry::_interruptAlpha)
+        //.function("getProp_totalAlpha", &TrackEntry::getAlpha)
+        .function("getProp_mixBlend", &TrackEntry::getMixBlend)
+        //.function("getProp_timelineMode", &TrackEntry::timelineMode)
+        //.function("getProp_timelineHoldMix", &TrackEntry::timelineHoldMix)
+        //.function("getProp_timelinesRotation", &TrackEntry::timelinesRotation)
+        //.function("reset", &TrackEntry::reset) //private
+        .function("getAnimationTime", &TrackEntry::getAnimationTime)
+        .function("setAnimationLast", &TrackEntry::setAnimationLast)
+        .function("isComplete", &TrackEntry::isComplete)
+        .function("resetRotationDirections", &TrackEntry::resetRotationDirections);
 
 
     class_<AnimationStateData>("AnimationStateData")
@@ -211,6 +342,18 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("update", &AnimationState::update)
         .function("clearTrack", &AnimationState::clearTrack)
         .function("clearTracks", &AnimationState::clearTracks);
+
+    class_<Animation>("Animation")
+        .constructor<const String &, Vector<Timeline *> &, float>()
+        .function("getProp_name", &Animation::getName)
+        .function("getProp_timelines", &Animation::getTimelines)
+        //.function("getProp_timelineIds", &Animation::getTimelines)
+        .function("getProp_duration", &Animation::getDuration)
+        .function("hasTimeline", &Animation::hasTimeline)
+        .function("apply", &Animation::apply, allow_raw_pointers())
+        // .class_function("binarySearch", &Animation::binarySearch)
+        // .class_function("linearSearch", &Animation::linearSearch)
+        ;
     
     register_vector<Bone *>("vector<Bone*>");
     class_<Skeleton>("Skeleton")
