@@ -99,6 +99,9 @@ EMSCRIPTEN_BINDINGS(spine) {
     //     .constructor<const Vector &>()
     //     .function("size", &Vector::size);
 
+    // class_<Pool>("Pool")
+    //     .constructor<>();
+
     class_<Color>("Color")
         .constructor<>()
         .constructor<float, float, float, float>()
@@ -119,6 +122,72 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("getProp_name", &ConstraintData::getName)
         .function("getProp_order", &ConstraintData::getOrder)
         .function("getProp_skinRequired", &ConstraintData::isSkinRequired);
+
+    class_<IkConstraintData, base<ConstraintData>>("IkConstraintData")
+        .constructor<const String& >()
+        .function("getProp_bones", &IkConstraintData::getBones, allow_raw_pointer<BoneData>())
+        .function("getProp_target", &IkConstraintData::getTarget, allow_raw_pointer<BoneData>())
+        .function("getProp_bendDirection", &IkConstraintData::getBendDirection)
+        .function("getProp_compress", &IkConstraintData::getCompress)
+        .function("getProp_stretch", &IkConstraintData::getStretch)
+        .function("getProp_uniform", &IkConstraintData::getUniform)
+        .function("getProp_mix", &IkConstraintData::getMix)
+        .function("getProp_softness", &IkConstraintData::getSoftness);
+
+    class_<PathConstraintData, base<ConstraintData>>("PathConstraintData")
+        .constructor<const String& >()
+        .function("getProp_bones", &PathConstraintData::getBones, allow_raw_pointer<BoneData>())
+        .function("getProp_target", &PathConstraintData::getTarget, allow_raw_pointer<SlotData>())
+        .function("getProp_positionMode", &PathConstraintData::getPositionMode)
+        .function("getProp_spacingMode", &PathConstraintData::getSpacingMode)
+        .function("getProp_rotateMode", &PathConstraintData::getRotateMode)
+        .function("getProp_offsetRotation", &PathConstraintData::getOffsetRotation)
+        .function("getProp_position", &PathConstraintData::getPosition)
+        .function("getProp_spacing", &PathConstraintData::getSpacing)
+        .function("getProp_rotateMix", &PathConstraintData::getRotateMix)
+        .function("getProp_translateMix", &PathConstraintData::getTranslateMix);
+
+
+    class_<SkeletonBounds>("SkeletonBounds")
+        //.function("getProp_minX", &SkeletonBounds::minX)
+        //.function("getProp_minY", &SkeletonBounds::minY)
+        //.function("getProp_maxX", &SkeletonBounds::maxX)
+        //.function("getProp_maxY", &SkeletonBounds::maxY)
+        //.function("getProp_boundingBoxes", &SkeletonBounds::boundingBoxes)
+        //.function("getProp_polygons", &SkeletonBounds::polygons)
+        .function("update", &SkeletonBounds::update)
+        //.function("aabbCompute", &SkeletonBounds::aabbCompute) // private
+        .function("aabbContainsPoint", &SkeletonBounds::aabbcontainsPoint)
+        .function("aabbIntersectsSegment", &SkeletonBounds::aabbintersectsSegment)
+        .function("aabbIntersectsSkeleton", &SkeletonBounds::aabbIntersectsSkeleton)
+        //.function("containsPoint", select_overload<void(float, float)>(&SkeletonBounds::containsPoint), allow_raw_pointers())
+        //.function("containsPointPolygon", select_overload<void(Polygon*, float, float)>(&SkeletonBounds::containsPoint), allow_raw_pointers())
+        //.function("intersectsSegment", select_overload<void(float, float, float, float)>(&SkeletonBounds::intersectsSegment))
+        //.function("intersectsSegmentPolygon", select_overload<void(spine::Polygon*, float, float, float, float)>(&SkeletonBounds::intersectsSegment), allow_raw_pointers())
+        .function("getPolygon", &SkeletonBounds::getPolygon, allow_raw_pointers())
+        .function("getWidth", &SkeletonBounds::getWidth)
+        .function("getHeight", &SkeletonBounds::getHeight);
+
+    class_<Event>("Event")
+        .constructor<float , const EventData &>()
+        .function("getProp_data", &Event::getData)
+        .function("getProp_intValue", &Event::getIntValue)
+        .function("getProp_floatValue", &Event::getFloatValue)
+        .function("getProp_stringValue", &Event::getStringValue)
+        .function("getProp_time", &Event::getTime)
+        .function("getProp_volume", &Event::getVolume)
+        .function("getProp_balance", &Event::getBalance); 
+
+    class_<EventData>("EventData")
+        .constructor<const String &>()
+        .function("getProp_name", &EventData::getName)
+        .function("getProp_intValue", &EventData::getIntValue)
+        .function("getProp_floatValue", &EventData::getFloatValue)
+        .function("getProp_stringValue", &EventData::getStringValue)
+        .function("getProp_audioPath", &EventData::getAudioPath)
+        .function("getProp_volume", &EventData::getVolume)
+        .function("getProp_balance", &EventData::getBalance);
+    
 
     // class_<Attachment>("Attachment")
     //     .constructor<const String& >()
@@ -214,6 +283,16 @@ EMSCRIPTEN_BINDINGS(spine) {
         //.function("setRegion", &RegionAttachment::setRegion) // have no setRegion
         .function("copy", &RegionAttachment::copy, allow_raw_pointer<Attachment>());
 
+
+    // class_<AttachmentLoader>("AttachmentLoader")
+    //     .constructor<>()
+    //     .function("newClippingAttachment", &AttachmentLoader::newClippingAttachment, pure_virtual(), allow_raw_pointer<ClippingAttachment>())
+    //     .function("newPointAttachment", &AttachmentLoader::newPointAttachment, pure_virtual(), allow_raw_pointer<PointAttachment>())
+    //     .function("newPathAttachment", &AttachmentLoader::newPathAttachment, pure_virtual(), allow_raw_pointer<PathAttachment>())
+    //     .function("newBoundingBoxAttachment", &AttachmentLoader::newBoundingBoxAttachment, pure_virtual(), allow_raw_pointer<BoundingBoxAttachment>())
+    //     .function("newMeshAttachment", &AttachmentLoader::newMeshAttachment, pure_virtual(), allow_raw_pointer<MeshAttachment>())
+    //     .function("newRegionAttachment", &AttachmentLoader::newRegionAttachment, pure_virtual(), allow_raw_pointer<RegionAttachment>());
+
     class_<PowInterpolation, base<Interpolation>>("Pow")
         .constructor<int>()
         .function("apply", &PowInterpolation::apply);
@@ -273,6 +352,54 @@ EMSCRIPTEN_BINDINGS(spine) {
     class_<Updatable>("Updatable")
         .function("update", &Updatable::update, pure_virtual())
         .function("isActive", &Updatable::isActive, pure_virtual());
+
+    class_<IkConstraint, base<Updatable>>("IkConstraint")
+        .constructor<IkConstraintData &, Skeleton &>()
+        .function("getProp_data",  &IkConstraint::getData)
+        .function("getProp_bones",  &IkConstraint::getBones, allow_raw_pointer<Bone>())
+        .function("getProp_target",  &IkConstraint::getTarget, allow_raw_pointer<Bone>())
+        .function("getProp_bendDirection",  &IkConstraint::getBendDirection)
+        .function("getProp_compress",  &IkConstraint::getCompress)
+        .function("getProp_stretch",  &IkConstraint::getStretch)
+        .function("getProp_mix",  &IkConstraint::getMix)
+        .function("getProp_softness",  &IkConstraint::getSoftness)
+        .function("getProp_active",  &IkConstraint::isActive)
+        .function("isActive",  &IkConstraint::isActive)
+        .function("apply", static_cast<void(IkConstraint::*)()>(&IkConstraint::apply))
+        .function("update", &IkConstraint::update)
+        //.function("apply1", static_cast<void(Updatable::*)(Bone &, float, float, bool, bool, bool, float)>(&IkConstraint::apply))
+        //.function("apply2", static_cast<void(IkConstraint::*)(Bone &, Bone &, float, float, int, bool, float, float)>(&IkConstraint::apply))
+        ;
+
+    class_<PathConstraint, base<Updatable>>("PathConstraint")
+        .constructor<PathConstraintData&, Skeleton&>()
+        // private but no need, just wrap in js
+        // static const float EPSILON;
+        // static const int NONE;
+        // static const int BEFORE;
+        // static const int AFTER;
+        .function("getProp_data",  &PathConstraint::getData)
+        .function("getProp_bones",  &PathConstraint::getBones, allow_raw_pointer<Bone>())
+        .function("getProp_target",  &PathConstraint::getTarget, allow_raw_pointer<Slot>())
+        .function("getProp_position",  &PathConstraint::getPosition)
+        .function("getProp_spacing",  &PathConstraint::getSpacing)
+        .function("getProp_rotateMix",  &PathConstraint::getRotateMix)
+        .function("getProp_translateMix",  &PathConstraint::getTranslateMix)
+        //.function("getProp_spaces",  &PathConstraint::spaces)
+        //.function("getProp_positions",  &PathConstraint::positions)
+        //.function("getProp_world",  &PathConstraint::world)
+        //.function("getProp_curves",  &PathConstraint::curves)
+        //.function("getProp_lengths",  &PathConstraint::lengths)
+        //.function("getProp_segments",  &PathConstraint::segments)
+        .function("getProp_active",  &PathConstraint::isActive)
+        .function("isActive",  &PathConstraint::isActive)
+        .function("apply",  &PathConstraint::apply)
+        .function("update",  &PathConstraint::update)
+        //.function("computeWorldPositions",  &PathConstraint::computeWorldPositions)
+        //.function("addBeforePosition",  &PathConstraint::addBeforePosition)
+        //.function("addAfterPosition",  &PathConstraint::addAfterPosition)
+        //.function("addCurvePosition",  &PathConstraint::addCurvePosition) // private
+        ;
 
     class_<Bone, base<Updatable>>("Bone")
         .constructor<BoneData &, Skeleton &, Bone *>()
@@ -364,6 +491,20 @@ EMSCRIPTEN_BINDINGS(spine) {
         .property("name", &Skin::AttachmentMap::Entry::_name)
         .function("getProp_attachment", &Skin::AttachmentMap::Entry::getAttachment, allow_raw_pointers());
         // .function("attachment", select_overload<void(Attachment *)>(&Skin::AttachmentMap::Entry::setAttachment), allow_raw_pointers())
+
+    class_<SkeletonClipping>("SkeletonClipping")
+        .constructor<>()
+        .function("getProp_clippedVertices", &SkeletonClipping::getClippedVertices)
+        .function("getProp_clippedTriangles", &SkeletonClipping::getClippedTriangles)
+        .function("getProp_UVs", &SkeletonClipping::getClippedUVs)
+        .function("clipStart", &SkeletonClipping::clipStart, allow_raw_pointers())
+        .function("clipEndWithSlot", select_overload<void(Slot&)>(&SkeletonClipping::clipEnd))
+        .function("clipEnd", select_overload<void()>(&SkeletonClipping::clipEnd))
+        .function("isClipping", &SkeletonClipping::isClipping);
+        //.function("clipTriangles", &SkeletonClipping::clipTriangles, allow_raw_pointers()); //paramters not match
+        //.function("clip", &SkeletonClipping::clip)
+        //.class_function("makeClockwise", &SkeletonClipping::makeClockwise)
+
 
     class_<SkeletonData>("SkeletonData")
         .constructor<>()
@@ -655,13 +796,55 @@ EMSCRIPTEN_BINDINGS(spine) {
     register_vector<Bone *>("vector<Bone*>");
     class_<Skeleton>("Skeleton")
         .constructor<SkeletonData *>()
-        .property("skin", &Skeleton::getSkin_Export)
-        .property("data", &Skeleton::getData_Export)
-        .function("getBones", &Skeleton::getBones_Export)
+        .function("getProp_data", &Skeleton::getData, allow_raw_pointer<SkeletonData>())
+        .function("getProp_bones", &Skeleton::getBones, allow_raw_pointer<Bone>())
+        .function("getProp_slots", &Skeleton::getSlots, allow_raw_pointer<Slot>())
+        .function("getProp_drawOrder", &Skeleton::getDrawOrder, allow_raw_pointer<Slot>())
+        .function("getProp_ikConstraints", &Skeleton::getIkConstraints, allow_raw_pointer<IkConstraint>())
+        .function("getProp_transformConstraints", &Skeleton::getTransformConstraints, allow_raw_pointer<TransformConstraint>())
+        .function("getProp_pathConstraints", &Skeleton::getPathConstraints, allow_raw_pointer<PathConstraint>())
+        .function("getProp__updateCache", &Skeleton::getUpdateCacheList, allow_raw_pointer<Updatable>())
+        //.function("getProp_updateCacheReset", Skeleton::)
+        .function("getProp_skin", &Skeleton::getSkin, allow_raw_pointer<Skin>())
+        .function("getProp_color", &Skeleton::getColor)
+        .function("getProp_time", &Skeleton::getTime)
+        .function("getProp_scaleX", &Skeleton::getScaleX)
+        .function("getProp_scaleY", &Skeleton::getScaleY)
+        .function("getProp_x", &Skeleton::getX)
+        .function("getProp_y", &Skeleton::getY)
+        .function("updateCache", &Skeleton::updateCache)
+        //.function("sortIkConstraint")
+        //.function("sortPathConstraint")
+        //.function("sortTransformConstraint")
+        //.function("sortPathConstraintAttachment")
+        //.function("sortPathConstraintAttachmentWith")
+        // .function("sortBone", &Skeleton::sortBone, allow_raw_pointer<Bone>())
+        // .function("sortReset", &Skeleton::sortReset, allow_raw_pointer<Bone>())
+        .function("updateWorldTransform", &Skeleton::updateWorldTransform)
         .function("setToSetupPose", &Skeleton::setToSetupPose)
         .function("setBonesToSetupPose", &Skeleton::setBonesToSetupPose)
         .function("setSlotsToSetupPose", &Skeleton::setSlotsToSetupPose)
-        .function("updateWorldTransform", &Skeleton::updateWorldTransform);
+        .function("getRootBone", &Skeleton::getRootBone, allow_raw_pointer<Bone>())
+        .function("findBone", &Skeleton::findBone, allow_raw_pointer<Bone>())
+        .function("findBoneIndex", &Skeleton::findBoneIndex)
+        .function("findSlot", &Skeleton::findSlot, allow_raw_pointer<Slot>())
+        .function("findSlotIndex", &Skeleton::findSlotIndex)
+        .function("setSkinByName", static_cast<void(Skeleton::*)(const String &)>(&Skeleton::setSkin))
+        .function("setSkin", static_cast<void(Skeleton::*)(Skin *)>(&Skeleton::setSkin), allow_raw_pointer<Skin>())
+        //.function("getAttachmentByName", static_cast<Attachment *(Skeleton::*)(const String &, const String &)>(&Skeleton::getAttachment), allow_raw_pointer<Attachment>())
+        //.function("getAttachment", static_cast<Attachment *(Skeleton::*)(int, const String &)>(&Skeleton::getAttachment))
+        .function("setAttachment", &Skeleton::setAttachment)
+        .function("findIkConstraint", &Skeleton::findIkConstraint, allow_raw_pointer<IkConstraint>())
+        .function("findTransformConstraint", &Skeleton::findTransformConstraint, allow_raw_pointer<TransformConstraint>())
+        .function("findPathConstraint", &Skeleton::findPathConstraint, allow_raw_pointer<PathConstraint>())
+        //.function("getBounds", &Skeleton::getBounds)
+        .function("update", &Skeleton::update)
+
+        .property("skin", &Skeleton::getSkin_Export)
+        .property("data", &Skeleton::getData_Export)
+        .function("getBones", &Skeleton::getBones_Export);
+
+    
 
     class_<VertexEffect>("VertexEffect")
         .function("begin", &VertexEffect::begin, pure_virtual())
