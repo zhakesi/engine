@@ -2,7 +2,6 @@
 #include "spine-skeleton-instance.h"
 #include <emscripten/bind.h>
 #include <memory>
-#include <spine/Vector.h>
 
 using namespace emscripten;
 using namespace spine;
@@ -23,7 +22,7 @@ EMSCRIPTEN_BINDINGS(spine) {
         .value("pathConstraintPosition", TimelineType_PathConstraintPosition)
         .value("pathConstraintSpacing", TimelineType_PathConstraintSpacing)
         .value("pathConstraintMix", TimelineType_PathConstraintMix)
-        .value("twoColor", TimelineType_TwoColor);\
+        .value("twoColor", TimelineType_TwoColor);
     
     enum_<MixDirection>("MixDirection")
         .value("mixIn", MixDirection_In)
@@ -125,6 +124,95 @@ EMSCRIPTEN_BINDINGS(spine) {
     //     .constructor<const String& >()
     //     .function("getProp_name", &Attachment::getName)
     //     .function("copy", &Attachment::copy, allow_raw_pointer<Attachment>());
+
+    // pure_virtual and raw pointer 
+    // class_<VertexAttachment>("VertexAttachment")
+    //     .constructor<const String& >()
+    //     .function("getProp_id", &VertexAttachment::getId)
+    //     .function("getProp_bones", &VertexAttachment::getBones)
+    //     .function("getProp_vertices", &VertexAttachment::getVertices)
+    //     .function("getProp_worldVerticesLength", &VertexAttachment::getWorldVerticesLength)
+    //     .function("getProp_deformAttachment", &VertexAttachment::getDeformAttachment, allow_raw_pointer<VertexAttachment>())
+    //     .function("getProp_name", &VertexAttachment::getName)
+    //     //.function("computeWorldVertices", &VertexAttachment::computeWorldVertices);
+    //     .function("copy", &VertexAttachment::copy, pure_virtual())
+    //     .function("copyTo", &VertexAttachment::copyTo, allow_raw_pointer<VertexAttachment>());
+
+    class_<BoundingBoxAttachment>("BoundingBoxAttachment")
+        .constructor<const String& >()
+        .function("getProp_name", &BoundingBoxAttachment::getName)
+        .function("copy", &BoundingBoxAttachment::copy, allow_raw_pointer<Attachment>());
+        //.function("getProp_color", &BoundingBoxAttachment::getColor)
+
+    class_<ClippingAttachment>("ClippingAttachment")
+        .constructor<const String& >()
+        .function("getProp_endSlot", &ClippingAttachment::getEndSlot, allow_raw_pointer<SlotData>())
+        .function("copy", &ClippingAttachment::copy, allow_raw_pointer<Attachment>());
+        //.function("getProp_color", &BoundingBoxAttachment::getColor)
+
+    class_<MeshAttachment>("MeshAttachment")
+        .constructor<const String& >()
+        //.function("getProp_region", &MeshAttachment::getRegion)
+        .function("getProp_path", &MeshAttachment::getPath)
+        .function("getProp_regionUVs", &MeshAttachment::getRegionUVs)
+        .function("getProp_uvs", &MeshAttachment::getUVs)
+        .function("getProp_triangles", &MeshAttachment::getTriangles)
+        .function("getProp_color", &MeshAttachment::getColor)
+        .function("getProp_width", &MeshAttachment::getWidth)
+        .function("getProp_height", &MeshAttachment::getHeight)
+        .function("getProp_hullLength", &MeshAttachment::getHullLength)
+        .function("getProp_edges", &MeshAttachment::getEdges)
+        //.function("getProp_tempColor", &MeshAttachment::getTempColor) // no tempColor
+        .function("updateUVs", &MeshAttachment::updateUVs)
+        .function("getParentMesh", &MeshAttachment::getParentMesh, allow_raw_pointer<MeshAttachment>())
+        .function("setParentMesh", &MeshAttachment::setParentMesh, allow_raw_pointer<MeshAttachment>())
+        .function("copy", &MeshAttachment::copy, allow_raw_pointer<Attachment>())
+        .function("newLinkedMesh", &MeshAttachment::newLinkedMesh, allow_raw_pointer<MeshAttachment>());
+
+    class_<PathAttachment>("PathAttachment")
+        .constructor<const String& >()
+        .function("getProp_lengths", &PathAttachment::getLengths)
+        .function("getProp_closed", &PathAttachment::isClosed)
+        .function("getProp_constantSpeed", &PathAttachment::isConstantSpeed)
+        //.function("getProp_color", &MeshAttachment::getColor) // no color
+        .function("copy", &PathAttachment::copy, allow_raw_pointer<Attachment>());
+
+    class_<PointAttachment>("PointAttachment")
+        .constructor<const String& >()
+        .function("getProp_x", &PointAttachment::getX)
+        .function("getProp_y", &PointAttachment::getY)
+        .function("getProp_rotation", &PointAttachment::getRotation)
+        //.function("computeWorldPosition", &PointAttachment::computeWorldPosition) //reference type
+        .function("computeWorldRotation", &PointAttachment::computeWorldRotation)
+        //.function("getProp_color", &MeshAttachment::getColor) // no color
+        .function("copy", &PointAttachment::copy, allow_raw_pointer<Attachment>());
+
+    //class_<HasRendererObject>("HasRendererObject")
+    //    .constructor<>();
+
+
+    class_<RegionAttachment, base<HasRendererObject>>("RegionAttachment")
+        .constructor<const String& >()
+        // static U4: number;
+        // static V4: number;
+        // .......
+        .function("getProp_x", &RegionAttachment::getX)
+        .function("getProp_y", &RegionAttachment::getY)
+        .function("getProp_scaleX", &RegionAttachment::getScaleX)
+        .function("getProp_scaleY", &RegionAttachment::getScaleY)
+        .function("getProp_rotation", &RegionAttachment::getRotation)
+        .function("getProp_width", &RegionAttachment::getWidth)
+        .function("getProp_height", &RegionAttachment::getHeight)
+        .function("getProp_color", &RegionAttachment::getColor)
+        .function("getProp_path", &RegionAttachment::getPath)
+        .function("getProp_rendererObject", &RegionAttachment::getRendererObject, allow_raw_pointer<void>())
+        //.function("getProp_region", &PointAttachment::getRegion)
+        .function("getProp_offset", &RegionAttachment::getOffset)
+        .function("getProp_uvs", &RegionAttachment::getUVs)
+        //.function("getProp_tempColor", &PointAttachment::getTempColor) // have no tempColor
+        .function("updateOffset", &RegionAttachment::updateOffset)
+        //.function("setRegion", &RegionAttachment::setRegion) // have no setRegion
+        .function("copy", &RegionAttachment::copy, allow_raw_pointer<Attachment>());
 
     class_<PowInterpolation, base<Interpolation>>("Pow")
         .constructor<int>()
@@ -288,6 +376,156 @@ EMSCRIPTEN_BINDINGS(spine) {
     //     .function("apply", &Timeline::apply, allow_raw_pointers())
     //     .function("getPropertyId", &Timeline::getPropertyId, allow_raw_pointers());
 
+    // class_<CurveTimeline>("CurveTimeline")
+    //     .constructor<int>()
+    //     // static const float LINEAR;
+    //     // static const float STEPPED;
+    //     // static const float BEZIER;
+    //     // static const int BEZIER_SIZE;
+    //     .function("getPropertyId", &CurveTimeline::getPropertyId, pure_virtual())
+    //     .function("getFrameCount", &CurveTimeline::getFrameCount)
+    //     .function("setLinear", &CurveTimeline::setLinear)
+    //     .function("setStepped", &CurveTimeline::setStepped)
+    //     .function("getCurveType", &CurveTimeline::getCurveType)
+    //     .function("setCurve", &CurveTimeline::setCurve)
+    //     .function("getCurvePercent", &CurveTimeline::getCurvePercent)
+    //     .function("apply", &CurveTimeline::apply, pure_virtual(&Timeline::apply), allow_raw_pointers());
+
+    class_<TranslateTimeline>("TranslateTimeline")
+        .constructor<int>()
+        // will wrap in js
+        // static const int ENTRIES
+        // static const int PREV_TIME;
+        // static const int PREV_X;
+        // static const int PREV_Y;
+        // static const int X;
+        // static const int Y;
+        //.function("getProp_boneIndex", &TranslateTimeline::getBoneIndex)
+        //.function("getProp_frames", &TranslateTimeline::getFrames)
+        .function("getPropertyId", &TranslateTimeline::getPropertyId)
+        .function("setFrame", &TranslateTimeline::setFrame)
+        .function("apply", &TranslateTimeline::apply, allow_raw_pointers());
+    
+    class_<ScaleTimeline, base<TranslateTimeline>>("ScaleTimeline")
+        .constructor<int>()
+        .function("getPropertyId", &ScaleTimeline::getPropertyId)
+        .function("apply", &ScaleTimeline::apply, allow_raw_pointers());
+
+    class_<ShearTimeline, base<TranslateTimeline>>("ScaleTimeline")
+        .constructor<int>()
+        .function("getPropertyId", &ShearTimeline::getPropertyId)
+        .function("apply", &ShearTimeline::apply, allow_raw_pointers());
+
+    class_<RotateTimeline>("RotateTimeline")
+        .constructor<int>()
+        // will wrap in js
+        //static const int PREV_TIME = -2;
+        //static const int PREV_ROTATION = -1;
+        //static const int ROTATION = 1;
+        .function("getProp_boneIndex", &RotateTimeline::getBoneIndex)
+        .function("getProp_frames", &RotateTimeline::getFrames)
+        .function("getPropertyId", &RotateTimeline::getPropertyId)
+        .function("setFrame", &RotateTimeline::setFrame)
+        .function("apply", &RotateTimeline::apply, allow_raw_pointers());
+
+    class_<ColorTimeline>("ColorTimeline")
+        .constructor<int>()
+        // will wrap in js
+        // static const int PREV_TIME;
+        // static const int PREV_R;
+        // static const int PREV_G;
+        // static const int PREV_B;
+        // static const int PREV_A;
+        // static const int R;
+        // static const int G;
+        // static const int B;
+        // static const int A;
+        .function("getProp_slotIndex", &ColorTimeline::getSlotIndex)
+        .function("getProp_frames", &ColorTimeline::getFrames)
+        .function("getPropertyId", &ColorTimeline::getPropertyId)
+        .function("setFrame", &ColorTimeline::setFrame)
+        .function("apply", &ColorTimeline::apply, allow_raw_pointers()); 
+
+    class_<TwoColorTimeline>("TwoColorTimeline")
+        .constructor<int>()
+        // static variables
+        .function("getProp_slotIndex", &TwoColorTimeline::getSlotIndex)
+        //.function("getProp_frames", &TwoColorTimeline::getFrames)
+        .function("getPropertyId", &TwoColorTimeline::getPropertyId)
+        .function("setFrame", &TwoColorTimeline::setFrame)
+        .function("apply", &TwoColorTimeline::apply, allow_raw_pointers());
+
+    class_<AttachmentTimeline>("AttachmentTimeline")
+        .constructor<int>()
+        .function("getProp_slotIndex", &AttachmentTimeline::getSlotIndex)
+        .function("getProp_frames", &AttachmentTimeline::getFrames)
+        .function("getProp_attachmentNames", &AttachmentTimeline::getAttachmentNames)
+        .function("getPropertyId", &AttachmentTimeline::getPropertyId)
+        .function("getFrameCount", &AttachmentTimeline::getFrameCount)
+        .function("setFrame", &AttachmentTimeline::setFrame)
+        .function("apply", &AttachmentTimeline::apply, allow_raw_pointers());
+        //.function("setAttachment", &AttachmentTimeline::setAttachment) //have no setAttachment
+
+    class_<DeformTimeline>("DeformTimeline")
+        .constructor<int>()
+        .function("getProp_slotIndex", &DeformTimeline::getSlotIndex)
+        .function("getProp_attachment", &DeformTimeline::getAttachment, allow_raw_pointer<VertexAttachment>())
+        .function("getProp_frames", &DeformTimeline::getFrames)
+        .function("getProp_frameVertices", &DeformTimeline::getVertices)
+        .function("getPropertyId", &DeformTimeline::getPropertyId)
+        .function("setFrame", &DeformTimeline::setFrame)
+        .function("apply", &DeformTimeline::apply, allow_raw_pointers());
+
+    class_<EventTimeline>("EventTimeline")
+        .constructor<int>()
+        .function("getProp_frames", &EventTimeline::getFrames)
+        .function("getProp_events", &EventTimeline::getEvents)
+        .function("getPropertyId", &EventTimeline::getPropertyId)
+        .function("getFrameCount", &EventTimeline::getFrameCount)
+        .function("setFrame", &EventTimeline::setFrame, allow_raw_pointers())
+        .function("apply", &EventTimeline::apply, allow_raw_pointers());
+
+    class_<DrawOrderTimeline>("DrawOrderTimeline")
+        .constructor<int>()
+        .function("getProp_frames", &EventTimeline::getFrames)
+        //.function("getProp_drawOrders", &EventTimeline::getDrawOrders)
+        .function("getPropertyId", &DrawOrderTimeline::getPropertyId)
+        .function("getFrameCount", &DrawOrderTimeline::getFrameCount)
+        .function("setFrame", &DrawOrderTimeline::setFrame, allow_raw_pointers())
+        .function("apply", &DrawOrderTimeline::apply, allow_raw_pointers());
+
+    class_<IkConstraintTimeline>("IkConstraintTimeline")
+        .constructor<int>()
+        // static variables
+        // .function("getProp_ikConstraintIndex", &EventTimeline::getFrames) // private
+        // .function("getProp_frames", &IkConstraintTimeline::getFrames)
+        .function("getPropertyId", &IkConstraintTimeline::getPropertyId)
+        .function("setFrame", &IkConstraintTimeline::setFrame)
+        .function("apply", &IkConstraintTimeline::apply, allow_raw_pointers());
+
+    class_<TransformConstraintTimeline>("TransformConstraintTimeline")
+        .constructor<int>()
+        // static variables
+        // .function("getProp_ikConstraintIndex", &TransformConstraintTimeline::getFrames) // private
+        //.function("getProp_frames", &TransformConstraintTimeline::getFrames)
+        .function("getPropertyId", &TransformConstraintTimeline::getPropertyId)
+        .function("setFrame", &TransformConstraintTimeline::setFrame)
+        .function("apply", &TransformConstraintTimeline::apply, allow_raw_pointers());
+
+    class_<PathConstraintPositionTimeline>("PathConstraintPositionTimeline")
+        .constructor<int>()
+        // static variables
+        // .function("getProp_ikConstraintIndex", &TransformConstraintTimeline::getFrames) // private
+        //.function("getProp_frames", &TransformConstraintTimeline::getFrames)
+        .function("getPropertyId", &PathConstraintPositionTimeline::getPropertyId)
+        .function("setFrame", &PathConstraintPositionTimeline::setFrame)
+        .function("apply", &PathConstraintPositionTimeline::apply, allow_raw_pointers());
+
+    class_<PathConstraintMixTimeline>("PathConstraintMixTimeline")
+        .constructor<int>()
+        .function("getPropertyId", &PathConstraintMixTimeline::getPropertyId)
+        .function("apply", &PathConstraintMixTimeline::apply, allow_raw_pointers());
+
     class_<TrackEntry>("TrackEntry")
         .constructor<>()
         .function("getProp_animation", &TrackEntry::getAnimation, allow_raw_pointer<Animation>())
@@ -326,22 +564,65 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("isComplete", &TrackEntry::isComplete)
         .function("resetRotationDirections", &TrackEntry::resetRotationDirections);
 
-
     class_<AnimationStateData>("AnimationStateData")
         .constructor<SkeletonData *>()
         .property("skeletonData", &AnimationStateData::getSkeletonData_Export)
         .property("defaultMix",&spine::AnimationStateData::getDefaultMix, &spine::AnimationStateData::setDefaultMix)
-        .function("setMix", &AnimationStateData::setMix_Export);
+
+        .function("getProp_defaultMix", &AnimationStateData::getDefaultMix)
+        .function("getProp_skeletonData", &AnimationStateData::getSkeletonData, allow_raw_pointers())
+        // .function("setMix", static_cast<void (AnimationStateData::*)(const String&, const String&, float)>(&AnimationStateData::setMix))
+        // .function("setMixWith", static_cast<void (AnimationStateData::*)(Animation*, Animation*, float)>(&AnimationStateData::setMix));
+        .function("getMix", &AnimationStateData::getMix, allow_raw_pointers());
+        
         // .function("setMixWith", &Skeleton::setMixWith_Export)
         //.function("getMix", &Skeleton::setMix_Export);
-    
+
     class_<AnimationState>("AnimationState")
         .constructor<AnimationStateData *>()
+        // static variables
         .property("data",&AnimationState::getData_Export)
         .property("timeScale",&AnimationState::getTimeScale, &AnimationState::setTimeScale)
+        // .class_function("getProp_emptyAnimation",&AnimationState::getEmptyAnimation, allow_raw_pointers()) // private
+        .function("getProp_data", &AnimationState::getData, allow_raw_pointers())
+        .function("getProp_tracks", &AnimationState::getTracks, allow_raw_pointers())
+        .function("getProp_timeScale", &AnimationState::getTimeScale)
+        //.function("getProp_unkeyedState")
+        //.function("getProp_events")
+        //.function("getProp_listeners")
+        //.function("getProp_queue")
+        //.function("getProp_queue")
+        //.function("getProp_propertyIDs", &AnimationState::getPropertyIDs)
+        //.function("getProp_animationsChanged", &AnimationState::getAnimationsChanged)
+        //.function("getProp_trackEntryPool", &AnimationState::getTrackEntryPool)
         .function("update", &AnimationState::update)
+        //.function("updateMixingFrom", &AnimationState::updateMixingFrom, allow_raw_pointers()) //private
+        .function("apply", &AnimationState::apply)
+        // .function("applyMixingFrom", &AnimationState::applyMixingFrom, allow_raw_pointers()) //private
+        //.function("applyAttachmentTimeline", &AnimationState::applyAttachmentTimeline) // have no
+        //.function("setAttachment", &AnimationState::setAttachment) // have no
+        // .class_function("applyRotateTimeline", &AnimationState::applyRotateTimeline, allow_raw_pointers())
+        // .function("queueEvents", &AnimationState::queueEvents, allow_raw_pointers())
+        .function("clearTracks", &AnimationState::clearTracks)
         .function("clearTrack", &AnimationState::clearTrack)
-        .function("clearTracks", &AnimationState::clearTracks);
+        // .function("setCurrent", &AnimationState::setCurrent, allow_raw_pointers())
+        // .function("setAnimation", &AnimationState::setAnimation)
+        // .function("setAnimationWith", &AnimationState::setAnimation)
+        // .function("addAnimation", &AnimationState::addAnimation)
+        // .function("addAnimationWith", &AnimationState::addAnimation)
+        // .function("setEmptyAnimation", &AnimationState::setEmptyAnimation)
+        // .function("addEmptyAnimation", &AnimationState::addEmptyAnimation, allow_raw_pointer<TrackEntry>())
+        // .function("setEmptyAnimations", &AnimationState::setEmptyAnimations)
+        //.function("expandToIndex", &AnimationState::expandToIndex, allow_raw_pointers()) // private        
+        //.function("trackEntry", &AnimationState::newTrackEntry, allow_raw_pointers()) // private
+        //.function("disposeNext", &AnimationState::disposeNext) // private
+        //.function("_animationsChanged", &AnimationState::animationsChanged) // private
+        //.function("computeHold", &AnimationState::computeHold, allow_raw_pointer<TrackEntry>()) // private
+        .function("getCurrent", &AnimationState::getCurrent, allow_raw_pointer<TrackEntry>());
+        //.function("addListener", &AnimationState::addListener)
+        //.function("removeListener", &AnimationState::removeListener)
+        //.function("clearListeners", &AnimationState::clearListeners) // no have clearListeners
+        // .function("clearListenerNotifications", &AnimationState::clearListenerNotifications); // no have clearListenerNotifications
 
     class_<Animation>("Animation")
         .constructor<const String &, Vector<Timeline *> &, float>()
@@ -354,7 +635,23 @@ EMSCRIPTEN_BINDINGS(spine) {
         // .class_function("binarySearch", &Animation::binarySearch)
         // .class_function("linearSearch", &Animation::linearSearch)
         ;
-    
+
+    // private
+    // class_<EventQueue>("EventQueue")
+    //     .constructor<AnimationState& , Pool<TrackEntry>& >()
+    //     .function("start", &EventQueue::start, allow_raw_pointers())
+    //     .function("interrupt", &EventQueue::interrupt, allow_raw_pointers())
+    //     .function("end", &EventQueue::end, allow_raw_pointers())
+    //     .function("dispose", &EventQueue::dispose, allow_raw_pointers())
+    //     .function("complete", &EventQueue::complete, allow_raw_pointers())
+    //     .function("event", &EventQueue::event, allow_raw_pointers())
+    //     .function("drain", &EventQueue::drain)
+    //     //.function("clear")
+
+    // class_<AnimationStateListener>("AnimationStateListener")
+
+    // class_<AnimationStateAdapter>("AnimationStateAdapter")
+
     register_vector<Bone *>("vector<Bone*>");
     class_<Skeleton>("Skeleton")
         .constructor<SkeletonData *>()
