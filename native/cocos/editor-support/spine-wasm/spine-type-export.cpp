@@ -102,6 +102,22 @@ EMSCRIPTEN_BINDINGS(spine) {
     // class_<Pool>("Pool")
     //     .constructor<>();
 
+    class_<MathUtil>("MathUtils")
+        .class_property("PI", &MathUtil::Pi)
+        .class_property("PI2", &MathUtil::Pi_2)
+        //.class_property("radiansToDegrees", &MathUtil::radiansToDegrees)
+        .class_property("radDeg", &MathUtil::Rad_Deg)
+        //.class_property("degreesToRadians", &MathUtil::degreesToRadians)
+        .class_function("clamp", &MathUtil::clamp)
+        .class_function("cosDeg", &MathUtil::cosDeg)
+        .class_function("cosDeg", &MathUtil::cosDeg)
+        .class_function("sinDeg", &MathUtil::sinDeg)
+        .class_function("signum", &MathUtil::sign);
+        //.class_function("toInt", &MathUtil::toInt)
+        //.class_function("cbrt", &MathUtil::randomTriangular)
+        //.class_function("randomTriangular", &MathUtil::randomTriangular)
+        //.class_function("randomTriangularWith", &MathUtil::randomTriangular);
+
     class_<Color>("Color")
         .constructor<>()
         .constructor<float, float, float, float>()
@@ -116,6 +132,13 @@ EMSCRIPTEN_BINDINGS(spine) {
     
     class_<Interpolation>("Interpolation")
         .function("apply", &Interpolation::apply, pure_virtual());
+
+
+    class_<Triangulator>("Triangulator")
+        .constructor<>()
+        .function("triangulate", &Triangulator::triangulate)
+        .function("decompose", &Triangulator::decompose, allow_raw_pointers());
+
 
     class_<ConstraintData>("ConstraintData")
         .constructor<const String& >()
@@ -146,7 +169,6 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("getProp_spacing", &PathConstraintData::getSpacing)
         .function("getProp_rotateMix", &PathConstraintData::getRotateMix)
         .function("getProp_translateMix", &PathConstraintData::getTranslateMix);
-
 
     class_<SkeletonBounds>("SkeletonBounds")
         //.function("getProp_minX", &SkeletonBounds::minX)
@@ -293,6 +315,46 @@ EMSCRIPTEN_BINDINGS(spine) {
     //     .function("newMeshAttachment", &AttachmentLoader::newMeshAttachment, pure_virtual(), allow_raw_pointer<MeshAttachment>())
     //     .function("newRegionAttachment", &AttachmentLoader::newRegionAttachment, pure_virtual(), allow_raw_pointer<RegionAttachment>());
 
+
+    class_<AtlasAttachmentLoader, base<AttachmentLoader>>("AtlasAttachmentLoader")
+        .constructor<Atlas* >()
+        .function("newRegionAttachment", &AtlasAttachmentLoader::newRegionAttachment, allow_raw_pointer<RegionAttachment>())
+        .function("newMeshAttachment", &AtlasAttachmentLoader::newMeshAttachment, allow_raw_pointer<MeshAttachment>())
+        .function("newBoundingBoxAttachment", &AtlasAttachmentLoader::newBoundingBoxAttachment, allow_raw_pointer<BoundingBoxAttachment>())
+        .function("newPathAttachment", &AtlasAttachmentLoader::newPathAttachment, allow_raw_pointer<PathAttachment>())
+        .function("newPointAttachment", &AtlasAttachmentLoader::newPointAttachment, allow_raw_pointer<PointAttachment>())
+        .function("newClippingAttachment", &AtlasAttachmentLoader::newClippingAttachment, allow_raw_pointer<ClippingAttachment>());
+        //.function("getProp_atlas")
+
+    class_<AtlasPage>("TextureAtlasPage")
+        .constructor<const String&>()
+        .property("name", &AtlasPage::name)
+        .property("minFilter", &AtlasPage::minFilter)
+        .property("magFilter", &AtlasPage::magFilter)
+        .property("uWrap", &AtlasPage::uWrap)
+        .property("vWrap", &AtlasPage::vWrap)
+        //.property("texture", &AtlasPage::texture) // no texture, use renderer object
+        .property("width", &AtlasPage::width)
+        .property("height", &AtlasPage::height);
+
+    class_<AtlasRegion>("TextureAtlasRegion")
+        //.property("page", &AtlasRegion::page)
+        .property("name", &AtlasRegion::name)
+        .property("x", &AtlasRegion::x)
+        .property("y", &AtlasRegion::y)
+        .property("index", &AtlasRegion::index)
+        .property("rotate", &AtlasRegion::rotate)
+        .property("degrees", &AtlasRegion::degrees);
+        //.property("texture", &AtlasRegion::height)
+
+
+    class_<Atlas>("TextureAtlas")
+        .constructor<const String&, TextureLoader*, bool>()
+        //.function("getProp_pages")
+        //.function("getProp_regions")
+        .function("findRegion", &Atlas::findRegion, allow_raw_pointer<AtlasRegion>());
+        //.function("dispose");
+
     class_<PowInterpolation, base<Interpolation>>("Pow")
         .constructor<int>()
         .function("apply", &PowInterpolation::apply);
@@ -401,6 +463,43 @@ EMSCRIPTEN_BINDINGS(spine) {
         //.function("addCurvePosition",  &PathConstraint::addCurvePosition) // private
         ;
 
+    class_<TransformConstraintData, base<ConstraintData>>("TransformConstraintData")
+        .constructor<const String&>()
+        .function("getProp_bones", &TransformConstraintData::getBones, allow_raw_pointer<BoneData>())
+        .function("getProp_target", &TransformConstraintData::getTarget, allow_raw_pointer<BoneData>())
+        .function("getProp_rotateMix", &TransformConstraintData::getRotateMix)
+        .function("getProp_translateMix", &TransformConstraintData::getTranslateMix)
+        .function("getProp_scaleMix", &TransformConstraintData::getScaleMix)
+        .function("getProp_shearMix", &TransformConstraintData::getShearMix)
+        .function("getProp_offsetRotation", &TransformConstraintData::getOffsetRotation)
+        .function("getProp_offsetX", &TransformConstraintData::getOffsetX)
+        .function("getProp_offsetY", &TransformConstraintData::getOffsetY)
+        .function("getProp_offsetScaleX", &TransformConstraintData::getOffsetScaleX)
+        .function("getProp_offsetScaleY", &TransformConstraintData::getOffsetScaleY)
+        .function("getProp_offsetShearY", &TransformConstraintData::getOffsetShearY)
+        .function("getProp_relative", &TransformConstraintData::isRelative)
+        .function("getProp_local", &TransformConstraintData::isLocal);
+
+    class_<TransformConstraint, base<Updatable>>("TransformConstraint")
+        .constructor<TransformConstraintData &, Skeleton &>()
+        .function("getProp_data", &TransformConstraint::getData)
+        .function("getProp_bones", &TransformConstraint::getBones, allow_raw_pointer<Bone>())
+        .function("getProp_target", &TransformConstraint::getTarget, allow_raw_pointer<Bone>())
+        .function("getProp_rotateMix", &TransformConstraint::getRotateMix)
+        .function("getProp_translateMix", &TransformConstraint::getTranslateMix)
+        .function("getProp_scaleMix", &TransformConstraint::getScaleMix)
+        .function("getProp_shearMix", &TransformConstraint::getShearMix)
+        //.function("getProp_temp") // no
+        .function("getProp_active", &TransformConstraint::isActive)
+        .function("isActive", &TransformConstraint::isActive)
+        .function("apply", &TransformConstraint::apply)
+        .function("update", &TransformConstraint::update);
+        //.function("applyAbsoluteWorld", &TransformConstraint::applyAbsoluteWorld)
+        //.function("applyRelativeWorld", &TransformConstraint::applyRelativeWorld)
+        //.function("applyAbsoluteLocal", &TransformConstraint::applyAbsoluteLocal)
+        //.function("applyRelativeLocal", &TransformConstraint::applyRelativeLocal)
+
+
     class_<Bone, base<Updatable>>("Bone")
         .constructor<BoneData &, Skeleton &, Bone *>()
         .property("a", &Bone::getA, &Bone::setA)
@@ -490,7 +589,6 @@ EMSCRIPTEN_BINDINGS(spine) {
         .property("slotIndex", &Skin::AttachmentMap::Entry::_slotIndex)
         .property("name", &Skin::AttachmentMap::Entry::_name)
         .function("getProp_attachment", &Skin::AttachmentMap::Entry::getAttachment, allow_raw_pointers());
-        // .function("attachment", select_overload<void(Attachment *)>(&Skin::AttachmentMap::Entry::setAttachment), allow_raw_pointers())
 
     class_<SkeletonClipping>("SkeletonClipping")
         .constructor<>()
@@ -505,11 +603,42 @@ EMSCRIPTEN_BINDINGS(spine) {
         //.function("clip", &SkeletonClipping::clip)
         //.class_function("makeClockwise", &SkeletonClipping::makeClockwise)
 
-
     class_<SkeletonData>("SkeletonData")
         .constructor<>()
+        .function("getProp_name", &SkeletonData::getName)
+        .function("getProp_bones", &SkeletonData::getBones, allow_raw_pointer<BoneData>())
+        .function("getProp_slots", &SkeletonData::getSlots, allow_raw_pointer<SlotData>())
+        .function("getProp_skins", &SkeletonData::getSkins, allow_raw_pointer<Skin>())
+        .function("getProp_defaultSkin", &SkeletonData::getDefaultSkin, allow_raw_pointer<Skin>())
+        .function("getProp_events", &SkeletonData::getEvents, allow_raw_pointer<EventData>())
+        .function("getProp_animations", &SkeletonData::getAnimations, allow_raw_pointer<Animation>())
+        .function("getProp_ikConstraints", &SkeletonData::getIkConstraints, allow_raw_pointer<IkConstraintData>())
+        .function("getProp_transformConstraints", &SkeletonData::getTransformConstraints, allow_raw_pointer<TransformConstraintData>())
+        .function("getProp_pathConstraints", &SkeletonData::getPathConstraints, allow_raw_pointer<PathConstraintData>())
+        .function("getProp_x", &SkeletonData::getX)
+        .function("getProp_y", &SkeletonData::getY)
+        .function("getProp_width", &SkeletonData::getWidth)
+        .function("getProp_height", &SkeletonData::getHeight)
+        .function("getProp_version", &SkeletonData::getVersion)
+        .function("getProp_hash", &SkeletonData::getHash)
+        .function("getProp_fps", &SkeletonData::getFps)
+        .function("getProp_imagesPath", &SkeletonData::getImagesPath)
+        .function("getProp_audioPath", &SkeletonData::getAudioPath)
+        .function("findBone", &SkeletonData::findBone, allow_raw_pointer<BoneData>())
+        .function("findBoneIndex", &SkeletonData::findBoneIndex)
+        .function("findSlot", &SkeletonData::findSlot, allow_raw_pointer<SlotData>())
+        .function("findSlotIndex", &SkeletonData::findSlotIndex)
+        .function("findSkin", &SkeletonData::findSkin, allow_raw_pointer<Skin>())
+        .function("findEvent", &SkeletonData::findEvent, allow_raw_pointer<EventData>())
+        .function("findAnimation", &SkeletonData::findAnimation, allow_raw_pointer<Animation>())
+        .function("findIkConstraint", &SkeletonData::findIkConstraint, allow_raw_pointer<IkConstraintData>())
+        .function("findTransformConstraint", &SkeletonData::findTransformConstraint, allow_raw_pointer<TransformConstraintData>())
+        .function("findPathConstraint", &SkeletonData::findPathConstraint, allow_raw_pointer<PathConstraintData>())
+        .function("findPathConstraintIndex", &SkeletonData::findPathConstraintIndex)
+
         .property("width",&spine::SkeletonData::getWidth, &spine::SkeletonData::setWidth)
-        .property("height",&spine::SkeletonData::getHeight, &spine::SkeletonData::setHeight);
+        .property("height",&spine::SkeletonData::getHeight, &spine::SkeletonData::setHeight)
+        ;
 
 
     // class_<Timeline>("Timeline")
@@ -844,7 +973,21 @@ EMSCRIPTEN_BINDINGS(spine) {
         .property("data", &Skeleton::getData_Export)
         .function("getBones", &Skeleton::getBones_Export);
 
-    
+    // incomplete
+    class_<SkeletonBinary>("SkeletonBinary")
+        .constructor<AttachmentLoader*>()
+        .function("setProp_scale", &SkeletonBinary::setScale);
+        //.function("getProp_scale", &SkeletonBinary::getScale)
+        //.function("readSkeletonData", &SkeletonBinary::readSkeletonData)
+        //.function("setCurve", &SkeletonBinary::setCurve);
+    // incomplete
+    class_<SkeletonJson>("SkeletonJson")
+        .constructor<Atlas*>()
+        .constructor<AttachmentLoader*>();
+        //.function("readSkeletonData", &SkeletonJson::readSkeletonData)
+        //.function("getProp_scale", &SkeletonJson::getScale)
+
+
 
     class_<VertexEffect>("VertexEffect")
         .function("begin", &VertexEffect::begin, pure_virtual())
