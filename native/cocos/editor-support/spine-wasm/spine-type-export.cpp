@@ -681,7 +681,7 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("getPropertyId", &ScaleTimeline::getPropertyId)
         .function("apply", &ScaleTimeline::apply, allow_raw_pointers());
 
-    class_<ShearTimeline, base<TranslateTimeline>>("ScaleTimeline")
+    class_<ShearTimeline, base<TranslateTimeline>>("ShearTimeline")
         .constructor<int>()
         .function("getPropertyId", &ShearTimeline::getPropertyId)
         .function("apply", &ShearTimeline::apply, allow_raw_pointers());
@@ -974,16 +974,17 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("getBones", &Skeleton::getBones_Export);
 
     // incomplete
-    class_<SkeletonBinary>("SkeletonBinary")
-        .constructor<AttachmentLoader*>()
-        .function("setProp_scale", &SkeletonBinary::setScale);
+    // class_<SkeletonBinary>("SkeletonBinary")
+    //     .constructor<AttachmentLoader*>()
+    //     .function("setProp_scale", &SkeletonBinary::setScale);
         //.function("getProp_scale", &SkeletonBinary::getScale)
         //.function("readSkeletonData", &SkeletonBinary::readSkeletonData)
         //.function("setCurve", &SkeletonBinary::setCurve);
     // incomplete
-    class_<SkeletonJson>("SkeletonJson")
-        .constructor<Atlas*>()
-        .constructor<AttachmentLoader*>();
+
+    // class_<SkeletonJson>("SkeletonJson")
+    //     .constructor<Atlas*>()
+    //     .constructor<AttachmentLoader*>();
         //.function("readSkeletonData", &SkeletonJson::readSkeletonData)
         //.function("getProp_scale", &SkeletonJson::getScale)
 
