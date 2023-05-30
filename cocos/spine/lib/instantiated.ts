@@ -25,7 +25,6 @@ import wasmFactory from 'external:emscripten/spine/spine.js';
 import spineWasmUrl from 'external:emscripten/spine/spine.wasm';
 import { game } from '../../game';
 import { sys } from '../../core';
-import { legacyCC } from '../../core/global-exports';
 import { WebAssemblySupportMode } from '../../misc/webassembly-support';
 import { overrideSpineDefine } from './spine-define';
 
