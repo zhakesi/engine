@@ -44,7 +44,10 @@ import { RenderDrawInfo } from '../2d/renderer/render-draw-info';
 import { Material, Texture2D } from '../asset/assets';
 import { builtinResMgr } from '../asset/asset-manager';
 import { Node } from '../scene-graph';
+import { SPINE_WASM } from './lib/instantiated';
+import spinex from './lib/spine-core-x.js';
 
+const xx = SPINE_WASM;
 /**
  * @en
  * Animation playback rate.
@@ -699,6 +702,8 @@ export class Skeleton extends UIRenderer {
     protected _cachedSockets: Map<string, number> = new Map<string, number>();
     private _drawInfoList: RenderDrawInfo[] = [];
 
+    private _colorTest: spinex.Color;
+
     private requestDrawInfo (idx: number) {
         if (!this._drawInfoList[idx]) {
             this._drawInfoList[idx] = new RenderDrawInfo();
@@ -721,6 +726,8 @@ export class Skeleton extends UIRenderer {
         setEnumAttr(this, '_defaultSkinIndex', this._enumSkins);
         setEnumAttr(this, '_animationIndex', this._enumAnimations);
         this._useVertexOpacity = true;
+
+        this._colorTest = new spinex.Color();
     }
 
     /**
