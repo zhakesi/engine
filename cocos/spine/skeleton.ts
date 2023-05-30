@@ -702,7 +702,7 @@ export class Skeleton extends UIRenderer {
     protected _cachedSockets: Map<string, number> = new Map<string, number>();
     private _drawInfoList: RenderDrawInfo[] = [];
 
-    private _colorTest: spinex.Color;
+    private _testColor: spinex.Color = null!;
 
     private requestDrawInfo (idx: number) {
         if (!this._drawInfoList[idx]) {
@@ -726,8 +726,7 @@ export class Skeleton extends UIRenderer {
         setEnumAttr(this, '_defaultSkinIndex', this._enumSkins);
         setEnumAttr(this, '_animationIndex', this._enumAnimations);
         this._useVertexOpacity = true;
-
-        this._colorTest = new spinex.Color();
+        this._testColor = new spinex.Color();
     }
 
     /**

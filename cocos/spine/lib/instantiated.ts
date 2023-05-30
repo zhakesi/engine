@@ -27,7 +27,7 @@ import { game } from '../../game';
 import { sys } from '../../core';
 import { legacyCC } from '../../core/global-exports';
 import { WebAssemblySupportMode } from '../../misc/webassembly-support';
-import spinex from './spine-core-x.js';
+import { overrideSpineDefine } from './spine-define';
 
 const wasmInstance: SpineWasm.instance = {} as any;
 const registerList: any[] = [];
@@ -45,7 +45,7 @@ function initWasm (wasmUrl) {
         Object.assign(wasmInstance, Instance);
         wasmInstance.asm.spineWasmInit();
         registerList.forEach((cb) => {
-            cb();
+            cb(wasmInstance);
         });
     }, (reason: any) => { console.error('[Spine]:', `Spine wasm load failed: ${reason}`); });
 }
@@ -87,17 +87,6 @@ export function waitForSpineWasmInstantiation () {
 
 game.onPostInfrastructureInitDelegate.add(waitForSpineWasmInstantiation);
 
-// export function getSpineWasm (): any {
-//     return wasmInstance as any;
-// }
-
-// export function registerAfterWasmInit (registerFunc) {
-//     registerList.push(registerFunc);
-// }
-
-function defineSPine () {
-    spinex.Color = (wasmInstance as any).Color;
-}
-registerList.push(defineSPine);
+registerList.push(overrideSpineDefine);
 
 export const SPINE_WASM = 1;
