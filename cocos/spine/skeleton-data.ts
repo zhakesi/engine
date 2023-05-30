@@ -24,7 +24,7 @@
 
 import { EDITOR } from 'internal:constants';
 import { CCString, Enum } from '../core';
-import SkeletonCache from './skeleton-cache';
+//import SkeletonCache from './skeleton-cache';
 import { Skeleton } from './skeleton';
 import { SkeletonTexture } from './skeleton-texture';
 import spine from './lib/spine-core.js';
@@ -279,7 +279,7 @@ export class SkeletonData extends Asset {
      * @zh 销毁 skeleton data。
      */
     public destroy () {
-        SkeletonCache.sharedCache.removeSkeleton(this._uuid);
+        //SkeletonCache.sharedCache.removeSkeleton(this._uuid);
         return super.destroy();
     }
 

@@ -1,28 +1,28 @@
-/*
- Copyright (c) 2020-2023 Xiamen Yaji Software Co., Ltd.
+// /*
+//  Copyright (c) 2020-2023 Xiamen Yaji Software Co., Ltd.
 
- https://www.cocos.com/
+//  https://www.cocos.com/
 
- Permission is hereby granted, free of charge, to any person obtaining a copy
- of this software and associated documentation files (the "Software"), to deal
- in the Software without restriction, including without limitation the rights to
- use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
- of the Software, and to permit persons to whom the Software is furnished to do so,
- subject to the following conditions:
+//  Permission is hereby granted, free of charge, to any person obtaining a copy
+//  of this software and associated documentation files (the "Software"), to deal
+//  in the Software without restriction, including without limitation the rights to
+//  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+//  of the Software, and to permit persons to whom the Software is furnished to do so,
+//  subject to the following conditions:
 
- The above copyright notice and this permission notice shall be included in
- all copies or substantial portions of the Software.
+//  The above copyright notice and this permission notice shall be included in
+//  all copies or substantial portions of the Software.
 
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- THE SOFTWARE.
-*/
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+//  THE SOFTWARE.
+// */
 
-import spine from './lib/spine-core.js';
+import spinex from './lib/spine-core-x.js';
 
 /**
  * @en
@@ -41,8 +41,8 @@ export class VertexEffectDelegate {
      * @en Spine vertex effect object instance.
      * @zh Spine 顶点特效对象实例。
      */
-    _vertexEffect: spine.VertexEffect | null = null;
-    private _interpolation: spine.Interpolation | null = null;
+    _vertexEffect: any;
+    private _interpolation: any;
     private _effectType: string;
 
     constructor () {
@@ -68,10 +68,10 @@ export class VertexEffectDelegate {
      * @param {Number} jitterY
      * @return {spine.VertexEffect} @en Return a vertex effect type of jitter. @zh 返回一个 jitter 类型的顶点特效对象实例。
      */
-    initJitter (jitterX: number, jitterY: number): spine.VertexEffect {
-        this._effectType = 'jitter';
-        this._vertexEffect = new spine.JitterEffect(jitterX, jitterY);
-        return this._vertexEffect;
+    initJitter (jitterX: number, jitterY: number): spinex.JitterEffect {
+        // this._effectType = 'jitter';
+        // this._vertexEffect = new spinex.JitterEffect(jitterX, jitterY);
+        // return this._vertexEffect;
     }
 
     /**
@@ -82,11 +82,11 @@ export class VertexEffectDelegate {
      * @param {Number} power
      * @return {sp.spine.JitterEffect} @en Return a vertex effect type of swirl. @zh 返回一个 swirl 类型的顶点特效对象实例。
      */
-    initSwirlWithPow (radius: number, power: number): spine.VertexEffect {
-        this._effectType = 'swirl';
-        this._interpolation = new spine.Pow(power);
-        this._vertexEffect = new spine.SwirlEffect(radius, this._interpolation);
-        return this._vertexEffect;
+    initSwirlWithPow (radius: number, power: number): spinex.SwirlEffect {
+        // this._effectType = 'swirl';
+        // this._interpolation = new spinex.Pow(power);
+        // this._vertexEffect = new spinex.SwirlEffect(radius, this._interpolation);
+        // return this._vertexEffect;
     }
 
     /**
@@ -98,10 +98,10 @@ export class VertexEffectDelegate {
      * @return {sp.spine.SwirlEffect} @en Return a vertex effect type of swirl. @zh 返回一个 swirl 类型的顶点特效对象实例。
      */
     initSwirlWithPowOut (radius: number, power: number) {
-        this._effectType = 'swirl';
-        this._interpolation = new spine.PowOut(power);
-        this._vertexEffect = new spine.SwirlEffect(radius, this._interpolation);
-        return this._vertexEffect;
+        // this._effectType = 'swirl';
+        // this._interpolation = new spineX.PowOut(power);
+        // this._vertexEffect = new spineX.SwirlEffect(radius, this._interpolation);
+        // return this._vertexEffect;
     }
 
     /**
@@ -111,7 +111,7 @@ export class VertexEffectDelegate {
      * @return {sp.spine.JitterEffect}
      */
     getJitterVertexEffect () {
-        return this._vertexEffect;
+        //return this._vertexEffect;
     }
 
     /**
@@ -121,7 +121,7 @@ export class VertexEffectDelegate {
      * @return {sp.spine.SwirlEffect}
      */
     getSwirlVertexEffect () {
-        return this._vertexEffect;
+        //return this._vertexEffect;
     }
 
     /**
@@ -131,7 +131,7 @@ export class VertexEffectDelegate {
      * @return {sp.spine.JitterEffect|sp.spine.SwirlEffect}
      */
     getVertexEffect () {
-        return this._vertexEffect;
+        //return this._vertexEffect;
     }
 
     /**
@@ -141,6 +141,6 @@ export class VertexEffectDelegate {
      * @return {String}
      */
     getEffectType () {
-        return this._effectType;
+        //return this._effectType;
     }
 }

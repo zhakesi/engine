@@ -1,6 +1,7 @@
 import spinex from './spine-core-x.js';
+import { js } from '../../core';
 
-export function overrideSpineDefine (wasm) {
+function overrideClass (wasm) {
     //spinex.Vector2 = wasm.Vector2;
     spinex.MathUtils = wasm.MathUtils;
     spinex.Color = wasm.Color;
@@ -65,4 +66,92 @@ export function overrideSpineDefine (wasm) {
     spinex.VertexEffect = wasm.VertexEffect;
     spinex.JitterEffect = wasm.JitterEffect;
     spinex.SwirlEffect = wasm.SwirlEffect;
+
+    spinex.SkeletonInstance = wasm.SkeletonInstance;
+    spinex.SkeletonInstance.HEAPU8 = wasm.HEAPU8;
+}
+
+function overrideProperty_BoneData () {
+    const BoneData = spinex.BoneData;
+    const prototype = BoneData.prototype as any;
+    const spPropertyPolyfills = [
+        {
+            proto: prototype,
+            property: 'index',
+            getter: prototype.getProp_index,
+            //setter: spinex.Color.prototype.setR,
+        },
+        // {
+        //     proto: spinex.BoneData.prototype,
+        //     property: 'name',
+        //     getter: spinex.BoneData.prototype.getProp_name,
+        // },
+        {
+            proto: prototype,
+            property: 'parent',
+            getter: prototype.getProp_parent,
+        },
+        {
+            proto: prototype,
+            property: 'length',
+            getter: prototype.getProp_length,
+        },
+        {
+            proto: prototype,
+            property: 'x',
+            getter: prototype.getProp_x,
+        },
+        {
+            proto: prototype,
+            property: 'y',
+            getter: prototype.getProp_y,
+        },
+        {
+            proto: prototype,
+            property: 'rotation',
+            getter: prototype.getProp_rotation,
+        },
+        {
+            proto: prototype,
+            property: 'scaleX',
+            getter: prototype.getProp_scaleX,
+        },
+        {
+            proto: prototype.prototype,
+            property: 'scaleY',
+            getter: prototype.getProp_scaleY,
+        },
+        {
+            proto: prototype,
+            property: 'shearX',
+            getter: prototype.getProp_shearX,
+        },
+        {
+            proto: prototype,
+            property: 'shearY',
+            getter: prototype.getProp_shearY,
+        },
+        {
+            proto: prototype,
+            property: 'transformMode',
+            getter: prototype.getProp_transformMode,
+        },
+        {
+            proto: prototype,
+            property: 'skinRequired',
+            getter: prototype.getProp_skinRequired,
+        },
+        // {
+        //     proto: spinex.BoneData.prototype,
+        //     property: 'color',
+        //     getter: spinex.BoneData.prototype.getProp_color,
+        // },
+    ];
+    spPropertyPolyfills.forEach((prop) => {
+        js.getset(prop.proto, prop.property, prop.getter);
+    });
+}
+
+export function overrideSpineDefine (wasm) {
+    overrideClass(wasm);
 }

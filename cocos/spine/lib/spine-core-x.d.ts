@@ -1273,6 +1273,24 @@ declare namespace spinex {
         transform(position: Vector2, uv: Vector2, light: Color, dark: Color): void;
         end(): void;
     }
+
+    class SkeletonInstance {
+        static HEAPU8: Uint8Array;
+        initSkeletonDataJson(jsonStr: string, atlasText: string);
+        initSkeleton();
+        getAnimationState();
+        setAnimation(trackIndex: number, name: string, loop: boolean);
+        setSkin(name: string);
+        setPremultipliedAlpha(usePremultipliedAlpha: boolean);
+        setColor(r: number, g: number, b: number, a: number);
+        setMix(fromName: string, toName: string, duration: number);
+        updateAnimation(dt: number);
+        setUseTint(useTint: boolean);
+        clearEffect();
+        setJitterEffect(jitter: JitterEffect);
+        setSwirlEffect(swirl: SwirlEffect);
+        updateRenderData();
+    }
 }
 
 export default spinex;

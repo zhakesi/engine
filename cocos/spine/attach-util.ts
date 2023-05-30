@@ -25,7 +25,7 @@
 import { Mat4 } from '../core';
 import { Skeleton } from './skeleton';
 import spine from './lib/spine-core.js';
-import { FrameBoneInfo } from './skeleton-cache';
+//import { FrameBoneInfo } from './skeleton-cache';
 import { Node } from '../scene-graph';
 
 const tempMat4 = new Mat4();
@@ -37,7 +37,7 @@ const tempMat4 = new Mat4();
  */
 export class AttachUtil {
     protected _inited = false;
-    protected _skeleton: spine.Skeleton|null = null;
+    protected _skeleton: any = null;
     protected _skeletonNode: Node|null = null;
     protected _skeletonComp: Skeleton|null = null;
 
@@ -68,17 +68,17 @@ export class AttachUtil {
         const socketNodes = this._skeletonComp!.socketNodes;
         if (socketNodes.size === 0) return;
 
-        let boneInfos: FrameBoneInfo[]|null = null;
-        const isCached = this._skeletonComp!.isAnimationCached();
-        if (isCached) {
-            boneInfos = this._skeletonComp!._curFrame && this._skeletonComp!._curFrame.boneInfos;
-        } else {
-            boneInfos = this._skeleton!.bones;
-        }
+        //let boneInfos: FrameBoneInfo[]|null = null;
+        // const isCached = this._skeletonComp!.isAnimationCached();
+        // if (isCached) {
+        //     boneInfos = this._skeletonComp!._curFrame && this._skeletonComp!._curFrame.boneInfos;
+        // } else {
+        const boneInfos = this._skeleton.getBones();
+        //}
 
         if (!boneInfos) return;
 
-        const matrixHandle = (node: Node, bone: FrameBoneInfo) => {
+        const matrixHandle = (node: Node, bone: any) => {
             const tm = tempMat4;
             tm.m00 = bone.a;
             tm.m01 = bone.c;
@@ -96,7 +96,7 @@ export class AttachUtil {
                 socketNodes.delete(boneIdx);
                 continue;
             }
-            const bone = boneInfos[boneIdx];
+            const bone = boneInfos.get(boneIdx);
             // Bone has been destroy
             if (!bone) {
                 boneNode.removeFromParent();
