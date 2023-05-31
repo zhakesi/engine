@@ -272,6 +272,7 @@ export class Skeleton extends UIRenderer {
             this.defaultSkin = '';
             this.defaultAnimation = '';
             this._updateSkeletonData();
+            this._updateUITransform();
         }
     }
 
@@ -523,10 +524,6 @@ export class Skeleton extends UIRenderer {
 
     public __preload () {
         super.__preload();
-        if (EDITOR && !legacyCC.GAME_VIEW) {
-            const Flags = CCObject.Flags;
-            this._objFlags |= (Flags.IsAnchorLocked | Flags.IsSizeLocked);
-        }
         this._updateSkeletonData();
     }
 
@@ -597,7 +594,6 @@ export class Skeleton extends UIRenderer {
         this._runtimeData = this._instance.initSkeletonDataJson(jsonStr, altasStr);
         if (!this._runtimeData) return;
 
-        this._updateUITransform();
         //if (this.isAnimationCached()) {
         //    this._initSkeletonCache();
         //} else {
@@ -1259,13 +1255,19 @@ export class Skeleton extends UIRenderer {
     }
 
     private _updateUITransform () {
-        const width = this._runtimeData.width;
-        const height = this._runtimeData.height;
-        if (width && height) {
-            const uiTrans = this.node._uiProps.uiTransformComp!;
-            uiTrans.setContentSize(width, height);
+        const uiTrans = this.node._uiProps.uiTransformComp!;
+        const skeletonData = this._runtimeData;
+        if (!skeletonData) {
+            uiTrans.setContentSize(100, 100);
             uiTrans.anchorX = 0.5;
-            uiTrans.anchorY = 0;
+            uiTrans.anchorX = 0.5;
+        }
+        const width = skeletonData.width;
+        const height = skeletonData.height;
+        if (width && height) {
+            uiTrans.setContentSize(width, height);
+            if (width !== 0) uiTrans.anchorX = Math.abs(skeletonData.x) / width;
+            if (height !== 0) uiTrans.anchorY = Math.abs(skeletonData.y) / height;
         }
     }
 

@@ -868,6 +868,21 @@ function overrideProperty_Bone () {
     const propertyPolyfills = [
         {
             proto: prototype,
+            property: 'skeleton',
+            getter: prototype.getProp_skeleton,
+        },
+        {
+            proto: prototype,
+            property: 'data',
+            getter: prototype.getProp_data,
+        },
+        {
+            proto: prototype,
+            property: 'parent',
+            getter: prototype.getProp_parent,
+        },
+        {
+            proto: prototype,
             property: 'x',
             getter: prototype.getProp_x,
         },
@@ -1521,11 +1536,6 @@ function overrideProperty_Skeleton () {
         },
         {
             proto: prototype,
-            property: 'bones',
-            getter: prototype.getProp_bones,
-        },
-        {
-            proto: prototype,
             property: 'slots',
             getter: prototype.getProp_slots,
         },
@@ -1592,6 +1602,19 @@ function overrideProperty_Skeleton () {
     ];
     propertyPolyfills.forEach((prop) => {
         js.getset(prop.proto, prop.property, prop.getter);
+    });
+    Object.defineProperty(prototype, 'bones', {
+        get () {
+            const bones: any[] = [];
+            const bonesVector = this.getProp_bones();
+            const count = bonesVector.size();
+            for (let i = 0; i < count; i++) {
+                const bonePtr = bonesVector.get(i);
+                bones.push(bonePtr);
+            }
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return bones;
+        },
     });
 }
 
