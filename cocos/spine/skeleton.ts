@@ -42,7 +42,7 @@ import { AttachUtil } from './attach-util';
 import { RenderDrawInfo } from '../2d/renderer/render-draw-info';
 import { VertexEffectDelegate } from './vertex-effect-delegate';
 import { SPINE_WASM } from './lib/instantiated';
-import spinex from './lib/spine-core-x.js';
+import spine from './lib/spine-core.js';
 
 const spineTag = SPINE_WASM;
 /**
@@ -193,10 +193,10 @@ export class Skeleton extends UIRenderer {
     @serializable
     protected _enableBatch = false;
 
-    protected _runtimeData: spinex.SkeletonData = null!;
-    public _skeleton: spinex.Skeleton = null!;
-    protected _instance: spinex.SkeletonInstance = null!;
-    protected _state: spinex.AnimationState = null!;
+    protected _runtimeData: spine.SkeletonData = null!;
+    public _skeleton: spine.Skeleton = null!;
+    protected _instance: spine.SkeletonInstance = null!;
+    protected _state: spine.AnimationState = null!;
     protected _texture: Texture2D | null = null;
     // Animation name
     protected _animationName = '';
@@ -241,7 +241,7 @@ export class Skeleton extends UIRenderer {
     constructor () {
         super();
         this._useVertexOpacity = true;
-        this._instance = new spinex.SkeletonInstance();
+        this._instance = new spine.SkeletonInstance();
         this.attachUtil = new AttachUtil();
     }
 
@@ -1133,7 +1133,7 @@ export class Skeleton extends UIRenderer {
         }
         this._cachedSockets.clear();
         const bones = this._skeleton.bones;
-        const getBoneName = (bone: spinex.Bone) => {
+        const getBoneName = (bone: spine.Bone) => {
             if (bone.parent == null) return bone.data.name || '<Unamed>';
             return `${getBoneName(bones[bone.parent.data.index]) as string}/${bone.data.name}`;
         };

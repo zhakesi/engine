@@ -26,7 +26,6 @@ import { EDITOR } from 'internal:constants';
 import { CCString, Enum } from '../core';
 //import SkeletonCache from './skeleton-cache';
 import { Skeleton } from './skeleton';
-import { SkeletonTexture } from './skeleton-texture';
 import spine from './lib/spine-core.js';
 import { ccclass, serializable, type } from '../core/data/decorators';
 import { legacyCC } from '../core/global-exports';
@@ -213,27 +212,28 @@ export class SkeletonData extends Asset {
             return null;
         }
 
-        const atlas = this._getAtlas(quiet);
-        if (!atlas) {
-            return null;
-        }
-        const attachmentLoader = new spine.AtlasAttachmentLoader(atlas);
+        // const atlas = this._getAtlas(quiet);
+        // if (!atlas) {
+        //     return null;
+        // }
+        // const attachmentLoader = new spine.AtlasAttachmentLoader(atlas);
 
-        let resData: spine.SkeletonJson | Uint8Array | null = null;
-        let reader: spine.SkeletonJson | spine.SkeletonBinary | null = null;
-        if (this.skeletonJson) {
-            reader = new spine.SkeletonJson(attachmentLoader);
-            resData = this.skeletonJson;
-        } else {
-            reader = new spine.SkeletonBinary(attachmentLoader);
-            resData = new Uint8Array(this._nativeAsset);
-        }
+        // let resData: spine.SkeletonJson | Uint8Array | null = null;
+        // let reader: spine.SkeletonJson | spine.SkeletonBinary | null = null;
+        // if (this.skeletonJson) {
+        //     reader = new spine.SkeletonJson(attachmentLoader);
+        //     resData = this.skeletonJson;
+        // } else {
+        //     reader = new spine.SkeletonBinary(attachmentLoader);
+        //     resData = new Uint8Array(this._nativeAsset);
+        // }
 
-        reader.scale = this.scale;
-        this._skeletonCache = reader.readSkeletonData(resData as any);
-        atlas.dispose();
+        // reader.scale = this.scale;
+        // this._skeletonCache = reader.readSkeletonData(resData as any);
+        // atlas.dispose();
 
-        return this._skeletonCache;
+        // return this._skeletonCache;
+        return null;
     }
 
     /**
@@ -283,41 +283,41 @@ export class SkeletonData extends Asset {
         return super.destroy();
     }
 
-    // PRIVATE
-    private _getTexture (line: string) {
-        const names = this.textureNames;
-        for (let i = 0; i < names.length; i++) {
-            if (names[i] === line) {
-                const texture = this.textures[i];
-                const tex = new SkeletonTexture({ width: texture.width, height: texture.height } as ImageBitmap);
-                tex.setRealTexture(texture);
-                return tex;
-            }
-        }
-        console.error(`${this.name} no textures found!`);
-        return null;
-    }
+    // // PRIVATE
+    // private _getTexture (line: string) {
+    //     const names = this.textureNames;
+    //     for (let i = 0; i < names.length; i++) {
+    //         if (names[i] === line) {
+    //             const texture = this.textures[i];
+    //             const tex = new SkeletonTexture({ width: texture.width, height: texture.height } as ImageBitmap);
+    //             tex.setRealTexture(texture);
+    //             return tex;
+    //         }
+    //     }
+    //     console.error(`${this.name} no textures found!`);
+    //     return null;
+    // }
 
-    /**
-     * @method _getAtlas
-     * @param {boolean} [quiet=false]
-     * @return {sp.spine.Atlas}
-     * @private
-     */
-    private _getAtlas (quiet?: boolean) {
-        if (this._atlasCache) {
-            return this._atlasCache;
-        }
+    // /**
+    //  * @method _getAtlas
+    //  * @param {boolean} [quiet=false]
+    //  * @return {sp.spine.Atlas}
+    //  * @private
+    //  */
+    // private _getAtlas (quiet?: boolean) {
+    //     if (this._atlasCache) {
+    //         return this._atlasCache;
+    //     }
 
-        if (!this.atlasText) {
-            if (!quiet) {
-                console.error(`${this.name} no atlas found!`);
-            }
-            return null;
-        }
+    //     if (!this.atlasText) {
+    //         if (!quiet) {
+    //             console.error(`${this.name} no atlas found!`);
+    //         }
+    //         return null;
+    //     }
 
-        return this._atlasCache = new spine.TextureAtlas(this.atlasText, this._getTexture.bind(this));
-    }
+    //     return this._atlasCache = new spine.TextureAtlas(this.atlasText, this._getTexture.bind(this));
+    // }
 }
 
 legacyCC.internal.SpineSkeletonData = SkeletonData;

@@ -22,7 +22,7 @@
 //  THE SOFTWARE.
 // */
 
-import spinex from './lib/spine-core-x.js';
+import spine from './lib/spine-core.js';
 
 /**
  * @en
@@ -68,9 +68,9 @@ export class VertexEffectDelegate {
      * @param {Number} jitterY
      * @return {spine.VertexEffect} @en Return a vertex effect type of jitter. @zh 返回一个 jitter 类型的顶点特效对象实例。
      */
-    initJitter (jitterX: number, jitterY: number): spinex.JitterEffect {
+    initJitter (jitterX: number, jitterY: number): spine.JitterEffect {
         // this._effectType = 'jitter';
-        // this._vertexEffect = new spinex.JitterEffect(jitterX, jitterY);
+        // this._vertexEffect = new spine.JitterEffect(jitterX, jitterY);
         // return this._vertexEffect;
     }
 
@@ -82,10 +82,10 @@ export class VertexEffectDelegate {
      * @param {Number} power
      * @return {sp.spine.JitterEffect} @en Return a vertex effect type of swirl. @zh 返回一个 swirl 类型的顶点特效对象实例。
      */
-    initSwirlWithPow (radius: number, power: number): spinex.SwirlEffect {
+    initSwirlWithPow (radius: number, power: number): spine.SwirlEffect {
         // this._effectType = 'swirl';
-        // this._interpolation = new spinex.Pow(power);
-        // this._vertexEffect = new spinex.SwirlEffect(radius, this._interpolation);
+        // this._interpolation = new spine.Pow(power);
+        // this._vertexEffect = new spine.SwirlEffect(radius, this._interpolation);
         // return this._vertexEffect;
     }
 

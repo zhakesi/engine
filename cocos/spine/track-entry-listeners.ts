@@ -23,7 +23,6 @@
 */
 
 import spine from './lib/spine-core.js';
-
 export class TrackEntryListeners {
     start?: ((entry: spine.TrackEntry) => void);
     interrupt?: ((entry: spine.TrackEntry) => void);

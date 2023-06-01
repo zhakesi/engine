@@ -24,7 +24,6 @@
 
 import { Mat4 } from '../core';
 import { Skeleton } from './skeleton';
-import spine from './lib/spine-core.js';
 //import { FrameBoneInfo } from './skeleton-cache';
 import { Node } from '../scene-graph';
 

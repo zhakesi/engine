@@ -1,78 +1,78 @@
-import spinex from './spine-core-x.js';
+import spine from './spine-core.js';
 import { js } from '../../core';
 
 function overrideClass (wasm) {
-    //spinex.Vector2 = wasm.Vector2;
-    spinex.MathUtils = wasm.MathUtils;
-    spinex.Color = wasm.Color;
-    spinex.Interpolation = wasm.Interpolation;
-    spinex.Triangulator = wasm.Triangulator;
-    spinex.ConstraintData = wasm.ConstraintData;
-    spinex.IkConstraintData = wasm.PathConstraintData;
-    spinex.PathConstraintData = wasm.PathConstraintData;
-    spinex.SkeletonBounds = wasm.SkeletonBounds;
-    spinex.Event = wasm.Event;
-    spinex.EventData = wasm.EventData;
-    spinex.Attachment = wasm.Attachment;
-    spinex.VertexAttachment = wasm.VertexAttachment;
-    spinex.BoundingBoxAttachment = wasm.BoundingBoxAttachment;
-    spinex.ClippingAttachment = wasm.ClippingAttachment;
-    spinex.MeshAttachment = wasm.MeshAttachment;
-    spinex.PathAttachment = wasm.PathAttachment;
-    spinex.PointAttachment = wasm.PointAttachment;
-    spinex.RegionAttachment = wasm.RegionAttachment;
-    spinex.AtlasAttachmentLoader = wasm.AtlasAttachmentLoader;
-    spinex.TextureAtlasPage = wasm.TextureAtlasPage;
-    spinex.TextureAtlasRegion = wasm.TextureAtlasRegion;
-    spinex.TextureAtlas = wasm.TextureAtlas;
-    spinex.PowOut = wasm.PowOut;
-    spinex.BoneData = wasm.BoneData;
-    spinex.SlotData = wasm.SlotData;
-    spinex.Updatable = wasm.Updatable;
-    spinex.IkConstraint = wasm.IkConstraint;
-    spinex.PathConstraint = wasm.PathConstraint;
-    spinex.TransformConstraintData = wasm.TransformConstraintData;
-    spinex.TransformConstraint = wasm.TransformConstraint;
-    spinex.Bone = wasm.Bone;
-    spinex.Slot = wasm.Slot;
-    spinex.Skin = wasm.Skin;
-    spinex.SkinEntry = wasm.SkinEntry;
-    spinex.SkeletonClipping = wasm.SkeletonClipping;
-    spinex.SkeletonData = wasm.SkeletonData;
-    spinex.TranslateTimeline = wasm.TranslateTimeline;
-    spinex.ScaleTimeline = wasm.ScaleTimeline;
-    spinex.ShearTimeline = wasm.ShearTimeline;
-    spinex.RotateTimeline = wasm.RotateTimeline;
-    spinex.ColorTimeline = wasm.ColorTimeline;
-    spinex.TwoColorTimeline = wasm.TwoColorTimeline;
-    spinex.AttachmentTimeline = wasm.AttachmentTimeline;
-    spinex.DeformTimeline = wasm.DeformTimeline;
-    spinex.EventTimeline = wasm.EventTimeline;
-    spinex.DrawOrderTimeline = wasm.DrawOrderTimeline;
-    spinex.IkConstraintTimeline = wasm.IkConstraintTimeline;
-    spinex.TransformConstraintTimeline = wasm.TransformConstraintTimeline;
-    spinex.PathConstraintPositionTimeline = wasm.PathConstraintPositionTimeline;
-    spinex.PathConstraintMixTimeline = wasm.PathConstraintMixTimeline;
-    spinex.TrackEntry = wasm.TrackEntry;
-    spinex.AnimationStateData = wasm.AnimationStateData;
-    spinex.AnimationState = wasm.AnimationState;
-    spinex.Animation = wasm.Animation;
-    spinex.EventQueue = wasm.EventQueue;
-    //spinex.AnimationStateListener = wasm.AnimationStateListener;
-    spinex.AnimationStateAdapter = wasm.AnimationStateAdapter;
-    spinex.Skeleton = wasm.Skeleton;
-    spinex.SkeletonBinary = wasm.SkeletonBinary;
-    spinex.SkeletonJson = wasm.SkeletonJson;
-    spinex.VertexEffect = wasm.VertexEffect;
-    spinex.JitterEffect = wasm.JitterEffect;
-    spinex.SwirlEffect = wasm.SwirlEffect;
+    //spine.Vector2 = wasm.Vector2;
+    spine.MathUtils = wasm.MathUtils;
+    spine.Color = wasm.Color;
+    spine.Interpolation = wasm.Interpolation;
+    spine.Triangulator = wasm.Triangulator;
+    spine.ConstraintData = wasm.ConstraintData;
+    spine.IkConstraintData = wasm.PathConstraintData;
+    spine.PathConstraintData = wasm.PathConstraintData;
+    spine.SkeletonBounds = wasm.SkeletonBounds;
+    spine.Event = wasm.Event;
+    spine.EventData = wasm.EventData;
+    spine.Attachment = wasm.Attachment;
+    spine.VertexAttachment = wasm.VertexAttachment;
+    spine.BoundingBoxAttachment = wasm.BoundingBoxAttachment;
+    spine.ClippingAttachment = wasm.ClippingAttachment;
+    spine.MeshAttachment = wasm.MeshAttachment;
+    spine.PathAttachment = wasm.PathAttachment;
+    spine.PointAttachment = wasm.PointAttachment;
+    spine.RegionAttachment = wasm.RegionAttachment;
+    spine.AtlasAttachmentLoader = wasm.AtlasAttachmentLoader;
+    spine.TextureAtlasPage = wasm.TextureAtlasPage;
+    spine.TextureAtlasRegion = wasm.TextureAtlasRegion;
+    spine.TextureAtlas = wasm.TextureAtlas;
+    spine.PowOut = wasm.PowOut;
+    spine.BoneData = wasm.BoneData;
+    spine.SlotData = wasm.SlotData;
+    spine.Updatable = wasm.Updatable;
+    spine.IkConstraint = wasm.IkConstraint;
+    spine.PathConstraint = wasm.PathConstraint;
+    spine.TransformConstraintData = wasm.TransformConstraintData;
+    spine.TransformConstraint = wasm.TransformConstraint;
+    spine.Bone = wasm.Bone;
+    spine.Slot = wasm.Slot;
+    spine.Skin = wasm.Skin;
+    spine.SkinEntry = wasm.SkinEntry;
+    spine.SkeletonClipping = wasm.SkeletonClipping;
+    spine.SkeletonData = wasm.SkeletonData;
+    spine.TranslateTimeline = wasm.TranslateTimeline;
+    spine.ScaleTimeline = wasm.ScaleTimeline;
+    spine.ShearTimeline = wasm.ShearTimeline;
+    spine.RotateTimeline = wasm.RotateTimeline;
+    spine.ColorTimeline = wasm.ColorTimeline;
+    spine.TwoColorTimeline = wasm.TwoColorTimeline;
+    spine.AttachmentTimeline = wasm.AttachmentTimeline;
+    spine.DeformTimeline = wasm.DeformTimeline;
+    spine.EventTimeline = wasm.EventTimeline;
+    spine.DrawOrderTimeline = wasm.DrawOrderTimeline;
+    spine.IkConstraintTimeline = wasm.IkConstraintTimeline;
+    spine.TransformConstraintTimeline = wasm.TransformConstraintTimeline;
+    spine.PathConstraintPositionTimeline = wasm.PathConstraintPositionTimeline;
+    spine.PathConstraintMixTimeline = wasm.PathConstraintMixTimeline;
+    spine.TrackEntry = wasm.TrackEntry;
+    spine.AnimationStateData = wasm.AnimationStateData;
+    spine.AnimationState = wasm.AnimationState;
+    spine.Animation = wasm.Animation;
+    spine.EventQueue = wasm.EventQueue;
+    //spine.AnimationStateListener = wasm.AnimationStateListener;
+    spine.AnimationStateAdapter = wasm.AnimationStateAdapter;
+    spine.Skeleton = wasm.Skeleton;
+    spine.SkeletonBinary = wasm.SkeletonBinary;
+    spine.SkeletonJson = wasm.SkeletonJson;
+    spine.VertexEffect = wasm.VertexEffect;
+    spine.JitterEffect = wasm.JitterEffect;
+    spine.SwirlEffect = wasm.SwirlEffect;
 
-    spinex.SkeletonInstance = wasm.SkeletonInstance;
-    spinex.SkeletonInstance.HEAPU8 = wasm.HEAPU8;
+    spine.SkeletonInstance = wasm.SkeletonInstance;
+    spine.SkeletonInstance.HEAPU8 = wasm.HEAPU8;
 }
 
 function overrideProperty_BoneData () {
-    const prototype = spinex.BoneData.prototype as any;
+    const prototype = spine.BoneData.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -140,9 +140,9 @@ function overrideProperty_BoneData () {
             getter: prototype.getProp_skinRequired,
         },
         // {
-        //     proto: spinex.BoneData.prototype,
+        //     proto: spine.BoneData.prototype,
         //     property: 'color',
-        //     getter: spinex.BoneData.prototype.getProp_color,
+        //     getter: spine.BoneData.prototype.getProp_color,
         // },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -151,7 +151,7 @@ function overrideProperty_BoneData () {
 }
 
 function overrideProperty_ConstraintData () {
-    const prototype = spinex.ConstraintData.prototype as any;
+    const prototype = spine.ConstraintData.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -175,7 +175,7 @@ function overrideProperty_ConstraintData () {
 }
 
 function overrideProperty_IkConstraintData () {
-    const prototype = spinex.IkConstraintData.prototype as any;
+    const prototype = spine.IkConstraintData.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -224,7 +224,7 @@ function overrideProperty_IkConstraintData () {
 }
 
 function overrideProperty_PathConstraintData () {
-    const prototype = spinex.PathConstraintData.prototype as any;
+    const prototype = spine.PathConstraintData.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -283,7 +283,7 @@ function overrideProperty_PathConstraintData () {
 }
 
 function overrideProperty_Event () {
-    const prototype = spinex.Event.prototype as any;
+    const prototype = spine.Event.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -327,7 +327,7 @@ function overrideProperty_Event () {
 }
 
 function overrideProperty_EventData () {
-    const prototype = spinex.EventData.prototype as any;
+    const prototype = spine.EventData.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -371,7 +371,7 @@ function overrideProperty_EventData () {
 }
 
 function overrideProperty_BoundingBoxAttachment () {
-    const prototype = spinex.BoundingBoxAttachment.prototype as any;
+    const prototype = spine.BoundingBoxAttachment.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -385,7 +385,7 @@ function overrideProperty_BoundingBoxAttachment () {
 }
 
 function overrideProperty_ClippingAttachment () {
-    const prototype = spinex.ClippingAttachment.prototype as any;
+    const prototype = spine.ClippingAttachment.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -399,7 +399,7 @@ function overrideProperty_ClippingAttachment () {
 }
 
 function overrideProperty_MeshAttachment () {
-    const prototype = spinex.MeshAttachment.prototype as any;
+    const prototype = spine.MeshAttachment.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -453,7 +453,7 @@ function overrideProperty_MeshAttachment () {
 }
 
 function overrideProperty_PathAttachment () {
-    const prototype = spinex.PathAttachment.prototype as any;
+    const prototype = spine.PathAttachment.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -477,7 +477,7 @@ function overrideProperty_PathAttachment () {
 }
 
 function overrideProperty_PointAttachment () {
-    const prototype = spinex.PointAttachment.prototype as any;
+    const prototype = spine.PointAttachment.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -501,7 +501,7 @@ function overrideProperty_PointAttachment () {
 }
 
 function overrideProperty_RegionAttachment () {
-    const prototype = spinex.RegionAttachment.prototype as any;
+    const prototype = spine.RegionAttachment.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -575,7 +575,7 @@ function overrideProperty_RegionAttachment () {
 }
 
 function overrideProperty_TextureAtlas () {
-    // const prototype = spinex.TextureAtlas.prototype as any;
+    // const prototype = spine.TextureAtlas.prototype as any;
     // const propertyPolyfills = [
     //     {
     //         proto: prototype,
@@ -594,7 +594,7 @@ function overrideProperty_TextureAtlas () {
 }
 
 function overrideProperty_SlotData () {
-    const prototype = spinex.SlotData.prototype as any;
+    const prototype = spine.SlotData.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -633,7 +633,7 @@ function overrideProperty_SlotData () {
 }
 
 function overrideProperty_IkConstraint () {
-    const prototype = spinex.IkConstraint.prototype as any;
+    const prototype = spine.IkConstraint.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -687,7 +687,7 @@ function overrideProperty_IkConstraint () {
 }
 
 function overrideProperty_PathConstraint () {
-    const prototype = spinex.PathConstraint.prototype as any;
+    const prototype = spine.PathConstraint.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -736,7 +736,7 @@ function overrideProperty_PathConstraint () {
 }
 
 function overrideProperty_TransformConstraintData () {
-    const prototype = spinex.TransformConstraintData.prototype as any;
+    const prototype = spine.TransformConstraintData.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -815,7 +815,7 @@ function overrideProperty_TransformConstraintData () {
 }
 
 function overrideProperty_TransformConstraint () {
-    const prototype = spinex.TransformConstraint.prototype as any;
+    const prototype = spine.TransformConstraint.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -864,7 +864,7 @@ function overrideProperty_TransformConstraint () {
 }
 
 function overrideProperty_Bone () {
-    const prototype = spinex.Bone.prototype as any;
+    const prototype = spine.Bone.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -998,7 +998,7 @@ function overrideProperty_Bone () {
 }
 
 function overrideProperty_Slot () {
-    const prototype = spinex.Slot.prototype as any;
+    const prototype = spine.Slot.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -1032,7 +1032,7 @@ function overrideProperty_Slot () {
 }
 
 function overrideProperty_Skin () {
-    const prototype = spinex.Skin.prototype as any;
+    const prototype = spine.Skin.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -1061,7 +1061,7 @@ function overrideProperty_Skin () {
 }
 
 function overrideProperty_SkinEntry () {
-    const prototype = spinex.SkinEntry.prototype as any;
+    const prototype = spine.SkinEntry.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -1075,7 +1075,7 @@ function overrideProperty_SkinEntry () {
 }
 
 function overrideProperty_SkeletonClipping () {
-    const prototype = spinex.SkeletonClipping.prototype as any;
+    const prototype = spine.SkeletonClipping.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -1099,7 +1099,7 @@ function overrideProperty_SkeletonClipping () {
 }
 
 function overrideProperty_SkeletonData () {
-    const prototype = spinex.SkeletonData.prototype as any;
+    const prototype = spine.SkeletonData.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -1208,7 +1208,7 @@ function overrideProperty_SkeletonData () {
 }
 
 function overrideProperty_RotateTimeline () {
-    const prototype = spinex.RotateTimeline.prototype as any;
+    const prototype = spine.RotateTimeline.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -1227,7 +1227,7 @@ function overrideProperty_RotateTimeline () {
 }
 
 function overrideProperty_ColorTimeline () {
-    const prototype = spinex.ColorTimeline.prototype as any;
+    const prototype = spine.ColorTimeline.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -1246,7 +1246,7 @@ function overrideProperty_ColorTimeline () {
 }
 
 function overrideProperty_TwoColorTimeline () {
-    const prototype = spinex.TwoColorTimeline.prototype as any;
+    const prototype = spine.TwoColorTimeline.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -1260,7 +1260,7 @@ function overrideProperty_TwoColorTimeline () {
 }
 
 function overrideProperty_AttachmentTimeline () {
-    const prototype = spinex.AttachmentTimeline.prototype as any;
+    const prototype = spine.AttachmentTimeline.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -1284,7 +1284,7 @@ function overrideProperty_AttachmentTimeline () {
 }
 
 function overrideProperty_DeformTimeline () {
-    const prototype = spinex.DeformTimeline.prototype as any;
+    const prototype = spine.DeformTimeline.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -1313,7 +1313,7 @@ function overrideProperty_DeformTimeline () {
 }
 
 function overrideProperty_EventTimeline () {
-    const prototype = spinex.EventTimeline.prototype as any;
+    const prototype = spine.EventTimeline.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -1332,7 +1332,7 @@ function overrideProperty_EventTimeline () {
 }
 
 function overrideProperty_DrawOrderTimeline () {
-    const prototype = spinex.DrawOrderTimeline.prototype as any;
+    const prototype = spine.DrawOrderTimeline.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -1346,7 +1346,7 @@ function overrideProperty_DrawOrderTimeline () {
 }
 
 function overrideProperty_TrackEntry () {
-    const prototype = spinex.TrackEntry.prototype as any;
+    const prototype = spine.TrackEntry.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -1460,7 +1460,7 @@ function overrideProperty_TrackEntry () {
 }
 
 function overrideProperty_AnimationStateData () {
-    const prototype = spinex.AnimationStateData.prototype as any;
+    const prototype = spine.AnimationStateData.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -1479,7 +1479,7 @@ function overrideProperty_AnimationStateData () {
 }
 
 function overrideProperty_AnimationState () {
-    const prototype = spinex.AnimationState.prototype as any;
+    const prototype = spine.AnimationState.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -1503,7 +1503,7 @@ function overrideProperty_AnimationState () {
 }
 
 function overrideProperty_Animation () {
-    const prototype = spinex.Animation.prototype as any;
+    const prototype = spine.Animation.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
@@ -1527,7 +1527,7 @@ function overrideProperty_Animation () {
 }
 
 function overrideProperty_Skeleton () {
-    const prototype = spinex.Skeleton.prototype as any;
+    const prototype = spine.Skeleton.prototype as any;
     const propertyPolyfills = [
         {
             proto: prototype,
