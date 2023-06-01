@@ -2,7 +2,9 @@ import spine from './spine-core.js';
 import { js } from '../../core';
 
 function overrideClass (wasm) {
-    //spine.Vector2 = wasm.Vector2;
+    spine.wasmUtil = wasm.SpineWasmUtil;
+    spine.wasmUtil.spineWasmInit();
+
     spine.MathUtils = wasm.MathUtils;
     spine.Color = wasm.Color;
     spine.Interpolation = wasm.Interpolation;

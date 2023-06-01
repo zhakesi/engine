@@ -42,7 +42,6 @@ function initWasm (wasmUrl) {
         },
     }).then((Instance: any) => {
         Object.assign(wasmInstance, Instance);
-        wasmInstance.asm.spineWasmInit();
         registerList.forEach((cb) => {
             cb(wasmInstance);
         });

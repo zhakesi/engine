@@ -211,29 +211,22 @@ export class SkeletonData extends Asset {
             }
             return null;
         }
-
-        // const atlas = this._getAtlas(quiet);
-        // if (!atlas) {
-        //     return null;
-        // }
-        // const attachmentLoader = new spine.AtlasAttachmentLoader(atlas);
-
-        // let resData: spine.SkeletonJson | Uint8Array | null = null;
-        // let reader: spine.SkeletonJson | spine.SkeletonBinary | null = null;
+        const spData = spine.wasmUtil.querySpineSkeletonDataByUUID(this._uuid);
+        if (spData) {
+            this._skeletonCache = spData;
+        } else {
+            this._skeletonCache = spine.wasmUtil.createSpineSkeletonDataWithJson(this.skeletonJsonStr, this._atlasText);
+            spine.wasmUtil.registerSpineSkeletonDataWithUUID(this._skeletonCache, this._uuid);
+        }
         // if (this.skeletonJson) {
         //     reader = new spine.SkeletonJson(attachmentLoader);
         //     resData = this.skeletonJson;
         // } else {
-        //     reader = new spine.SkeletonBinary(attachmentLoader);
-        //     resData = new Uint8Array(this._nativeAsset);
+        //     // reader = new spine.SkeletonBinary(attachmentLoader);
+        //     // resData = new Uint8Array(this._nativeAsset);
         // }
 
-        // reader.scale = this.scale;
-        // this._skeletonCache = reader.readSkeletonData(resData as any);
-        // atlas.dispose();
-
-        // return this._skeletonCache;
-        return null;
+        return this._skeletonCache;
     }
 
     /**

@@ -1291,6 +1291,14 @@ declare namespace spine {
         setSwirlEffect(swirl: SwirlEffect);
         updateRenderData();
     }
+
+    class wasmUtil {
+        static spineWasmInit(): void;
+        static spineWasmDestroy(): void;
+        static querySpineSkeletonDataByUUID(uuid: string): SkeletonData;
+        static createSpineSkeletonDataWithJson(jsonStr: string, atlasText: string): SkeletonData;
+        static registerSpineSkeletonDataWithUUID(data: SkeletonData, uuid: string);
+    }
 }
 
 export default spine;
