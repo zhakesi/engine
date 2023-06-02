@@ -17,26 +17,12 @@ SpineSkeletonInstance::~SpineSkeletonInstance()
     if (_animState) delete _animState;
     if (_animStateData) delete _animStateData;
     if (_skeleton) delete _skeleton;
-    if (_skeletonData) delete _skeletonData;
     if (_model) delete _model;
 }
 
-spine::SkeletonData *SpineSkeletonInstance::initSkeletonDataJson(const std::string& jsonStr, const std::string& altasStr)
-{
-    auto* atlas = new Atlas(altasStr.c_str(), altasStr.size(),"", nullptr, false);
-    if (!atlas) {
-        LogUtil::PrintToJs("create atlas failed!!!");
-        return nullptr;
-    }
-    AttachmentLoader *attachmentLoader = new AtlasAttachmentLoaderExtension(atlas);
-    spine::SkeletonJson json(attachmentLoader);
-    json.setScale(1.0F);
-    _skeletonData = json.readSkeletonData(jsonStr.c_str());
-    LogUtil::PrintToJs("initWithSkeletonData ok.");
-    return _skeletonData;
-}
+Skeleton *SpineSkeletonInstance::initSkeleton(SkeletonData* data) {
+    _skeletonData = data;
 
-Skeleton *SpineSkeletonInstance::initSkeleton() {
     _skeleton = new Skeleton(_skeletonData);
 
     _animStateData = new AnimationStateData(_skeletonData);

@@ -1,12 +1,56 @@
 #include <spine/spine.h>
+#include "spine-wasm.h"
 #include "spine-skeleton-instance.h"
 #include <emscripten/bind.h>
 #include <memory>
+#include <vector>
 
 using namespace emscripten;
 using namespace spine;
 
+std::string convertSPString2std(const spine::String& str) {
+    std::string stdStr(str.buffer(), str.length());
+    return stdStr;
+}
+template <typename T>
+std::vector<T> convertSPVector2Std(Vector<T> &container) {
+    int count = container.size();
+    std::vector<T> stdVector(count);
+    for (int i = 0; i < count; i++) {
+        stdVector[i] = container[i];
+    }
+    return stdVector;
+}
+
+template <typename T>
+std::vector<T> convertSPVector2Std_2(Vector<T> container) {
+    int count = container.size();
+    std::vector<T> stdVector(count);
+    for (int i = 0; i < count; i++) {
+        stdVector[i] = container[i];
+    }
+    return stdVector;
+}
+
 EMSCRIPTEN_BINDINGS(spine) {
+    register_vector<float>("VectorFloat");
+    register_vector<BoneData*>("VectorBoneData");
+    register_vector<Bone*>("VectorBone");
+    register_vector<SlotData*>("VectorSlotData");
+    register_vector<Slot*>("VectorSlot");
+    register_vector<Animation*>("VectorAnimation");
+    register_vector<Skin*>("VectorSkin");
+    register_vector<EventData*>("VectorEventData");
+    register_vector<Event*>("VectorEvent");
+    register_vector<ConstraintData*>("VectorConstraintData");
+    register_vector<IkConstraint*>("VectorIkConstraint");
+    register_vector<PathConstraint*>("VectorPathConstraint");
+    register_vector<TransformConstraint*>("VectorTransformConstraint");
+    register_vector<IkConstraintData*>("VectorIkConstraintData");
+    register_vector<TransformConstraintData*>("VectorTransformConstraintData");
+    register_vector<PathConstraintData*>("VectorPathConstraintData");
+    register_vector<TrackEntry*>("VectorTrackEntry");
+
     enum_<TimelineType>("TimelineType")
         .value("rotate", TimelineType_Rotate)
         .value("translate", TimelineType_Translate)
@@ -142,13 +186,13 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<ConstraintData>("ConstraintData")
         .constructor<const String& >()
-        .function("getProp_name", &ConstraintData::getName)
+        .function("getProp_name", optional_override([](ConstraintData &obj) { return convertSPString2std(obj.getName());}))
         .function("getProp_order", &ConstraintData::getOrder)
         .function("getProp_skinRequired", &ConstraintData::isSkinRequired);
 
     class_<IkConstraintData, base<ConstraintData>>("IkConstraintData")
         .constructor<const String& >()
-        .function("getProp_bones", &IkConstraintData::getBones, allow_raw_pointer<BoneData>())
+        .function("getProp_bones", optional_override([](IkConstraintData &obj) { return convertSPVector2Std(obj.getBones());}), allow_raw_pointers())
         .function("getProp_target", &IkConstraintData::getTarget, allow_raw_pointer<BoneData>())
         .function("getProp_bendDirection", &IkConstraintData::getBendDirection)
         .function("getProp_compress", &IkConstraintData::getCompress)
@@ -159,7 +203,7 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<PathConstraintData, base<ConstraintData>>("PathConstraintData")
         .constructor<const String& >()
-        .function("getProp_bones", &PathConstraintData::getBones, allow_raw_pointer<BoneData>())
+        .function("getProp_bones", optional_override([](PathConstraintData &obj) { return convertSPVector2Std(obj.getBones());}), allow_raw_pointers())
         .function("getProp_target", &PathConstraintData::getTarget, allow_raw_pointer<SlotData>())
         .function("getProp_positionMode", &PathConstraintData::getPositionMode)
         .function("getProp_spacingMode", &PathConstraintData::getSpacingMode)
@@ -195,18 +239,18 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("getProp_data", &Event::getData)
         .function("getProp_intValue", &Event::getIntValue)
         .function("getProp_floatValue", &Event::getFloatValue)
-        .function("getProp_stringValue", &Event::getStringValue)
+        .function("getProp_stringValue",optional_override([](Event &obj) { return convertSPString2std(obj.getStringValue());}))
         .function("getProp_time", &Event::getTime)
         .function("getProp_volume", &Event::getVolume)
         .function("getProp_balance", &Event::getBalance); 
 
     class_<EventData>("EventData")
         .constructor<const String &>()
-        .function("getProp_name", &EventData::getName)
+        .function("getProp_name", optional_override([](EventData &obj) { return convertSPString2std(obj.getName());}))
         .function("getProp_intValue", &EventData::getIntValue)
         .function("getProp_floatValue", &EventData::getFloatValue)
-        .function("getProp_stringValue", &EventData::getStringValue)
-        .function("getProp_audioPath", &EventData::getAudioPath)
+        .function("getProp_stringValue", optional_override([](EventData &obj) { return convertSPString2std(obj.getStringValue());}))
+        .function("getProp_audioPath", optional_override([](EventData &obj) { return convertSPString2std(obj.getAudioPath());}))
         .function("getProp_volume", &EventData::getVolume)
         .function("getProp_balance", &EventData::getBalance);
     
@@ -231,20 +275,20 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<BoundingBoxAttachment>("BoundingBoxAttachment")
         .constructor<const String& >()
-        .function("getProp_name", &BoundingBoxAttachment::getName)
-        .function("copy", &BoundingBoxAttachment::copy, allow_raw_pointer<Attachment>());
+        .function("getProp_name", optional_override([](BoundingBoxAttachment &obj) { return convertSPString2std(obj.getName());}))
+        .function("copy", &BoundingBoxAttachment::copy, allow_raw_pointers());
         //.function("getProp_color", &BoundingBoxAttachment::getColor)
 
     class_<ClippingAttachment>("ClippingAttachment")
         .constructor<const String& >()
         .function("getProp_endSlot", &ClippingAttachment::getEndSlot, allow_raw_pointer<SlotData>())
         .function("copy", &ClippingAttachment::copy, allow_raw_pointer<Attachment>());
-        //.function("getProp_color", &BoundingBoxAttachment::getColor)
+        //.function("getProp_color", &ClippingAttachment::getColor)
 
     class_<MeshAttachment>("MeshAttachment")
         .constructor<const String& >()
         //.function("getProp_region", &MeshAttachment::getRegion)
-        .function("getProp_path", &MeshAttachment::getPath)
+        .function("getProp_path", optional_override([](MeshAttachment &obj) { return convertSPString2std(obj.getPath());}))
         .function("getProp_regionUVs", &MeshAttachment::getRegionUVs)
         .function("getProp_uvs", &MeshAttachment::getUVs)
         .function("getProp_triangles", &MeshAttachment::getTriangles)
@@ -262,11 +306,11 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<PathAttachment>("PathAttachment")
         .constructor<const String& >()
-        .function("getProp_lengths", &PathAttachment::getLengths)
+        .function("getProp_lengths", optional_override([](PathAttachment &obj) { return convertSPVector2Std(obj.getLengths());}))
         .function("getProp_closed", &PathAttachment::isClosed)
         .function("getProp_constantSpeed", &PathAttachment::isConstantSpeed)
         //.function("getProp_color", &MeshAttachment::getColor) // no color
-        .function("copy", &PathAttachment::copy, allow_raw_pointer<Attachment>());
+        .function("copy", &PathAttachment::copy, allow_raw_pointers());
 
     class_<PointAttachment>("PointAttachment")
         .constructor<const String& >()
@@ -275,7 +319,7 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("getProp_rotation", &PointAttachment::getRotation)
         //.function("computeWorldPosition", &PointAttachment::computeWorldPosition) //reference type
         .function("computeWorldRotation", &PointAttachment::computeWorldRotation)
-        //.function("getProp_color", &MeshAttachment::getColor) // no color
+        //.function("getProp_color", &PointAttachment::getColor) // no color
         .function("copy", &PointAttachment::copy, allow_raw_pointer<Attachment>());
 
     //class_<HasRendererObject>("HasRendererObject")
@@ -295,7 +339,7 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("getProp_width", &RegionAttachment::getWidth)
         .function("getProp_height", &RegionAttachment::getHeight)
         .function("getProp_color", &RegionAttachment::getColor)
-        .function("getProp_path", &RegionAttachment::getPath)
+        .function("getProp_path", optional_override([](RegionAttachment &obj) { return convertSPString2std(obj.getPath());}))
         .function("getProp_rendererObject", &RegionAttachment::getRendererObject, allow_raw_pointer<void>())
         //.function("getProp_region", &PointAttachment::getRegion)
         .function("getProp_offset", &RegionAttachment::getOffset)
@@ -328,7 +372,7 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<AtlasPage>("TextureAtlasPage")
         .constructor<const String&>()
-        .property("name", &AtlasPage::name)
+        .function("getProp_name", optional_override([](AtlasPage &obj) { return convertSPString2std((const String)obj.name);}))
         .property("minFilter", &AtlasPage::minFilter)
         .property("magFilter", &AtlasPage::magFilter)
         .property("uWrap", &AtlasPage::uWrap)
@@ -339,7 +383,7 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<AtlasRegion>("TextureAtlasRegion")
         //.property("page", &AtlasRegion::page)
-        .property("name", &AtlasRegion::name)
+        .function("getProp_name", optional_override([](AtlasRegion &obj) { return convertSPString2std((const String)obj.name);}))
         .property("x", &AtlasRegion::x)
         .property("y", &AtlasRegion::y)
         .property("index", &AtlasRegion::index)
@@ -373,22 +417,8 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<BoneData>("BoneData")
         .constructor<int, const String&, BoneData *>()
-        .property("index", &BoneData::getIndex)
-        .property("name", &BoneData::getName_Export)
-        .property("parent", &BoneData::getParent_Export)
-        .property("length", &BoneData::getLength, &BoneData::setLength)
-        .property("x", &BoneData::getX, &BoneData::setX)
-        .property("y", &BoneData::getY, &BoneData::setY)
-        .property("rotation", &BoneData::getRotation, &BoneData::setRotation)
-        .property("scaleX", &BoneData::getScaleX, &BoneData::setScaleX)
-        .property("scaleY", &BoneData::getScaleY, &BoneData::setScaleY)
-        .property("shearX", &BoneData::getShearX, &BoneData::setShearX)
-        .property("shearY", &BoneData::getShearY, &BoneData::setShearY)
-        .property("transformMode", &BoneData::getTransformMode, &BoneData::setTransformMode)
-        .property("skinRequired", &BoneData::isSkinRequired, &BoneData::setSkinRequired)
-        //---------------------------------------------------------------------------
         .function("getProp_index", &BoneData::getIndex)
-        .function("getProp_name", &BoneData::getName)
+        .function("getProp_name", optional_override([](BoneData &obj) { return convertSPString2std(obj.getName());}))
         .function("getProp_parent", &BoneData::getParent, allow_raw_pointer<BoneData>())
         .function("getProp_length", &BoneData::getLength)
         .function("getProp_x", &BoneData::getX)
@@ -405,7 +435,7 @@ EMSCRIPTEN_BINDINGS(spine) {
     class_<SlotData>("SlotData")
         .constructor<int, const String&, BoneData &>()
         .function("getProp_index", &SlotData::getIndex)
-        .function("getProp_name", &SlotData::getName)
+        .function("getProp_name", optional_override([](SlotData &obj) { return convertSPString2std(obj.getName());}))
         .function("getProp_boneData", &SlotData::getBoneData)
         .function("getProp_color", &SlotData::getColor)
         .function("getProp_darkColor", &SlotData::getDarkColor)
@@ -418,7 +448,7 @@ EMSCRIPTEN_BINDINGS(spine) {
     class_<IkConstraint, base<Updatable>>("IkConstraint")
         .constructor<IkConstraintData &, Skeleton &>()
         .function("getProp_data",  &IkConstraint::getData)
-        .function("getProp_bones",  &IkConstraint::getBones, allow_raw_pointer<Bone>())
+        .function("getProp_bones", optional_override([](IkConstraint &obj) { return convertSPVector2Std(obj.getBones());}), allow_raw_pointers())
         .function("getProp_target",  &IkConstraint::getTarget, allow_raw_pointer<Bone>())
         .function("getProp_bendDirection",  &IkConstraint::getBendDirection)
         .function("getProp_compress",  &IkConstraint::getCompress)
@@ -441,7 +471,7 @@ EMSCRIPTEN_BINDINGS(spine) {
         // static const int BEFORE;
         // static const int AFTER;
         .function("getProp_data",  &PathConstraint::getData)
-        .function("getProp_bones",  &PathConstraint::getBones, allow_raw_pointer<Bone>())
+        .function("getProp_bones", optional_override([](PathConstraint &obj) { return convertSPVector2Std(obj.getBones());}), allow_raw_pointers())
         .function("getProp_target",  &PathConstraint::getTarget, allow_raw_pointer<Slot>())
         .function("getProp_position",  &PathConstraint::getPosition)
         .function("getProp_spacing",  &PathConstraint::getSpacing)
@@ -465,7 +495,7 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<TransformConstraintData, base<ConstraintData>>("TransformConstraintData")
         .constructor<const String&>()
-        .function("getProp_bones", &TransformConstraintData::getBones, allow_raw_pointer<BoneData>())
+        .function("getProp_bones", optional_override([](TransformConstraintData &obj) { return convertSPVector2Std(obj.getBones());}), allow_raw_pointers())
         .function("getProp_target", &TransformConstraintData::getTarget, allow_raw_pointer<BoneData>())
         .function("getProp_rotateMix", &TransformConstraintData::getRotateMix)
         .function("getProp_translateMix", &TransformConstraintData::getTranslateMix)
@@ -483,7 +513,7 @@ EMSCRIPTEN_BINDINGS(spine) {
     class_<TransformConstraint, base<Updatable>>("TransformConstraint")
         .constructor<TransformConstraintData &, Skeleton &>()
         .function("getProp_data", &TransformConstraint::getData)
-        .function("getProp_bones", &TransformConstraint::getBones, allow_raw_pointer<Bone>())
+        .function("getProp_bones", optional_override([](TransformConstraint &obj) { return convertSPVector2Std(obj.getBones());}), allow_raw_pointers())
         .function("getProp_target", &TransformConstraint::getTarget, allow_raw_pointer<Bone>())
         .function("getProp_rotateMix", &TransformConstraint::getRotateMix)
         .function("getProp_translateMix", &TransformConstraint::getTranslateMix)
@@ -502,17 +532,9 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<Bone, base<Updatable>>("Bone")
         .constructor<BoneData &, Skeleton &, Bone *>()
-        .property("a", &Bone::getA, &Bone::setA)
-        .property("b", &Bone::getB, &Bone::setB)
-        .property("c", &Bone::getC, &Bone::setC)
-        .property("d", &Bone::getD, &Bone::setD)
-        .property("worldX", &Bone::getWorldX, &Bone::setWorldX)
-        .property("worldY", &Bone::getWorldY, &Bone::setWorldY)
-        .property("data", &Bone::getData)
-        .function("getParent", &Bone::getParent_Export, allow_raw_pointer<Bone>())
         .function("getProp_data", &Bone::getData)
         .function("getProp_skeleton", &Bone::getSkeleton)
-        //.function("getProp_parent", &Bone::getParent)
+        .function("getProp_parent", &Bone::getParent, allow_raw_pointers())
         //.function("getProp_children", &Bone::getChildren)
         .function("getProp_x", &Bone::getX)
         .function("getProp_y", &Bone::getY)
@@ -571,10 +593,10 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<Skin>("Skin")
         .constructor<const String&>()
-        .property("name", &Skin::getName_Export)
+        .function("getProp_name", optional_override([](Skin &obj) { return convertSPString2std(obj.getName());}))
         .function("getProp_attachments", &Skin::getAttachments)
-        .function("getProp_bones", &Skin::getBones)
-        .function("getProp_constraints", &Skin::getConstraints)
+        .function("getProp_bones", optional_override([](Skin &obj) { return convertSPVector2Std(obj.getBones());}), allow_raw_pointers())
+        .function("getProp_constraints", optional_override([](Skin &obj) { return convertSPVector2Std(obj.getConstraints());}), allow_raw_pointers())
         .function("setAttachment", select_overload<void(size_t, const String &, Attachment *)>(&Skin::setAttachment), allow_raw_pointers())
         .function("addSkin", select_overload<void(Skin *)>(&Skin::addSkin), allow_raw_pointers())
         .function("copySkin", select_overload<void(Skin *)>(&Skin::copySkin), allow_raw_pointers())
@@ -587,7 +609,7 @@ EMSCRIPTEN_BINDINGS(spine) {
     class_<Skin::AttachmentMap::Entry>("SkinEntry")
         .constructor<size_t, const String &, Attachment *>()
         .property("slotIndex", &Skin::AttachmentMap::Entry::_slotIndex)
-        .property("name", &Skin::AttachmentMap::Entry::_name)
+        .function("getProp_name", optional_override([](Skin::AttachmentMap::Entry &obj) { return convertSPString2std((const String)obj._name);}))
         .function("getProp_attachment", &Skin::AttachmentMap::Entry::getAttachment, allow_raw_pointers());
 
     class_<SkeletonClipping>("SkeletonClipping")
@@ -605,25 +627,25 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<SkeletonData>("SkeletonData")
         .constructor<>()
-        .function("getProp_name", &SkeletonData::getName)
-        .function("getProp_bones", &SkeletonData::getBones, allow_raw_pointer<BoneData>())
-        .function("getProp_slots", &SkeletonData::getSlots, allow_raw_pointer<SlotData>())
-        .function("getProp_skins", &SkeletonData::getSkins, allow_raw_pointer<Skin>())
+        .function("getProp_name", optional_override([](SkeletonData &obj) { return convertSPString2std(obj.getName());}))
+        .function("getProp_bones", optional_override([](SkeletonData &obj) { return convertSPVector2Std(obj.getBones());}), allow_raw_pointers())
+        .function("getProp_slots", optional_override([](SkeletonData &obj) { return convertSPVector2Std(obj.getSlots());}), allow_raw_pointers())
+        .function("getProp_skins", optional_override([](SkeletonData &obj) { return convertSPVector2Std(obj.getSkins());}), allow_raw_pointers())
         .function("getProp_defaultSkin", &SkeletonData::getDefaultSkin, allow_raw_pointer<Skin>())
-        .function("getProp_events", &SkeletonData::getEvents, allow_raw_pointer<EventData>())
-        .function("getProp_animations", &SkeletonData::getAnimations, allow_raw_pointer<Animation>())
-        .function("getProp_ikConstraints", &SkeletonData::getIkConstraints, allow_raw_pointer<IkConstraintData>())
-        .function("getProp_transformConstraints", &SkeletonData::getTransformConstraints, allow_raw_pointer<TransformConstraintData>())
-        .function("getProp_pathConstraints", &SkeletonData::getPathConstraints, allow_raw_pointer<PathConstraintData>())
+        .function("getProp_events", optional_override([](SkeletonData &obj) { return convertSPVector2Std(obj.getEvents());}), allow_raw_pointers())
+        .function("getProp_animations", optional_override([](SkeletonData &obj) { return convertSPVector2Std(obj.getAnimations());}), allow_raw_pointers())
+        .function("getProp_ikConstraints", optional_override([](SkeletonData &obj) { return convertSPVector2Std(obj.getIkConstraints());}), allow_raw_pointers())
+        .function("getProp_transformConstraints", optional_override([](SkeletonData &obj) { return convertSPVector2Std(obj.getTransformConstraints());}), allow_raw_pointers())
+        .function("getProp_pathConstraints", optional_override([](SkeletonData &obj) { return convertSPVector2Std(obj.getPathConstraints());}), allow_raw_pointers())
         .function("getProp_x", &SkeletonData::getX)
         .function("getProp_y", &SkeletonData::getY)
         .function("getProp_width", &SkeletonData::getWidth)
         .function("getProp_height", &SkeletonData::getHeight)
-        .function("getProp_version", &SkeletonData::getVersion)
-        .function("getProp_hash", &SkeletonData::getHash)
+        .function("getProp_version", optional_override([](SkeletonData &obj) { return convertSPString2std(obj.getVersion());}))
+        .function("getProp_hash", optional_override([](SkeletonData &obj) { return convertSPString2std(obj.getHash());}))
         .function("getProp_fps", &SkeletonData::getFps)
-        .function("getProp_imagesPath", &SkeletonData::getImagesPath)
-        .function("getProp_audioPath", &SkeletonData::getAudioPath)
+        .function("getProp_imagesPath", optional_override([](SkeletonData &obj) { return convertSPString2std(obj.getImagesPath());}))
+        .function("getProp_audioPath",optional_override([](SkeletonData &obj) { return convertSPString2std(obj.getAudioPath());}))
         .function("findBone", &SkeletonData::findBone, allow_raw_pointer<BoneData>())
         .function("findBoneIndex", &SkeletonData::findBoneIndex)
         .function("findSlot", &SkeletonData::findSlot, allow_raw_pointer<SlotData>())
@@ -634,11 +656,7 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("findIkConstraint", &SkeletonData::findIkConstraint, allow_raw_pointer<IkConstraintData>())
         .function("findTransformConstraint", &SkeletonData::findTransformConstraint, allow_raw_pointer<TransformConstraintData>())
         .function("findPathConstraint", &SkeletonData::findPathConstraint, allow_raw_pointer<PathConstraintData>())
-        .function("findPathConstraintIndex", &SkeletonData::findPathConstraintIndex)
-
-        .property("width",&spine::SkeletonData::getWidth, &spine::SkeletonData::setWidth)
-        .property("height",&spine::SkeletonData::getHeight, &spine::SkeletonData::setHeight)
-        ;
+        .function("findPathConstraintIndex", &SkeletonData::findPathConstraintIndex);
 
 
     // class_<Timeline>("Timeline")
@@ -693,7 +711,7 @@ EMSCRIPTEN_BINDINGS(spine) {
         //static const int PREV_ROTATION = -1;
         //static const int ROTATION = 1;
         .function("getProp_boneIndex", &RotateTimeline::getBoneIndex)
-        .function("getProp_frames", &RotateTimeline::getFrames)
+        .function("getProp_frames", optional_override([](RotateTimeline &obj) { return convertSPVector2Std(obj.getFrames());}))
         .function("getPropertyId", &RotateTimeline::getPropertyId)
         .function("setFrame", &RotateTimeline::setFrame)
         .function("apply", &RotateTimeline::apply, allow_raw_pointers());
@@ -711,7 +729,7 @@ EMSCRIPTEN_BINDINGS(spine) {
         // static const int B;
         // static const int A;
         .function("getProp_slotIndex", &ColorTimeline::getSlotIndex)
-        .function("getProp_frames", &ColorTimeline::getFrames)
+        .function("getProp_frames", optional_override([](ColorTimeline &obj) { return convertSPVector2Std(obj.getFrames());}))
         .function("getPropertyId", &ColorTimeline::getPropertyId)
         .function("setFrame", &ColorTimeline::setFrame)
         .function("apply", &ColorTimeline::apply, allow_raw_pointers()); 
@@ -728,8 +746,8 @@ EMSCRIPTEN_BINDINGS(spine) {
     class_<AttachmentTimeline>("AttachmentTimeline")
         .constructor<int>()
         .function("getProp_slotIndex", &AttachmentTimeline::getSlotIndex)
-        .function("getProp_frames", &AttachmentTimeline::getFrames)
-        .function("getProp_attachmentNames", &AttachmentTimeline::getAttachmentNames)
+        .function("getProp_frames", optional_override([](AttachmentTimeline &obj) { return convertSPVector2Std((Vector<float> &)obj.getFrames());}))
+        //.function("getProp_attachmentNames", &AttachmentTimeline::getAttachmentNames)
         .function("getPropertyId", &AttachmentTimeline::getPropertyId)
         .function("getFrameCount", &AttachmentTimeline::getFrameCount)
         .function("setFrame", &AttachmentTimeline::setFrame)
@@ -740,7 +758,7 @@ EMSCRIPTEN_BINDINGS(spine) {
         .constructor<int>()
         .function("getProp_slotIndex", &DeformTimeline::getSlotIndex)
         .function("getProp_attachment", &DeformTimeline::getAttachment, allow_raw_pointer<VertexAttachment>())
-        .function("getProp_frames", &DeformTimeline::getFrames)
+        .function("getProp_frames", optional_override([](DeformTimeline &obj) { return convertSPVector2Std((Vector<float> &)obj.getFrames());}))
         .function("getProp_frameVertices", &DeformTimeline::getVertices)
         .function("getPropertyId", &DeformTimeline::getPropertyId)
         .function("setFrame", &DeformTimeline::setFrame)
@@ -748,8 +766,8 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<EventTimeline>("EventTimeline")
         .constructor<int>()
-        .function("getProp_frames", &EventTimeline::getFrames)
-        .function("getProp_events", &EventTimeline::getEvents)
+        .function("getProp_frames", optional_override([](EventTimeline &obj) { return convertSPVector2Std_2(obj.getFrames());}))
+        .function("getProp_events", optional_override([](EventTimeline &obj) { return convertSPVector2Std(obj.getEvents());}), allow_raw_pointers())
         .function("getPropertyId", &EventTimeline::getPropertyId)
         .function("getFrameCount", &EventTimeline::getFrameCount)
         .function("setFrame", &EventTimeline::setFrame, allow_raw_pointers())
@@ -757,7 +775,7 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<DrawOrderTimeline>("DrawOrderTimeline")
         .constructor<int>()
-        .function("getProp_frames", &EventTimeline::getFrames)
+        .function("getProp_frames", optional_override([](DrawOrderTimeline &obj) { return convertSPVector2Std(obj.getFrames());}))
         //.function("getProp_drawOrders", &EventTimeline::getDrawOrders)
         .function("getPropertyId", &DrawOrderTimeline::getPropertyId)
         .function("getFrameCount", &DrawOrderTimeline::getFrameCount)
@@ -855,7 +873,7 @@ EMSCRIPTEN_BINDINGS(spine) {
         .property("timeScale",&AnimationState::getTimeScale, &AnimationState::setTimeScale)
         // .class_function("getProp_emptyAnimation",&AnimationState::getEmptyAnimation, allow_raw_pointers()) // private
         .function("getProp_data", &AnimationState::getData, allow_raw_pointers())
-        .function("getProp_tracks", &AnimationState::getTracks, allow_raw_pointers())
+        .function("getProp_tracks", optional_override([](AnimationState &obj) { return convertSPVector2Std(obj.getTracks());}), allow_raw_pointers())
         .function("getProp_timeScale", &AnimationState::getTimeScale)
         //.function("getProp_unkeyedState")
         //.function("getProp_events")
@@ -896,8 +914,8 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<Animation>("Animation")
         .constructor<const String &, Vector<Timeline *> &, float>()
-        .function("getProp_name", &Animation::getName)
-        .function("getProp_timelines", &Animation::getTimelines)
+        .function("getProp_name", optional_override([](Animation &obj) { return convertSPString2std(obj.getName());}))
+        .function("getProp_timelines", optional_override([](Animation &obj) { return convertSPVector2Std(obj.getTimelines());}))
         //.function("getProp_timelineIds", &Animation::getTimelines)
         .function("getProp_duration", &Animation::getDuration)
         .function("hasTimeline", &Animation::hasTimeline)
@@ -921,17 +939,17 @@ EMSCRIPTEN_BINDINGS(spine) {
     // class_<AnimationStateListener>("AnimationStateListener")
 
     // class_<AnimationStateAdapter>("AnimationStateAdapter")
+    
 
-    register_vector<Bone *>("vector<Bone*>");
     class_<Skeleton>("Skeleton")
         .constructor<SkeletonData *>()
         .function("getProp_data", &Skeleton::getData, allow_raw_pointer<SkeletonData>())
-        .function("getProp_bones", &Skeleton::getBones, allow_raw_pointer<Bone>())
-        .function("getProp_slots", &Skeleton::getSlots, allow_raw_pointer<Slot>())
-        .function("getProp_drawOrder", &Skeleton::getDrawOrder, allow_raw_pointer<Slot>())
-        .function("getProp_ikConstraints", &Skeleton::getIkConstraints, allow_raw_pointer<IkConstraint>())
-        .function("getProp_transformConstraints", &Skeleton::getTransformConstraints, allow_raw_pointer<TransformConstraint>())
-        .function("getProp_pathConstraints", &Skeleton::getPathConstraints, allow_raw_pointer<PathConstraint>())
+        .function("getProp_bones", optional_override([](Skeleton &obj) { return convertSPVector2Std(obj.getBones());}), allow_raw_pointers())
+        .function("getProp_slots", optional_override([](Skeleton &obj) { return convertSPVector2Std(obj.getSlots());}), allow_raw_pointers())
+        .function("getProp_drawOrder", optional_override([](Skeleton &obj) { return convertSPVector2Std(obj.getDrawOrder());}), allow_raw_pointers())
+        .function("getProp_ikConstraints", optional_override([](Skeleton &obj) { return convertSPVector2Std(obj.getIkConstraints());}), allow_raw_pointers())
+        .function("getProp_transformConstraints", optional_override([](Skeleton &obj) { return convertSPVector2Std(obj.getTransformConstraints());}), allow_raw_pointers())
+        .function("getProp_pathConstraints", optional_override([](Skeleton &obj) { return convertSPVector2Std(obj.getPathConstraints());}), allow_raw_pointers())
         .function("getProp__updateCache", &Skeleton::getUpdateCacheList, allow_raw_pointer<Updatable>())
         //.function("getProp_updateCacheReset", Skeleton::)
         .function("getProp_skin", &Skeleton::getSkin, allow_raw_pointer<Skin>())
@@ -967,11 +985,7 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("findTransformConstraint", &Skeleton::findTransformConstraint, allow_raw_pointer<TransformConstraint>())
         .function("findPathConstraint", &Skeleton::findPathConstraint, allow_raw_pointer<PathConstraint>())
         //.function("getBounds", &Skeleton::getBounds)
-        .function("update", &Skeleton::update)
-
-        .property("skin", &Skeleton::getSkin_Export)
-        .property("data", &Skeleton::getData_Export)
-        .function("getBones", &Skeleton::getBones_Export);
+        .function("update", &Skeleton::update);
 
     // incomplete
     // class_<SkeletonBinary>("SkeletonBinary")
@@ -1029,8 +1043,7 @@ EMSCRIPTEN_BINDINGS(spine) {
 
     class_<SpineSkeletonInstance>("SkeletonInstance")
         .constructor<>()
-        .function("initSkeletonDataJson", &SpineSkeletonInstance::initSkeletonDataJson, allow_raw_pointer<SkeletonData>())
-        .function("initSkeleton", &SpineSkeletonInstance::initSkeleton, allow_raw_pointer<Skeleton>())
+        .function("initSkeleton", &SpineSkeletonInstance::initSkeleton, allow_raw_pointers())
         .function("setAnimation", &SpineSkeletonInstance::setAnimation)
         .function("setSkin", &SpineSkeletonInstance::setSkin)
         .function("updateAnimation", &SpineSkeletonInstance::updateAnimation)
@@ -1043,6 +1056,15 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("clearEffect", &SpineSkeletonInstance::clearEffect)
         .function("getAnimationState", &SpineSkeletonInstance::getAnimationState, allow_raw_pointer<AnimationState>())
         .function("setMix", &SpineSkeletonInstance::setMix)
-        .function("setStartListener", &SpineSkeletonInstance::setStartListener)
-        ;
+        .function("setStartListener", &SpineSkeletonInstance::setStartListener);
+}
+
+EMSCRIPTEN_BINDINGS(cocos_spine) {
+    class_<SpineWasmUtil>("SpineWasmUtil")
+    .class_function("spineWasmInit", &SpineWasmUtil::spineWasmInit)
+    .class_function("spineWasmDestroy", &SpineWasmUtil::spineWasmDestroy)
+    .class_function("querySpineSkeletonDataByUUID", &SpineWasmUtil::querySpineSkeletonDataByUUID, allow_raw_pointers())
+    .class_function("createSpineSkeletonDataWithJson", &SpineWasmUtil::createSpineSkeletonDataWithJson, allow_raw_pointers())
+    .class_function("registerSpineSkeletonDataWithUUID", &SpineWasmUtil::registerSpineSkeletonDataWithUUID, allow_raw_pointers())
+    .class_function("destroySpineSkeletonDataWithUUID", &SpineWasmUtil::destroySpineSkeletonDataWithUUID);
 }

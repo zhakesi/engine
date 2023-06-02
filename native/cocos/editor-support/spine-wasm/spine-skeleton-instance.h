@@ -18,8 +18,7 @@ class SpineSkeletonInstance {
 public:
     SpineSkeletonInstance();
     ~SpineSkeletonInstance();
-    SkeletonData *initSkeletonDataJson(const std::string& jsonStr, const std::string& altasStr);
-    Skeleton *initSkeleton();
+    Skeleton *initSkeleton(SkeletonData* data);
     void setAnimation(float trackIndex, const std::string& name, bool loop);
     void setSkin(const std::string& name);
     void updateAnimation(float dltTime);
