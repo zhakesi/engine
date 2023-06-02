@@ -1276,8 +1276,7 @@ declare namespace spine {
 
     class SkeletonInstance {
         static HEAPU8: Uint8Array;
-        initSkeletonDataJson(jsonStr: string, atlasText: string);
-        initSkeleton();
+        initSkeleton(data: SkeletonData);
         getAnimationState();
         setAnimation(trackIndex: number, name: string, loop: boolean);
         setSkin(name: string);
@@ -1298,6 +1297,7 @@ declare namespace spine {
         static querySpineSkeletonDataByUUID(uuid: string): SkeletonData;
         static createSpineSkeletonDataWithJson(jsonStr: string, atlasText: string): SkeletonData;
         static registerSpineSkeletonDataWithUUID(data: SkeletonData, uuid: string);
+        static destroySpineSkeletonDataWithUUID(uuid: string);
     }
 }
 

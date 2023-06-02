@@ -193,7 +193,7 @@ export class Skeleton extends UIRenderer {
     @serializable
     protected _enableBatch = false;
 
-    protected _runtimeData: spine.SkeletonData = null!;
+    protected _runtimeData: spine.SkeletonData | null = null;
     public _skeleton: spine.Skeleton = null!;
     protected _instance: spine.SkeletonInstance = null!;
     protected _state: spine.AnimationState = null!;
@@ -589,15 +589,12 @@ export class Skeleton extends UIRenderer {
         }
         this._texture = skeletonData.textures[0];
 
-        const jsonStr = skeletonData.skeletonJsonStr;
-        const altasStr = skeletonData.atlasText;
-        this._runtimeData = this._instance.initSkeletonDataJson(jsonStr, altasStr);
+        this._runtimeData = skeletonData.getRuntimeData();
         if (!this._runtimeData) return;
-
+        this._skeleton = this._instance.initSkeleton(this._runtimeData);
         //if (this.isAnimationCached()) {
         //    this._initSkeletonCache();
         //} else {
-        this._skeleton = this._instance.initSkeleton();
         this._state = this._instance.getAnimationState();
         this._instance.setPremultipliedAlpha(this._premultipliedAlpha);
         //}

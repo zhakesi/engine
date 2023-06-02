@@ -273,44 +273,9 @@ export class SkeletonData extends Asset {
      */
     public destroy () {
         //SkeletonCache.sharedCache.removeSkeleton(this._uuid);
+        spine.wasmUtil.registerSpineSkeletonDataWithUUID(this._skeletonCache, this._uuid);
         return super.destroy();
     }
-
-    // // PRIVATE
-    // private _getTexture (line: string) {
-    //     const names = this.textureNames;
-    //     for (let i = 0; i < names.length; i++) {
-    //         if (names[i] === line) {
-    //             const texture = this.textures[i];
-    //             const tex = new SkeletonTexture({ width: texture.width, height: texture.height } as ImageBitmap);
-    //             tex.setRealTexture(texture);
-    //             return tex;
-    //         }
-    //     }
-    //     console.error(`${this.name} no textures found!`);
-    //     return null;
-    // }
-
-    // /**
-    //  * @method _getAtlas
-    //  * @param {boolean} [quiet=false]
-    //  * @return {sp.spine.Atlas}
-    //  * @private
-    //  */
-    // private _getAtlas (quiet?: boolean) {
-    //     if (this._atlasCache) {
-    //         return this._atlasCache;
-    //     }
-
-    //     if (!this.atlasText) {
-    //         if (!quiet) {
-    //             console.error(`${this.name} no atlas found!`);
-    //         }
-    //         return null;
-    //     }
-
-    //     return this._atlasCache = new spine.TextureAtlas(this.atlasText, this._getTexture.bind(this));
-    // }
 }
 
 legacyCC.internal.SpineSkeletonData = SkeletonData;
