@@ -19,6 +19,7 @@ function overrideDefineArrayProp (prototype, getPropVector, name) {
 
 function overrideClass (wasm) {
     spine.wasmUtil = wasm.SpineWasmUtil;
+    spine.wasmUtil.HEAPU8 = wasm.HEAPU8;
     spine.wasmUtil.spineWasmInit();
 
     spine.MathUtils = wasm.MathUtils;
@@ -86,7 +87,6 @@ function overrideClass (wasm) {
     spine.SwirlEffect = wasm.SwirlEffect;
 
     spine.SkeletonInstance = wasm.SkeletonInstance;
-    spine.wasmUtil.HEAPU8 = wasm.HEAPU8;
 }
 
 function overrideProperty_BoneData () {

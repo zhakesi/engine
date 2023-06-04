@@ -42,8 +42,10 @@ import { RenderDrawInfo } from '../2d/renderer/render-draw-info';
 import { SPINE_WASM } from './lib/instantiated';
 import spine from './lib/spine-core.js';
 import { VertexEffectDelegate } from './vertex-effect-delegate';
+import SkeletonCache, { AnimationCache, AnimationFrame } from './skeleton-cache';
 
 const spineTag = SPINE_WASM;
+const CachedFrameTime = 1 / 60;
 /**
  * @en
  * Animation playback rate.
@@ -212,12 +214,18 @@ export class Skeleton extends UIRenderer {
     private _drawInfoList: RenderDrawInfo[] = [];
     protected _socketNodes: Map<number, Node> = new Map();
     protected _cachedSockets: Map<string, number> = new Map<string, number>();
-    // Animation queue
-    protected _animationQueue: AnimationItem[] = [];
-    // Head animation info of
-    protected _headAniInfo: AnimationItem | null = null;
-    // Is animation complete.
-    protected _isAniComplete = true;
+
+    // Below properties will effect when cache mode is SHARED_CACHE or PRIVATE_CACHE.
+    // accumulate time
+    protected _accTime = 0;
+    // Play times counter
+    protected _playCount = 0;
+    // Skeleton cache
+    protected _skeletonCache: SkeletonCache | null = null;
+    protected _animCache: AnimationCache | null = null;
+    protected _curFrame: AnimationFrame | null = null;
+    // Is need update skeltonData
+    protected _needUpdateSkeltonData = true;
 
     constructor () {
         super();
@@ -535,7 +543,7 @@ export class Skeleton extends UIRenderer {
         this.destroyRenderData();
         this._cleanMaterialCache();
         if (!JSB) {
-            spine.wasmUtil.destroySkeleton(this._instance);
+            spine.wasmUtil.destroySpineInstance(this._instance);
         }
         super.onDestroy();
     }
@@ -577,29 +585,68 @@ export class Skeleton extends UIRenderer {
 
         this._runtimeData = skeletonData.getRuntimeData();
         if (!this._runtimeData) return;
-        this._skeleton = this._instance.initSkeleton(this._runtimeData);
-        //if (this.isAnimationCached()) {
-        //    this._initSkeletonCache();
-        //} else {
-        this._state = this._instance.getAnimationState();
-        this._instance.setPremultipliedAlpha(this._premultipliedAlpha);
-        //}
+        this.setSkeletonData(this._runtimeData);
+
         this._refreshInspector();
         if (this.defaultSkin) this.setSkin(this.defaultSkin);
         if (this.defaultAnimation) this.animation = this.defaultAnimation;
 
         this._updateUseTint();
 
-        this._flushAssembler();
-
         this._indexBoneSockets();
         this._updateSocketBindings();
         this.attachUtil.init(this);
     }
 
+    /**
+     * @en
+     * Sets runtime skeleton data to sp.Skeleton.<br>
+     * This method is different from the `skeletonData` property. This method is passed in the raw data provided by the
+     *  Spine runtime, and the skeletonData type is the asset type provided by Creator.
+     * @zh
+     * 设置底层运行时用到的 SkeletonData。<br>
+     * 这个接口有别于 `skeletonData` 属性，这个接口传入的是 Spine runtime 提供的原始数据，而 skeletonData 的类型是 Creator 提供的资源类型。
+     * @method setSkeletonData
+     * @param {sp.spine.SkeletonData} skeletonData
+     */
+    public setSkeletonData (skeletonData: spine.SkeletonData) {
+        if (!EDITOR || legacyCC.GAME_VIEW) {
+            if (this._cacheMode !== AnimationCacheMode.REALTIME) {
+                this._skeletonCache = SkeletonCache.sharedCache;
+            }
+        }
+        this._skeleton = this._instance.initSkeleton(skeletonData);
+        this._state = this._instance.getAnimationState();
+        this._instance.setPremultipliedAlpha(this._premultipliedAlpha);
+        if (this.isAnimationCached()) {
+            if (this.debugBones || this.debugSlots) {
+                warn('Debug bones or slots is invalid in cached mode');
+            }
+        }
+        // Recreate render data and mark dirty
+        this._flushAssembler();
+    }
+
     public setAnimation (trackIndex: number, name: string, loop?: boolean) {
         if (loop === undefined) loop = true;
-        this._instance.setAnimation(trackIndex, name, loop);
+
+        if (this.isAnimationCached()) {
+            if (trackIndex !== 0) {
+                warn('Track index can not greater than 0 in cached mode.');
+            }
+            if (!this._skeletonCache) return;
+            let cache = this._skeletonCache.getAnimationCache(this._skeletonData!._uuid, name);
+            if (!cache) {
+                cache = this._skeletonCache.initAnimationCache(this._skeletonData!, name);
+            }
+            this._animCache = cache;
+            this._animationName = name;
+            this._accTime = 0;
+            this._playCount = 0;
+        } else {
+            this._animationName = name;
+            this._instance.setAnimation(trackIndex, name, loop);
+        }
         this.markForUpdateRenderData();
     }
 
@@ -608,15 +655,28 @@ export class Skeleton extends UIRenderer {
     }
 
     public updateAnimation (dt: number) {
-        if (this._paused) return;
+        if (EDITOR && !legacyCC.GAME_VIEW) return;
+        if (this.paused) return;
         dt *= this._timeScale * timeScale;
-        this._instance.updateAnimation(dt);
+        if (this.isAnimationCached()) {
+            this._accTime += dt;
+            const frameIdx = Math.floor(this._accTime / CachedFrameTime);
+            this._animCache!.updateToFrame(frameIdx);
+            this._curFrame = this._animCache!.getFrame(frameIdx);
+        } else {
+            this._instance.updateAnimation(dt);
+        }
         this.markForUpdateRenderData();
     }
 
     public updateRenderData (): any {
-        const model = this._instance.updateRenderData();
-        return model;
+        if (this.isAnimationCached()) {
+            const model = this._curFrame!.model;
+            return model;
+        } else {
+            const model = this._instance.updateRenderData();
+            return model;
+        }
     }
 
     protected _flushAssembler () {
@@ -949,7 +1009,9 @@ export class Skeleton extends UIRenderer {
      * @param {Number} duration
      */
     public setMix (fromAnimation: string, toAnimation: string, duration: number): void {
-        this._instance.setMix(fromAnimation, toAnimation, duration);
+        // if (this._state) {
+        //     this._state.data.setMix(fromAnimation, toAnimation, duration);
+        // }
     }
 
     /**

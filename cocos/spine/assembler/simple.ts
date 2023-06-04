@@ -93,6 +93,17 @@ export const simple: IAssembler = {
 };
 
 function updateComponentRenderData (comp: Skeleton, batcher: Batcher2D) {
+    if (comp.isAnimationCached()) {
+        cacheTraverse(comp);
+    } else {
+        realTimeTraverse(comp);
+    }
+    const rd = comp.renderData!;
+    const accessor = _useTint ? _tintAccessor : _accessor;
+    accessor.getMeshBuffer(rd.chunk.bufferId).setDirty();
+}
+
+function realTimeTraverse (comp: Skeleton) {
     _premultipliedAlpha = comp.premultipliedAlpha;
     _useTint = comp.useTint;
 
@@ -100,6 +111,7 @@ function updateComponentRenderData (comp: Skeleton, batcher: Batcher2D) {
 
     comp.drawList.reset();
     const model = comp.updateRenderData();
+
     const vc = model.vCount;
     const ic = model.iCount;
     const rd = comp.renderData!;
@@ -137,8 +149,42 @@ function updateComponentRenderData (comp: Skeleton, batcher: Batcher2D) {
         comp.requestDrawData(material, indexOffset, indexCount);
         indexOffset += indexCount;
     }
-    const accessor = _useTint ? _tintAccessor : _accessor;
-    accessor.getMeshBuffer(rd.chunk.bufferId).setDirty();
+}
+
+function cacheTraverse (comp: Skeleton) {
+    _premultipliedAlpha = comp.premultipliedAlpha;
+    _useTint = comp.useTint;
+
+    comp.drawList.reset();
+    const model = comp.updateRenderData();
+
+    const vc = model.vCount;
+    const ic = model.iCount;
+    const rd = comp.renderData!;
+    rd.resize(vc, ic);
+    rd.indices = new Uint16Array(ic);
+    const vbuf = rd.chunk.vb;
+    const vUint8Buf = new Uint8Array(vbuf.buffer, vbuf.byteOffset, 4 * vbuf.length);
+    vUint8Buf.set(model.vData);
+
+    const iUint16Buf = rd.indices;
+    iUint16Buf.set(model.iData);
+    const chunkOffset = rd.chunk.vertexOffset;
+    for (let i = 0; i < ic; i++) {
+        rd.indices[i] += chunkOffset;
+    }
+
+    const meshes = model.meshes;
+    const count = meshes.length;
+    let indexOffset = 0;
+    let indexCount = 0;
+    for (let i = 0; i < count; i++) {
+        const mesh = meshes[i];
+        const material = _getSlotMaterial(mesh.blendMode, comp);
+        indexCount = mesh.iCount;
+        comp.requestDrawData(material, indexOffset, indexCount);
+        indexOffset += indexCount;
+    }
 }
 
 legacyCC.internal.SpineAssembler = simple;
