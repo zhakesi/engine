@@ -1,5 +1,5 @@
-#ifndef __SPINE_SKELETON_H__
-#define __SPINE_SKELETON_H__
+#ifndef _SPINE_SKELETON_INSTANCE_H_
+#define _SPINE_SKELETON_INSTANCE_H_
 #include <spine/spine.h>
 #include "mesh-type-define.h"
 #include "spine-model.h"

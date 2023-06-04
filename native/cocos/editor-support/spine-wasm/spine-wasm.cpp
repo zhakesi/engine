@@ -63,3 +63,10 @@ void SpineWasmUtil::destroySpineSkeletonDataWithUUID(const std::string& uuid) {
         skeletonDataMap.erase(iter);
     }
 }
+
+void SpineWasmUtil::destroySpineInstance(SpineSkeletonInstance* instance) {
+    if (instance) {
+        delete instance;
+        instance = nullptr;
+    }
+}

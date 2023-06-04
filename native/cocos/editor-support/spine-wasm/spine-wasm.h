@@ -2,6 +2,7 @@
 #ifndef _SPINE_WASM_H_
 #define _SPINE_WASM_H_
 #include <spine/spine.h>
+#include "spine-skeleton-instance.h"
 #include <string>
 using namespace spine;
 
@@ -14,6 +15,7 @@ public:
     static SkeletonData*   createSpineSkeletonDataWithJson(const std::string& jsonStr, const std::string& altasStr);
     static void            registerSpineSkeletonDataWithUUID(SkeletonData* data, const std::string& uuid);
     static void            destroySpineSkeletonDataWithUUID(const std::string& uuid);
+    static void            destroySpineInstance(SpineSkeletonInstance* instance);
 };
 
 #endif

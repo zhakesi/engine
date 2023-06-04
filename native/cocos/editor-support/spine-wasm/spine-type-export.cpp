@@ -12,6 +12,12 @@ std::string convertSPString2std(const spine::String& str) {
     std::string stdStr(str.buffer(), str.length());
     return stdStr;
 }
+
+const spine::String convertStd2SPString(std::string& str) {
+    const spine::String spString(str.c_str(), str.length());
+    return spString;
+}
+
 template <typename T>
 std::vector<T> convertSPVector2Std(Vector<T> &container) {
     int count = container.size();
@@ -652,7 +658,8 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("findSlotIndex", &SkeletonData::findSlotIndex)
         .function("findSkin", &SkeletonData::findSkin, allow_raw_pointer<Skin>())
         .function("findEvent", &SkeletonData::findEvent, allow_raw_pointer<EventData>())
-        .function("findAnimation", &SkeletonData::findAnimation, allow_raw_pointer<Animation>())
+        .function("findAnimation", optional_override([](SkeletonData &obj, std::string& name) { return obj.findAnimation(convertStd2SPString(name));}, allow_raw_pointers()))
+        //.function("findAnimation", &SkeletonData::findAnimation, allow_raw_pointer<Animation>())
         .function("findIkConstraint", &SkeletonData::findIkConstraint, allow_raw_pointer<IkConstraintData>())
         .function("findTransformConstraint", &SkeletonData::findTransformConstraint, allow_raw_pointer<TransformConstraintData>())
         .function("findPathConstraint", &SkeletonData::findPathConstraint, allow_raw_pointer<PathConstraintData>())
@@ -1066,5 +1073,6 @@ EMSCRIPTEN_BINDINGS(cocos_spine) {
     .class_function("querySpineSkeletonDataByUUID", &SpineWasmUtil::querySpineSkeletonDataByUUID, allow_raw_pointers())
     .class_function("createSpineSkeletonDataWithJson", &SpineWasmUtil::createSpineSkeletonDataWithJson, allow_raw_pointers())
     .class_function("registerSpineSkeletonDataWithUUID", &SpineWasmUtil::registerSpineSkeletonDataWithUUID, allow_raw_pointers())
-    .class_function("destroySpineSkeletonDataWithUUID", &SpineWasmUtil::destroySpineSkeletonDataWithUUID);
+    .class_function("destroySpineSkeletonDataWithUUID", &SpineWasmUtil::destroySpineSkeletonDataWithUUID)
+    .class_function("destroySpineInstance", &SpineWasmUtil::destroySpineInstance, allow_raw_pointers());
 }
