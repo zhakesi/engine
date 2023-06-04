@@ -71,10 +71,10 @@ export class AttachUtil {
         // if (isCached) {
         //     boneInfos = this._skeletonComp!._curFrame && this._skeletonComp!._curFrame.boneInfos;
         // } else {
-        const boneInfos = this._skeleton.getBones();
+        const boneInfos = this._skeleton.bones;
         //}
 
-        if (!boneInfos) return;
+        if (!boneInfos || boneInfos.length < 1) return;
 
         const matrixHandle = (node: Node, bone: any) => {
             const tm = tempMat4;
@@ -94,7 +94,7 @@ export class AttachUtil {
                 socketNodes.delete(boneIdx);
                 continue;
             }
-            const bone = boneInfos.get(boneIdx);
+            const bone = boneInfos[boneIdx];
             // Bone has been destroy
             if (!bone) {
                 boneNode.removeFromParent();

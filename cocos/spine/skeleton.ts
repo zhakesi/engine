@@ -29,7 +29,6 @@ import { Enum, ccenum } from '../core/value-types/enum';
 import { Component, Node } from '../scene-graph';
 import { CCBoolean, CCClass, CCFloat, CCObject, Color, Mat4, RecyclePool, js } from '../core';
 import { SkeletonData } from './skeleton-data';
-//import SkeletonCache, { AnimationCache, AnimationFrame } from './skeleton-cache';
 import { UIRenderer, UITransform } from '../2d';
 import { Batcher2D } from '../2d/renderer/batcher-2d';
 import { BlendFactor, BlendOp } from '../gfx';
@@ -220,28 +219,12 @@ export class Skeleton extends UIRenderer {
     // Is animation complete.
     protected _isAniComplete = true;
 
-    // // Skeleton cache
-    // protected _skeletonCache: SkeletonCache | null = null;
-    // // Frame cache
-    // /**
-    //  * @internal
-    //  */
-    // public _frameCache: AnimationCache | null = null;
-    // // Cur frame
-    // /**
-    //  * @internal
-    //  */
-    // public _curFrame: AnimationFrame | null = null;
-    // // Below properties will effect when cache mode is SHARED_CACHE or PRIVATE_CACHE.
-    // // accumulate time
-    // protected _accTime = 0;
-    // Play times counter
-    protected _playCount = 0;
-
     constructor () {
         super();
         this._useVertexOpacity = true;
-        this._instance = new spine.SkeletonInstance();
+        if (!JSB) {
+            this._instance = new spine.SkeletonInstance();
+        }
         this.attachUtil = new AttachUtil();
     }
 
@@ -388,8 +371,8 @@ export class Skeleton extends UIRenderer {
         return this._defaultCacheMode;
     }
     set defaultCacheMode (mode: AnimationCacheMode) {
-        // this._defaultCacheMode = mode;
-        // this.setAnimationCacheMode(this._defaultCacheMode);
+        this._defaultCacheMode = mode;
+        this.setAnimationCacheMode(this._defaultCacheMode);
     }
 
     /**
@@ -551,6 +534,9 @@ export class Skeleton extends UIRenderer {
     public onDestroy () {
         this.destroyRenderData();
         this._cleanMaterialCache();
+        if (!JSB) {
+            spine.wasmUtil.destroySkeleton(this._instance);
+        }
         super.onDestroy();
     }
 
@@ -575,10 +561,10 @@ export class Skeleton extends UIRenderer {
      * @zh 清除动画并还原到初始姿势。
      */
     public clearAnimation () {
-        // if (!this.isAnimationCached()) {
-        //     this.clearTrack(0);
-        //     this.setToSetupPose();
-        // }
+        if (!this.isAnimationCached()) {
+            this.clearTrack(0);
+            this.setToSetupPose();
+        }
     }
 
     protected _updateSkeletonData () {
@@ -926,9 +912,9 @@ export class Skeleton extends UIRenderer {
      * @return {sp.spine.Bone}
      */
     public findBone (boneName: string) {
-        // if (this._skeleton) {
-        //     return this._skeleton.findBone(boneName);
-        // }
+        if (this._skeleton) {
+            return this._skeleton.findBone(boneName);
+        }
         return null;
     }
 
@@ -945,9 +931,9 @@ export class Skeleton extends UIRenderer {
      * @return {sp.spine.Slot}
      */
     public findSlot (slotName: string) {
-        // if (this._skeleton) {
-        //     return this._skeleton.findSlot(slotName);
-        // }
+        if (this._skeleton) {
+            return this._skeleton.findSlot(slotName);
+        }
         return null;
     }
 
@@ -1062,23 +1048,6 @@ export class Skeleton extends UIRenderer {
         }
     }
 
-    // protected _indexBoneSockets (): void {
-    //     if (!this._skeleton) {
-    //         return;
-    //     }
-    //     this._cachedSockets.clear();
-    //     const bones = this._skeleton.getBones();
-    //     const getBoneName = (bone: any) => {
-    //         // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    //         if (bone.getParent() == null) return bone.data.name || '<Unamed>';
-    //         return `${getBoneName(bones.get(bone.getParent().data.index)) as string}/${bone.data.name}`;
-    //     };
-    //     for (let i = 0, l = bones.size(); i < l; i++) {
-    //         const bd = bones.get(i).data;
-    //         const boneName = getBoneName(bones.get(i));
-    //         this._cachedSockets.set(boneName, bd.index);
-    //     }
-    // }
     protected _indexBoneSockets (): void {
         if (!this._skeleton) {
             return;
@@ -1222,20 +1191,6 @@ export class Skeleton extends UIRenderer {
             if (width !== 0) uiTrans.anchorX = Math.abs(skeletonData.x) / width;
             if (height !== 0) uiTrans.anchorY = Math.abs(skeletonData.y) / height;
         }
-    }
-
-    private _initSkeletonCache () {
-        if (this._cacheMode === AnimationCacheMode.SHARED_CACHE) {
-            this._skeletonCache = SkeletonCache.sharedCache;
-        } else if (this._cacheMode === AnimationCacheMode.PRIVATE_CACHE) {
-            this._skeletonCache = new SkeletonCache();
-            this._skeletonCache.enablePrivateMode();
-        }
-        if (this.debugBones || this.debugSlots) {
-            warn('Debug bones or slots is invalid in cached mode');
-        }
-        const skeletonInfo = this._skeletonCache.getSkeletonCache((this.skeletonData as any)._uuid, this._runtimeData);
-        this._skeleton = skeletonInfo.skeleton;
     }
 
     protected _updateColor () {

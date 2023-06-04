@@ -111,14 +111,14 @@ function updateComponentRenderData (comp: Skeleton, batcher: Batcher2D) {
     const vPtr = model.vPtr;
     const vLength = vc * 4 * floatStride;
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    const vData = spine.SkeletonInstance.HEAPU8.subarray(vPtr, vPtr + vLength);
+    const vData = spine.wasmUtil.HEAPU8.subarray(vPtr, vPtr + vLength);
     vUint8Buf.set(vData);
 
     const iPtr = model.iPtr;
     const ibuf = rd.indices;
     const iLength = 2 * ic;
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    const iData = spine.SkeletonInstance.HEAPU8.subarray(iPtr, iPtr + iLength);
+    const iData = spine.wasmUtil.HEAPU8.subarray(iPtr, iPtr + iLength);
     const iUint8Buf = new Uint8Array(ibuf.buffer);
     iUint8Buf.set(iData);
     const chunkOffset = rd.chunk.vertexOffset;

@@ -86,7 +86,7 @@ function overrideClass (wasm) {
     spine.SwirlEffect = wasm.SwirlEffect;
 
     spine.SkeletonInstance = wasm.SkeletonInstance;
-    spine.SkeletonInstance.HEAPU8 = wasm.HEAPU8;
+    spine.wasmUtil.HEAPU8 = wasm.HEAPU8;
 }
 
 function overrideProperty_BoneData () {
