@@ -54,6 +54,7 @@ export class AnimationCache {
     protected _instance: spine.SkeletonInstance = null!;
     protected _state: spine.AnimationState = null!;
     protected _skeletonData: spine.SkeletonData = null!;
+    protected _skeleton: spine.Skeleton = null!;
     protected _frames: AnimationFrame[] = [];
     protected _curIndex = -1;
     protected _isCompleted = false;
@@ -62,10 +63,18 @@ export class AnimationCache {
     constructor (data: spine.SkeletonData) {
         this._instance = new spine.SkeletonInstance();
         this._skeletonData = data;
-        this._instance.initSkeleton(data);
-        this._state = this._instance.getAnimationState();
+        this._skeleton = this._instance.initSkeleton(data);
         this._instance.setUseTint(_useTint);
     }
+
+    get skeleton () {
+        return this._skeleton;
+    }
+
+    public setSkin (skinName: string) {
+        this._instance.setSkin(skinName);
+    }
+
     public setAnimation (animationName: string) {
         const animations = this._skeletonData.animations;
         let animation: spine.Animation | null = null;
@@ -79,7 +88,7 @@ export class AnimationCache {
             console.warn(`find no animation named ${animationName} !!!`);
             return;
         }
-        this._maxFrameIdex = Math.floor(animation.duration / FrameTime);
+        this._maxFrameIdex = Math.floor((animation as any).duration / FrameTime);
         this._instance.setAnimation(0, animationName, false);
     }
 
@@ -99,6 +108,12 @@ export class AnimationCache {
     public getFrame (frameIdx: number) {
         const index = frameIdx % this._maxFrameIdex;
         return this._frames[index];
+    }
+
+    public invalidAnimationFrames () {
+        this._curIndex = -1;
+        this._isCompleted = false;
+        this._frames.length = 0;
     }
 
     private updateRenderData (index: number, model: any) {
@@ -172,10 +187,18 @@ class SkeletonCache {
         return animCache;
     }
 
-    public removeCachedAnimations (uuid: string) {
-        const animationPool = this._animationPool;
-        for (const key in animationPool) {
-            if (key.includes(uuid)) {
+    public destroyCachedAnimations (uuid?: string) {
+        if (uuid) {
+            const animationPool = this._animationPool;
+            for (const key in animationPool) {
+                if (key.includes(uuid)) {
+                    animationPool[key].destory();
+                    delete animationPool[key];
+                }
+            }
+        } else {
+            const animationPool = this._animationPool;
+            for (const key in animationPool) {
                 animationPool[key].destory();
                 delete animationPool[key];
             }

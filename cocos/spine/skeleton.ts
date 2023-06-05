@@ -201,6 +201,7 @@ export class Skeleton extends UIRenderer {
     protected _texture: Texture2D | null = null;
     // Animation name
     protected _animationName = '';
+    protected _skinName = '';
     protected _drawList = new RecyclePool<SkeletonDrawData>(() => ({
         material: null,
         indexOffset: 0,
@@ -588,8 +589,8 @@ export class Skeleton extends UIRenderer {
         this.setSkeletonData(this._runtimeData);
 
         this._refreshInspector();
-        if (this.defaultSkin) this.setSkin(this.defaultSkin);
         if (this.defaultAnimation) this.animation = this.defaultAnimation;
+        if (this.defaultSkin) this.setSkin(this.defaultSkin);
 
         this._updateUseTint();
 
@@ -611,17 +612,21 @@ export class Skeleton extends UIRenderer {
      */
     public setSkeletonData (skeletonData: spine.SkeletonData) {
         if (!EDITOR || legacyCC.GAME_VIEW) {
-            if (this._cacheMode !== AnimationCacheMode.REALTIME) {
+            if (this._cacheMode === AnimationCacheMode.SHARED_CACHE) {
                 this._skeletonCache = SkeletonCache.sharedCache;
+            } else if (this._cacheMode === AnimationCacheMode.PRIVATE_CACHE) {
+                this._skeletonCache = new SkeletonCache();
             }
         }
-        this._skeleton = this._instance.initSkeleton(skeletonData);
-        this._state = this._instance.getAnimationState();
-        this._instance.setPremultipliedAlpha(this._premultipliedAlpha);
+
         if (this.isAnimationCached()) {
             if (this.debugBones || this.debugSlots) {
                 warn('Debug bones or slots is invalid in cached mode');
             }
+        } else {
+            this._skeleton = this._instance.initSkeleton(skeletonData);
+            this._state = this._instance.getAnimationState();
+            this._instance.setPremultipliedAlpha(this._premultipliedAlpha);
         }
         // Recreate render data and mark dirty
         this._flushAssembler();
@@ -634,13 +639,17 @@ export class Skeleton extends UIRenderer {
             if (trackIndex !== 0) {
                 warn('Track index can not greater than 0 in cached mode.');
             }
+            this._animationName = name;
             if (!this._skeletonCache) return;
-            let cache = this._skeletonCache.getAnimationCache(this._skeletonData!._uuid, name);
+            let cache = this._skeletonCache.getAnimationCache(this._skeletonData!._uuid, this._animationName);
             if (!cache) {
-                cache = this._skeletonCache.initAnimationCache(this._skeletonData!, name);
+                cache = this._skeletonCache.initAnimationCache(this._skeletonData!, this._animationName);
+            }
+            this._skeleton = cache.skeleton;
+            if (this._cacheMode === AnimationCacheMode.PRIVATE_CACHE) {
+                cache.invalidAnimationFrames();
             }
             this._animCache = cache;
-            this._animationName = name;
             this._accTime = 0;
             this._playCount = 0;
         } else {
@@ -651,7 +660,14 @@ export class Skeleton extends UIRenderer {
     }
 
     public setSkin (name: string) {
-        this._instance.setSkin(name);
+        this._skinName = name;
+        if (this.isAnimationCached()) {
+            if (this._animCache) {
+                this._animCache.setSkin(name);
+            }
+        } else {
+            this._instance.setSkin(name);
+        }
     }
 
     public updateAnimation (dt: number) {
@@ -910,8 +926,8 @@ export class Skeleton extends UIRenderer {
         if (this._cacheMode !== cacheMode) {
             this._cacheMode = cacheMode;
             this._updateSkeletonData();
-            // this._updateUseTint();
-            // this._updateSocketBindings();
+            this._updateUseTint();
+            this._updateSocketBindings();
             this.markForUpdateRenderData();
         }
     }
@@ -1009,9 +1025,14 @@ export class Skeleton extends UIRenderer {
      * @param {Number} duration
      */
     public setMix (fromAnimation: string, toAnimation: string, duration: number): void {
-        // if (this._state) {
-        //     this._state.data.setMix(fromAnimation, toAnimation, duration);
-        // }
+        if (this.isAnimationCached()) {
+            console.warn('cached mode not support setMix!!!');
+            return;
+        }
+        if (this._state) {
+            this._instance.setMix(fromAnimation, toAnimation, duration);
+            //this._state.data.setMix(fromAnimation, toAnimation, duration);
+        }
     }
 
     /**
@@ -1292,6 +1313,7 @@ export class Skeleton extends UIRenderer {
      */
     public setStartListener (listener: any) {
         // this._ensureListener();
+        this._instance.setStartListener(listener);
         // this._listener!.start = listener;
     }
 

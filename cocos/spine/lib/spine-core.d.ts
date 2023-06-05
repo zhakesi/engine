@@ -1288,6 +1288,7 @@ declare namespace spine {
         setJitterEffect(jitter: spine.VertexEffect);
         setSwirlEffect(swirl: spine.VertexEffect);
         updateRenderData();
+        setStartListener(listener: any);
     }
 
     class wasmUtil {

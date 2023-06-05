@@ -268,7 +268,7 @@ export class SkeletonData extends Asset {
      * @zh 销毁 skeleton data。
      */
     public destroy () {
-        SkeletonCache.sharedCache.removeCachedAnimations(this._uuid);
+        SkeletonCache.sharedCache.destroyCachedAnimations(this._uuid);
         if (this._skeletonCache) {
             spine.wasmUtil.registerSpineSkeletonDataWithUUID(this._skeletonCache, this._uuid);
         }
