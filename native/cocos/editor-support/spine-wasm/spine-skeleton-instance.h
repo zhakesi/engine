@@ -7,7 +7,7 @@
 #include <memory>
 #include <functional>
 using namespace spine;
-typedef std::function<void(TrackEntry *entry)> StartListener;
+typedef std::function<void()> StartListener;
 class SpineSkeletonInstance {
     struct UserData {
         bool useTint = false;

@@ -21,16 +21,18 @@ SpineSkeletonInstance::~SpineSkeletonInstance()
 }
 
 Skeleton *SpineSkeletonInstance::initSkeleton(SkeletonData* data) {
+    
+    if (_clipper) delete _clipper;
+    if (_animState) delete _animState;
+    if (_animStateData) delete _animStateData;
+    if (_skeleton) delete _skeleton;
+    if (_model) delete _model;
+    
     _skeletonData = data;
-
     _skeleton = new Skeleton(_skeletonData);
-
     _animStateData = new AnimationStateData(_skeletonData);
-
     _animState = new AnimationState(_animStateData);
-
     _clipper = new SkeletonClipping();
-
     _skeleton->setToSetupPose();
     _skeleton->updateWorldTransform();
     LogUtil::PrintToJs("initSkeleton ok.");
@@ -358,6 +360,7 @@ void SpineSkeletonInstance::setMix(const std::string& from, const std::string& t
 
 void SpineSkeletonInstance::setStartListener(const StartListener &listener) {
     LogUtil::PrintToJs("XXX- setStartListener");
+    listener();
 }
 
 void SpineSkeletonInstance::setUseTint(bool useTint) {
