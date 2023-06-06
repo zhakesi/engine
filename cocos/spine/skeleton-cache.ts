@@ -23,6 +23,7 @@
 */
 
 import { TrackEntryListeners } from './track-entry-listeners';
+import { vfmtPosUvColor4B, vfmtPosUvTwoColor4B, getAttributeStride } from '../2d/renderer/vertex-format';
 import { SPINE_WASM } from './lib/instantiated';
 import spine from './lib/spine-core.js';
 import { SkeletonData } from './skeleton-data';
@@ -30,7 +31,18 @@ import { SkeletonData } from './skeleton-data';
 const MaxCacheTime = 30;
 const FrameTime = 1 / 60;
 const spineTag = SPINE_WASM;
-const _useTint = false;
+const _useTint = true;
+const _byteStrideOneColor = getAttributeStride(vfmtPosUvColor4B);
+const _byteStrideTwoColor = getAttributeStride(vfmtPosUvTwoColor4B);
+
+class FrameBoneInfo {
+    a = 0;
+    b = 0;
+    c = 0;
+    d = 0;
+    worldX = 0;
+    worldY = 0;
+}
 
 class SpineModel {
     public vCount = 0;
@@ -47,7 +59,7 @@ class SpineMesh {
 
 export interface AnimationFrame {
     model: SpineModel;
-    boneInfos: any[];
+    boneInfos: FrameBoneInfo[];
 }
 
 export class AnimationCache {
@@ -119,7 +131,7 @@ export class AnimationCache {
     private updateRenderData (index: number, model: any) {
         const vc = model.vCount;
         const ic = model.iCount;
-        const floatStride = _useTint ? 7 : 6;
+        const floatStride = (_useTint ?  _byteStrideTwoColor : _byteStrideOneColor) / 4;
         const vUint8Buf = new Uint8Array(4 * floatStride * vc);
         const iUint16Buf = new Uint16Array(ic);
 
@@ -153,9 +165,22 @@ export class AnimationCache {
             modelData.meshes.push(meshData);
         }
 
+        const bones = this._skeleton.bones;
+        const boneInfosArray: FrameBoneInfo[] = [];
+        bones.forEach((bone) => {
+            const boneInfo = new FrameBoneInfo();
+            boneInfo.a = bone.a;
+            boneInfo.b = bone.b;
+            boneInfo.c = bone.c;
+            boneInfo.d = bone.d;
+            boneInfo.worldX = bone.worldX;
+            boneInfo.worldY = bone.worldY;
+            boneInfosArray.push(boneInfo);
+        });
+
         this._frames[index] = {
             model: modelData,
-            boneInfos: [],
+            boneInfos: boneInfosArray,
         };
     }
 

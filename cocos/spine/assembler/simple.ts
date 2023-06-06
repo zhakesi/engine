@@ -1,9 +1,33 @@
+/*
+ Copyright (c) 2020-2023 Xiamen Yaji Software Co., Ltd.
+
+ https://www.cocos.com/
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights to
+ use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+ of the Software, and to permit persons to whom the Software is furnished to do so,
+ subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+*/
+
 import { UIRenderable } from '../../2d';
 import { IAssembler, IAssemblerManager } from '../../2d/renderer/base';
 
 import { Batcher2D } from '../../2d/renderer/batcher-2d';
 import { StaticVBAccessor } from '../../2d/renderer/static-vb-accessor';
-import { vfmtPosUvColor4B, vfmtPosUvTwoColor4B } from '../../2d/renderer/vertex-format';
+import { vfmtPosUvColor4B, vfmtPosUvTwoColor4B, getAttributeStride } from '../../2d/renderer/vertex-format';
 import { Skeleton, SpineMaterialType } from '../skeleton';
 import { BlendFactor } from '../../gfx';
 import { legacyCC } from '../../core/global-exports';
@@ -16,6 +40,9 @@ let _tintAccessor: StaticVBAccessor = null!;
 
 let _premultipliedAlpha = false;
 let _useTint = false;
+
+const _byteStrideOneColor = getAttributeStride(vfmtPosUvColor4B);
+const _byteStrideTwoColor = getAttributeStride(vfmtPosUvTwoColor4B);
 
 function _getSlotMaterial (blendMode: number, comp: Skeleton) {
     let src: BlendFactor;
@@ -107,7 +134,7 @@ function realTimeTraverse (comp: Skeleton) {
     _premultipliedAlpha = comp.premultipliedAlpha;
     _useTint = comp.useTint;
 
-    const floatStride = _useTint ? 7 : 6;
+    const floatStride = (_useTint ?  _byteStrideTwoColor : _byteStrideOneColor) / 4;
 
     comp.drawList.reset();
     const model = comp.updateRenderData();

@@ -66,13 +66,13 @@ export class AttachUtil {
         const socketNodes = this._skeletonComp!.socketNodes;
         if (socketNodes.size === 0) return;
 
-        //let boneInfos: spine.Bone[]|null = null;
-        // const isCached = this._skeletonComp!.isAnimationCached();
-        // if (isCached) {
-        //     boneInfos = this._skeletonComp!._curFrame && this._skeletonComp!._curFrame.boneInfos;
-        // } else {
-        const boneInfos = this._skeleton.bones;
-        //}
+        let boneInfos;
+        const isCached = this._skeletonComp!.isAnimationCached();
+        if (isCached && this._skeletonComp!._curFrame) {
+            boneInfos = this._skeletonComp!._curFrame.boneInfos;
+        } else {
+            boneInfos = this._skeleton.bones;
+        }
 
         if (!boneInfos || boneInfos.length < 1) return;
 

@@ -1,3 +1,27 @@
+/*
+ Copyright (c) 2020-2023 Xiamen Yaji Software Co., Ltd.
+
+ https://www.cocos.com/
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated documentation files (the "Software"), to deal
+ in the Software without restriction, including without limitation the rights to
+ use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+ of the Software, and to permit persons to whom the Software is furnished to do so,
+ subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in
+ all copies or substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+*/
+
 import spine from './spine-core.js';
 import { js } from '../../core';
 
@@ -95,67 +119,67 @@ function overrideProperty_BoneData () {
         {
             proto: prototype,
             property: 'index',
-            getter: prototype.getProp_index,
+            getter: prototype.getIndex,
         },
         {
             proto: prototype,
             property: 'name',
-            getter: prototype.getProp_name,
+            getter: prototype.getName,
         },
         {
             proto: prototype,
             property: 'parent',
-            getter: prototype.getProp_parent,
+            getter: prototype.getParent,
         },
         {
             proto: prototype,
             property: 'length',
-            getter: prototype.getProp_length,
+            getter: prototype.getLength,
         },
         {
             proto: prototype,
             property: 'x',
-            getter: prototype.getProp_x,
+            getter: prototype.getX,
         },
         {
             proto: prototype,
             property: 'y',
-            getter: prototype.getProp_y,
+            getter: prototype.getY,
         },
         {
             proto: prototype,
             property: 'rotation',
-            getter: prototype.getProp_rotation,
+            getter: prototype.getRotation,
         },
         {
             proto: prototype,
             property: 'scaleX',
-            getter: prototype.getProp_scaleX,
+            getter: prototype.getScaleX,
         },
         {
             proto: prototype,
             property: 'scaleY',
-            getter: prototype.getProp_scaleY,
+            getter: prototype.getScaleY,
         },
         {
             proto: prototype,
             property: 'shearX',
-            getter: prototype.getProp_shearX,
+            getter: prototype.getShearX,
         },
         {
             proto: prototype,
             property: 'shearY',
-            getter: prototype.getProp_shearY,
+            getter: prototype.getShearY,
         },
         {
             proto: prototype,
             property: 'transformMode',
-            getter: prototype.getProp_transformMode,
+            getter: prototype.getTransformMode,
         },
         {
             proto: prototype,
             property: 'skinRequired',
-            getter: prototype.getProp_skinRequired,
+            getter: prototype.getSkinRequired,
         },
         // {
         //     proto: spine.BoneData.prototype,
@@ -174,17 +198,19 @@ function overrideProperty_ConstraintData () {
         {
             proto: prototype,
             property: 'name',
-            getter: prototype.getProp_name,
+            getter: prototype.getName,
         },
         {
             proto: prototype,
             property: 'order',
-            getter: prototype.getProp_order,
+            getter: prototype.getOrder,
+            setter: prototype.setOder,
         },
         {
             proto: prototype,
             property: 'skinRequired',
-            getter: prototype.getProp_skinRequired,
+            getter: prototype.getSkinRequired,
+            setter: prototype.setSkinRequired,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -198,43 +224,43 @@ function overrideProperty_IkConstraintData () {
         {
             proto: prototype,
             property: 'target',
-            getter: prototype.getProp_target,
+            getter: prototype.getTarget,
         },
         {
             proto: prototype,
             property: 'bendDirection',
-            getter: prototype.getProp_bendDirection,
+            getter: prototype.getBendDirection,
         },
         {
             proto: prototype,
             property: 'compress',
-            getter: prototype.getProp_compress,
+            getter: prototype.getCompress,
         },
         {
             proto: prototype,
             property: 'stretch',
-            getter: prototype.getProp_stretch,
+            getter: prototype.getStretch,
         },
         {
             proto: prototype,
             property: 'uniform',
-            getter: prototype.getProp_uniform,
+            getter: prototype.getUniform,
         },
         {
             proto: prototype,
             property: 'mix',
-            getter: prototype.getProp_mix,
+            getter: prototype.getMix,
         },
         {
             proto: prototype,
             property: 'softness',
-            getter: prototype.getProp_softness,
+            getter: prototype.getSoftness,
         },
     ];
     propertyPolyfills.forEach((prop) => {
         js.getset(prop.proto, prop.property, prop.getter);
     });
-    overrideDefineArrayProp(prototype, prototype.getProp_bones, 'bones');
+    overrideDefineArrayProp(prototype, prototype.getBones, 'bones');
 }
 
 function overrideProperty_PathConstraintData () {
@@ -243,53 +269,53 @@ function overrideProperty_PathConstraintData () {
         {
             proto: prototype,
             property: 'target',
-            getter: prototype.getProp_target,
+            getter: prototype.getTarget,
         },
         {
             proto: prototype,
             property: 'positionMode',
-            getter: prototype.getProp_positionMode,
+            getter: prototype.getPositionMode,
         },
         {
             proto: prototype,
             property: 'spacingMode',
-            getter: prototype.getProp_spacingMode,
+            getter: prototype.getSpacingMode,
         },
         {
             proto: prototype,
             property: 'rotateMode',
-            getter: prototype.getProp_rotateMode,
+            getter: prototype.getRotateMode,
         },
         {
             proto: prototype,
             property: 'offsetRotation',
-            getter: prototype.getProp_offsetRotation,
+            getter: prototype.getOffsetRotation,
         },
         {
             proto: prototype,
             property: 'position',
-            getter: prototype.getProp_position,
+            getter: prototype.getPosition,
         },
         {
             proto: prototype,
             property: 'spacing',
-            getter: prototype.getProp_spacing,
+            getter: prototype.getSpacing,
         },
         {
             proto: prototype,
             property: 'rotateMix',
-            getter: prototype.getProp_rotateMix,
+            getter: prototype.getRotateMix,
         },
         {
             proto: prototype,
             property: 'translateMix',
-            getter: prototype.getProp_translateMix,
+            getter: prototype.getTranslateMix,
         },
     ];
     propertyPolyfills.forEach((prop) => {
         js.getset(prop.proto, prop.property, prop.getter);
     });
-    overrideDefineArrayProp(prototype, prototype.getProp_bones, 'bones');
+    overrideDefineArrayProp(prototype, prototype.getBones, 'bones');
 }
 
 function overrideProperty_Event () {
@@ -298,37 +324,37 @@ function overrideProperty_Event () {
         {
             proto: prototype,
             property: 'data',
-            getter: prototype.getProp_data,
+            getter: prototype.getData,
         },
         {
             proto: prototype,
             property: 'intValue',
-            getter: prototype.getProp_intValue,
+            getter: prototype.getIntValue,
         },
         {
             proto: prototype,
             property: 'floatValue',
-            getter: prototype.getProp_floatValue,
+            getter: prototype.getFloatValue,
         },
         {
             proto: prototype,
             property: 'stringValue',
-            getter: prototype.getProp_stringValue,
+            getter: prototype.getStringValue,
         },
         {
             proto: prototype,
             property: 'time',
-            getter: prototype.getProp_time,
+            getter: prototype.getTime,
         },
         {
             proto: prototype,
             property: 'volume',
-            getter: prototype.getProp_volume,
+            getter: prototype.getVolume,
         },
         {
             proto: prototype,
             property: 'balance',
-            getter: prototype.getProp_balance,
+            getter: prototype.getBalance,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -342,37 +368,37 @@ function overrideProperty_EventData () {
         {
             proto: prototype,
             property: 'name',
-            getter: prototype.getProp_name,
+            getter: prototype.getName,
         },
         {
             proto: prototype,
             property: 'intValue',
-            getter: prototype.getProp_intValue,
+            getter: prototype.getIntValue,
         },
         {
             proto: prototype,
             property: 'floatValue',
-            getter: prototype.getProp_floatValue,
+            getter: prototype.getFloatValue,
         },
         {
             proto: prototype,
             property: 'stringValue',
-            getter: prototype.getProp_stringValue,
+            getter: prototype.getStringValue,
         },
         {
             proto: prototype,
             property: 'audioPath',
-            getter: prototype.getProp_audioPath,
+            getter: prototype.getAudioPath,
         },
         {
             proto: prototype,
             property: 'volume',
-            getter: prototype.getProp_volume,
+            getter: prototype.getVolume,
         },
         {
             proto: prototype,
             property: 'balance',
-            getter: prototype.getProp_balance,
+            getter: prototype.getBalance,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -386,7 +412,7 @@ function overrideProperty_BoundingBoxAttachment () {
         {
             proto: prototype,
             property: 'name',
-            getter: prototype.getProp_name,
+            getter: prototype.getName,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -400,7 +426,7 @@ function overrideProperty_ClippingAttachment () {
         {
             proto: prototype,
             property: 'endSlot',
-            getter: prototype.getProp_endSlot,
+            getter: prototype.getEndSlot,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -414,47 +440,47 @@ function overrideProperty_MeshAttachment () {
         {
             proto: prototype,
             property: 'path',
-            getter: prototype.getProp_path,
+            getter: prototype.getPath,
         },
         {
             proto: prototype,
             property: 'regionUVs',
-            getter: prototype.getProp_regionUVs,
+            getter: prototype.getRegionUVs,
         },
         {
             proto: prototype,
             property: 'uvs',
-            getter: prototype.getProp_uvs,
+            getter: prototype.getUvs,
         },
         {
             proto: prototype,
             property: 'triangles',
-            getter: prototype.getProp_triangles,
+            getter: prototype.getTriangles,
         },
         {
             proto: prototype,
             property: 'color',
-            getter: prototype.getProp_color,
+            getter: prototype.getColor,
         },
         {
             proto: prototype,
             property: 'width',
-            getter: prototype.getProp_width,
+            getter: prototype.getWidth,
         },
         {
             proto: prototype,
             property: 'height',
-            getter: prototype.getProp_height,
+            getter: prototype.getHeight,
         },
         {
             proto: prototype,
             property: 'hullLength',
-            getter: prototype.getProp_hullLength,
+            getter: prototype.getHullLength,
         },
         {
             proto: prototype,
             property: 'edges',
-            getter: prototype.getProp_edges,
+            getter: prototype.getEdges,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -468,18 +494,18 @@ function overrideProperty_PathAttachment () {
         {
             proto: prototype,
             property: 'closed',
-            getter: prototype.getProp_closed,
+            getter: prototype.getClosed,
         },
         {
             proto: prototype,
             property: 'constantSpeed',
-            getter: prototype.getProp_constantSpeed,
+            getter: prototype.getConstantSpeed,
         },
     ];
     propertyPolyfills.forEach((prop) => {
         js.getset(prop.proto, prop.property, prop.getter);
     });
-    overrideDefineArrayProp(prototype, prototype.getProp_lengths, 'lengths');
+    overrideDefineArrayProp(prototype, prototype.getLengths, 'lengths');
 }
 
 function overrideProperty_PointAttachment () {
@@ -488,17 +514,17 @@ function overrideProperty_PointAttachment () {
         {
             proto: prototype,
             property: 'x',
-            getter: prototype.getProp_x,
+            getter: prototype.getX,
         },
         {
             proto: prototype,
             property: 'y',
-            getter: prototype.getProp_y,
+            getter: prototype.getY,
         },
         {
             proto: prototype,
             property: 'rotation',
-            getter: prototype.rotation,
+            getter: prototype.getRotation,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -512,52 +538,52 @@ function overrideProperty_RegionAttachment () {
         {
             proto: prototype,
             property: 'x',
-            getter: prototype.getProp_x,
+            getter: prototype.getX,
         },
         {
             proto: prototype,
             property: 'y',
-            getter: prototype.getProp_y,
+            getter: prototype.getY,
         },
         {
             proto: prototype,
             property: 'scaleX',
-            getter: prototype.getProp_scaleX,
+            getter: prototype.getScaleX,
         },
         {
             proto: prototype,
             property: 'scaleY',
-            getter: prototype.getProp_scaleY,
+            getter: prototype.getScaleY,
         },
         {
             proto: prototype,
             property: 'rotation',
-            getter: prototype.getProp_rotation,
+            getter: prototype.getRotation,
         },
         {
             proto: prototype,
             property: 'width',
-            getter: prototype.getProp_width,
+            getter: prototype.getWidth,
         },
         {
             proto: prototype,
             property: 'height',
-            getter: prototype.getProp_height,
+            getter: prototype.getHeight,
         },
         {
             proto: prototype,
             property: 'color',
-            getter: prototype.getProp_color,
+            getter: prototype.getColor,
         },
         {
             proto: prototype,
             property: 'path',
-            getter: prototype.getProp_path,
+            getter: prototype.getPath,
         },
         {
             proto: prototype,
             property: 'rendererObject',
-            getter: prototype.getProp_rendererObject,
+            getter: prototype.getRendererObject,
         },
         // {
         //     proto: prototype,
@@ -567,12 +593,12 @@ function overrideProperty_RegionAttachment () {
         {
             proto: prototype,
             property: 'offset',
-            getter: prototype.getProp_offset,
+            getter: prototype.getOffset,
         },
         {
             proto: prototype,
             property: 'uvs',
-            getter: prototype.getProp_uvs,
+            getter: prototype.getUVs,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -605,32 +631,32 @@ function overrideProperty_SlotData () {
         {
             proto: prototype,
             property: 'index',
-            getter: prototype.getProp_index,
+            getter: prototype.getIndex,
         },
         {
             proto: prototype,
             property: 'name',
-            getter: prototype.getProp_name,
+            getter: prototype.getName,
         },
         {
             proto: prototype,
             property: 'boneData',
-            getter: prototype.getProp_boneData,
+            getter: prototype.getBoneData,
         },
         {
             proto: prototype,
             property: 'color',
-            getter: prototype.color,
+            getter: prototype.getColor,
         },
         {
             proto: prototype,
             property: 'darkColor',
-            getter: prototype.getProp_darkColor,
+            getter: prototype.getDarkColor,
         },
         {
             proto: prototype,
             property: 'blendMode',
-            getter: prototype.getProp_blendMode,
+            getter: prototype.getBlendMode,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -644,48 +670,48 @@ function overrideProperty_IkConstraint () {
         {
             proto: prototype,
             property: 'data',
-            getter: prototype.getProp_data,
+            getter: prototype.getData,
         },
         {
             proto: prototype,
             property: 'target',
-            getter: prototype.getProp_target,
+            getter: prototype.getTarget,
         },
         {
             proto: prototype,
             property: 'bendDirection',
-            getter: prototype.getProp_bendDirection,
+            getter: prototype.getBendDirection,
         },
         {
             proto: prototype,
             property: 'compress',
-            getter: prototype.getProp_compress,
+            getter: prototype.getCompress,
         },
         {
             proto: prototype,
             property: 'stretch',
-            getter: prototype.getProp_stretch,
+            getter: prototype.getStretch,
         },
         {
             proto: prototype,
             property: 'mix',
-            getter: prototype.getProp_mix,
+            getter: prototype.getMix,
         },
         {
             proto: prototype,
             property: 'softness',
-            getter: prototype.getProp_softness,
+            getter: prototype.getSoftness,
         },
         {
             proto: prototype,
             property: 'active',
-            getter: prototype.getProp_active,
+            getter: prototype.getActive,
         },
     ];
     propertyPolyfills.forEach((prop) => {
         js.getset(prop.proto, prop.property, prop.getter);
     });
-    overrideDefineArrayProp(prototype, prototype.getProp_bones, 'bones');
+    overrideDefineArrayProp(prototype, prototype.getBones, 'bones');
 }
 
 function overrideProperty_PathConstraint () {
@@ -694,43 +720,43 @@ function overrideProperty_PathConstraint () {
         {
             proto: prototype,
             property: 'data',
-            getter: prototype.getProp_data,
+            getter: prototype.getData,
         },
         {
             proto: prototype,
             property: 'target',
-            getter: prototype.getProp_target,
+            getter: prototype.getTarget,
         },
         {
             proto: prototype,
             property: 'position',
-            getter: prototype.getProp_position,
+            getter: prototype.getPosition,
         },
         {
             proto: prototype,
             property: 'spacing',
-            getter: prototype.getProp_spacing,
+            getter: prototype.getSpacing,
         },
         {
             proto: prototype,
             property: 'rotateMix',
-            getter: prototype.getProp_rotateMix,
+            getter: prototype.getRotateMix,
         },
         {
             proto: prototype,
             property: 'translateMix',
-            getter: prototype.getProp_translateMix,
+            getter: prototype.getTranslateMix,
         },
         {
             proto: prototype,
             property: 'active',
-            getter: prototype.getProp_active,
+            getter: prototype.getActive,
         },
     ];
     propertyPolyfills.forEach((prop) => {
         js.getset(prop.proto, prop.property, prop.getter);
     });
-    overrideDefineArrayProp(prototype, prototype.getProp_bones, 'bones');
+    overrideDefineArrayProp(prototype, prototype.getBones, 'bones');
 }
 
 function overrideProperty_TransformConstraintData () {
@@ -739,73 +765,73 @@ function overrideProperty_TransformConstraintData () {
         {
             proto: prototype,
             property: 'target',
-            getter: prototype.getProp_target,
+            getter: prototype.getTarget,
         },
         {
             proto: prototype,
             property: 'rotateMix',
-            getter: prototype.getProp_rotateMix,
+            getter: prototype.getRotateMix,
         },
         {
             proto: prototype,
             property: 'translateMix',
-            getter: prototype.getProp_translateMix,
+            getter: prototype.getTranslateMix,
         },
         {
             proto: prototype,
             property: 'scaleMix',
-            getter: prototype.getProp_scaleMix,
+            getter: prototype.getScaleMix,
         },
         {
             proto: prototype,
             property: 'shearMix',
-            getter: prototype.getProp_shearMix,
+            getter: prototype.getShearMix,
         },
         {
             proto: prototype,
             property: 'offsetRotation',
-            getter: prototype.getProp_offsetRotation,
+            getter: prototype.getOffsetRotation,
         },
         {
             proto: prototype,
             property: 'offsetX',
-            getter: prototype.getProp_offsetX,
+            getter: prototype.getOffsetX,
         },
         {
             proto: prototype,
             property: 'offsetY',
-            getter: prototype.getProp_offsetY,
+            getter: prototype.getOffsetY,
         },
         {
             proto: prototype,
             property: 'offsetScaleX',
-            getter: prototype.getProp_offsetScaleX,
+            getter: prototype.getOffsetScaleX,
         },
         {
             proto: prototype,
             property: 'offsetScaleY',
-            getter: prototype.getProp_offsetScaleY,
+            getter: prototype.getOffsetScaleY,
         },
         {
             proto: prototype,
             property: 'offsetShearY',
-            getter: prototype.getProp_offsetShearY,
+            getter: prototype.getOffsetShearY,
         },
         {
             proto: prototype,
             property: 'relative',
-            getter: prototype.getProp_relative,
+            getter: prototype.getRelative,
         },
         {
             proto: prototype,
             property: 'local',
-            getter: prototype.getProp_local,
+            getter: prototype.getLocal,
         },
     ];
     propertyPolyfills.forEach((prop) => {
         js.getset(prop.proto, prop.property, prop.getter);
     });
-    overrideDefineArrayProp(prototype, prototype.getProp_bones, 'bones');
+    overrideDefineArrayProp(prototype, prototype.getBones, 'bones');
 }
 
 function overrideProperty_TransformConstraint () {
@@ -814,43 +840,43 @@ function overrideProperty_TransformConstraint () {
         {
             proto: prototype,
             property: 'data',
-            getter: prototype.getProp_data,
+            getter: prototype.getData,
         },
         {
             proto: prototype,
             property: 'target',
-            getter: prototype.getProp_target,
+            getter: prototype.getTarget,
         },
         {
             proto: prototype,
             property: 'rotateMix',
-            getter: prototype.getProp_rotateMix,
+            getter: prototype.getRotateMix,
         },
         {
             proto: prototype,
             property: 'translateMix',
-            getter: prototype.getProp_translateMix,
+            getter: prototype.getTranslateMix,
         },
         {
             proto: prototype,
             property: 'scaleMix',
-            getter: prototype.getProp_scaleMix,
+            getter: prototype.getScaleMix,
         },
         {
             proto: prototype,
             property: 'shearMix',
-            getter: prototype.getProp_shearMix,
+            getter: prototype.getShearMix,
         },
         {
             proto: prototype,
             property: 'active',
-            getter: prototype.getProp_active,
+            getter: prototype.getActive,
         },
     ];
     propertyPolyfills.forEach((prop) => {
         js.getset(prop.proto, prop.property, prop.getter);
     });
-    overrideDefineArrayProp(prototype, prototype.getProp_bones, 'bones');
+    overrideDefineArrayProp(prototype, prototype.getBones, 'bones');
 }
 
 function overrideProperty_Bone () {
@@ -859,127 +885,127 @@ function overrideProperty_Bone () {
         {
             proto: prototype,
             property: 'skeleton',
-            getter: prototype.getProp_skeleton,
+            getter: prototype.getSkeleton,
         },
         {
             proto: prototype,
             property: 'data',
-            getter: prototype.getProp_data,
+            getter: prototype.getData,
         },
         {
             proto: prototype,
             property: 'parent',
-            getter: prototype.getProp_parent,
+            getter: prototype.getParent,
         },
         {
             proto: prototype,
             property: 'x',
-            getter: prototype.getProp_x,
+            getter: prototype.getX,
         },
         {
             proto: prototype,
             property: 'y',
-            getter: prototype.getProp_y,
+            getter: prototype.getY,
         },
         {
             proto: prototype,
             property: 'rotation',
-            getter: prototype.getProp_rotation,
+            getter: prototype.getRotation,
         },
         {
             proto: prototype,
             property: 'scaleX',
-            getter: prototype.getProp_scaleX,
+            getter: prototype.getScaleX,
         },
         {
             proto: prototype,
             property: 'scaleY',
-            getter: prototype.getProp_scaleY,
+            getter: prototype.getScaleY,
         },
         {
             proto: prototype,
             property: 'shearX',
-            getter: prototype.getProp_shearX,
+            getter: prototype.getShearX,
         },
         {
             proto: prototype,
             property: 'shearY',
-            getter: prototype.getProp_shearY,
+            getter: prototype.getShearY,
         },
         {
             proto: prototype,
             property: 'ax',
-            getter: prototype.getProp_ax,
+            getter: prototype.getAX,
         },
         {
             proto: prototype,
             property: 'ay',
-            getter: prototype.getProp_ay,
+            getter: prototype.getAY,
         },
         {
             proto: prototype,
             property: 'arotation',
-            getter: prototype.getProp_arotation,
+            getter: prototype.getARotation,
         },
         {
             proto: prototype,
             property: 'ascaleX',
-            getter: prototype.getProp_ascaleX,
+            getter: prototype.getAScaleX,
         },
         {
             proto: prototype,
             property: 'ascaleY',
-            getter: prototype.getProp_ascaleY,
+            getter: prototype.getAScaleY,
         },
         {
             proto: prototype,
             property: 'ashearX',
-            getter: prototype.getProp_ashearX,
+            getter: prototype.getAShearX,
         },
         {
             proto: prototype,
             property: 'ashearY',
-            getter: prototype.getProp_ashearY,
+            getter: prototype.getAShearY,
         },
         {
             proto: prototype,
             property: 'appliedValid',
-            getter: prototype.getProp_appliedValid,
+            getter: prototype.getAppliedValid,
         },
         {
             proto: prototype,
             property: 'a',
-            getter: prototype.getProp_a,
+            getter: prototype.getA,
         },
         {
             proto: prototype,
             property: 'b',
-            getter: prototype.getProp_b,
+            getter: prototype.getB,
         },
         {
             proto: prototype,
             property: 'c',
-            getter: prototype.getProp_c,
+            getter: prototype.getC,
         },
         {
             proto: prototype,
             property: 'd',
-            getter: prototype.getProp_d,
+            getter: prototype.getD,
         },
         {
             proto: prototype,
             property: 'worldY',
-            getter: prototype.getProp_worldY,
+            getter: prototype.getWorldY,
         },
         {
             proto: prototype,
             property: 'worldX',
-            getter: prototype.getProp_worldX,
+            getter: prototype.getWorldX,
         },
         {
             proto: prototype,
             property: 'active',
-            getter: prototype.getProp_active,
+            getter: prototype.getActive,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -993,27 +1019,27 @@ function overrideProperty_Slot () {
         {
             proto: prototype,
             property: 'data',
-            getter: prototype.getProp_data,
+            getter: prototype.getData,
         },
         {
             proto: prototype,
             property: 'bone',
-            getter: prototype.getProp_bone,
+            getter: prototype.getBone,
         },
         {
             proto: prototype,
             property: 'color',
-            getter: prototype.getProp_color,
+            getter: prototype.getColor,
         },
         {
             proto: prototype,
             property: 'darkColor',
-            getter: prototype.getProp_darkColor,
+            getter: prototype.getDarkColor,
         },
         {
             proto: prototype,
             property: 'deform',
-            getter: prototype.getProp_deform,
+            getter: prototype.getDeform,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -1027,15 +1053,15 @@ function overrideProperty_Skin () {
         {
             proto: prototype,
             property: 'name',
-            getter: prototype.getProp_name,
+            getter: prototype.getName,
         },
     ];
     propertyPolyfills.forEach((prop) => {
         js.getset(prop.proto, prop.property, prop.getter);
     });
-    overrideDefineArrayProp(prototype, prototype.getProp_bones, 'bones');
-    overrideDefineArrayProp(prototype, prototype.getProp_attachments, 'attachments');
-    overrideDefineArrayProp(prototype, prototype.getProp_constraints, 'constraints');
+    overrideDefineArrayProp(prototype, prototype.getBones, 'bones');
+    overrideDefineArrayProp(prototype, prototype.getAttachments, 'attachments');
+    overrideDefineArrayProp(prototype, prototype.getConstraints, 'constraints');
 }
 
 function overrideProperty_SkinEntry () {
@@ -1044,7 +1070,7 @@ function overrideProperty_SkinEntry () {
         {
             proto: prototype,
             property: 'attachment',
-            getter: prototype.getProp_attachment,
+            getter: prototype.getAttachment,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -1058,17 +1084,17 @@ function overrideProperty_SkeletonClipping () {
         {
             proto: prototype,
             property: 'clippedVertices',
-            getter: prototype.getProp_clippedVertices,
+            getter: prototype.getClippedVertices,
         },
         {
             proto: prototype,
             property: 'clippedTriangles',
-            getter: prototype.getProp_clippedTriangles,
+            getter: prototype.getClippedTriangles,
         },
         {
             proto: prototype,
             property: 'UVs',
-            getter: prototype.getProp_UVs,
+            getter: prototype.getUVs,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -1082,71 +1108,71 @@ function overrideProperty_SkeletonData () {
         {
             proto: prototype,
             property: 'name',
-            getter: prototype.getProp_name,
+            getter: prototype.getName,
         },
         {
             proto: prototype,
             property: 'defaultSkin',
-            getter: prototype.getProp_defaultSkin,
+            getter: prototype.getDefaultSkin,
         },
         {
             proto: prototype,
             property: 'x',
-            getter: prototype.getProp_x,
+            getter: prototype.getX,
         },
         {
             proto: prototype,
             property: 'y',
-            getter: prototype.getProp_y,
+            getter: prototype.getY,
         },
         {
             proto: prototype,
             property: 'width',
-            getter: prototype.getProp_width,
+            getter: prototype.getWidth,
         },
         {
             proto: prototype,
             property: 'height',
-            getter: prototype.getProp_height,
+            getter: prototype.getHeight,
         },
         {
             proto: prototype,
             property: 'version',
-            getter: prototype.getProp_version,
+            getter: prototype.getVersion,
         },
         {
             proto: prototype,
             property: 'hash',
-            getter: prototype.getProp_hash,
+            getter: prototype.getHash,
         },
         {
             proto: prototype,
             property: 'fps',
-            getter: prototype.getProp_fps,
+            getter: prototype.getFps,
         },
         {
             proto: prototype,
             property: 'imagesPath',
-            getter: prototype.getProp_imagesPath,
+            getter: prototype.getImagesPath,
         },
         {
             proto: prototype,
             property: 'audioPath',
-            getter: prototype.getProp_audioPath,
+            getter: prototype.getAudioPath,
         },
     ];
     propertyPolyfills.forEach((prop) => {
         js.getset(prop.proto, prop.property, prop.getter);
     });
 
-    overrideDefineArrayProp(prototype, prototype.getProp_bones, 'bones');
-    overrideDefineArrayProp(prototype, prototype.getProp_slots, 'slots');
-    overrideDefineArrayProp(prototype, prototype.getProp_skins, 'skins');
-    overrideDefineArrayProp(prototype, prototype.getProp_animations, 'animations');
-    overrideDefineArrayProp(prototype, prototype.getProp_events, 'events');
-    overrideDefineArrayProp(prototype, prototype.getProp_ikConstraints, 'ikConstraints');
-    overrideDefineArrayProp(prototype, prototype.transformConstraints, 'transformConstraints');
-    overrideDefineArrayProp(prototype, prototype.getProp_pathConstraints, 'pathConstraints');
+    overrideDefineArrayProp(prototype, prototype.getBones, 'bones');
+    overrideDefineArrayProp(prototype, prototype.getSlots, 'slots');
+    overrideDefineArrayProp(prototype, prototype.getSkins, 'skins');
+    overrideDefineArrayProp(prototype, prototype.getAnimations, 'animations');
+    overrideDefineArrayProp(prototype, prototype.getEvents, 'events');
+    overrideDefineArrayProp(prototype, prototype.getIkConstraints, 'ikConstraints');
+    overrideDefineArrayProp(prototype, prototype.getTransformConstraints, 'transformConstraints');
+    overrideDefineArrayProp(prototype, prototype.getPathConstraints, 'pathConstraints');
 }
 
 function overrideProperty_RotateTimeline () {
@@ -1155,13 +1181,13 @@ function overrideProperty_RotateTimeline () {
         {
             proto: prototype,
             property: 'boneIndex',
-            getter: prototype.getProp_boneIndex,
+            getter: prototype.getBoneIndex,
         },
     ];
     propertyPolyfills.forEach((prop) => {
         js.getset(prop.proto, prop.property, prop.getter);
     });
-    overrideDefineArrayProp(prototype, prototype.getProp_frames, 'frames');
+    overrideDefineArrayProp(prototype, prototype.getFrames, 'frames');
 }
 
 function overrideProperty_ColorTimeline () {
@@ -1170,13 +1196,13 @@ function overrideProperty_ColorTimeline () {
         {
             proto: prototype,
             property: 'slotIndex',
-            getter: prototype.getProp_slotIndex,
+            getter: prototype.getSlotIndex,
         },
     ];
     propertyPolyfills.forEach((prop) => {
         js.getset(prop.proto, prop.property, prop.getter);
     });
-    overrideDefineArrayProp(prototype, prototype.getProp_frames, 'frames');
+    overrideDefineArrayProp(prototype, prototype.getFrames, 'frames');
 }
 
 function overrideProperty_TwoColorTimeline () {
@@ -1185,7 +1211,7 @@ function overrideProperty_TwoColorTimeline () {
         {
             proto: prototype,
             property: 'slotIndex',
-            getter: prototype.getProp_slotIndex,
+            getter: prototype.getSlotIndex,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -1199,18 +1225,18 @@ function overrideProperty_AttachmentTimeline () {
         {
             proto: prototype,
             property: 'slotIndex',
-            getter: prototype.getProp_slotIndex,
+            getter: prototype.getSlotIndex,
         },
         {
             proto: prototype,
             property: 'attachmentNames',
-            getter: prototype.getProp_attachmentNames,
+            getter: prototype.getAttachmentNames,
         },
     ];
     propertyPolyfills.forEach((prop) => {
         js.getset(prop.proto, prop.property, prop.getter);
     });
-    overrideDefineArrayProp(prototype, prototype.getProp_frames, 'frames');
+    overrideDefineArrayProp(prototype, prototype.getFrames, 'frames');
 }
 
 function overrideProperty_DeformTimeline () {
@@ -1219,34 +1245,34 @@ function overrideProperty_DeformTimeline () {
         {
             proto: prototype,
             property: 'slotIndex',
-            getter: prototype.getProp_slotIndex,
+            getter: prototype.getSlotIndex,
         },
         {
             proto: prototype,
             property: 'attachment',
-            getter: prototype.getProp_attachment,
+            getter: prototype.getAttachment,
         },
         {
             proto: prototype,
             property: 'frameVertices',
-            getter: prototype.getProp_frameVertices,
+            getter: prototype.getFrameVertices,
         },
     ];
     propertyPolyfills.forEach((prop) => {
         js.getset(prop.proto, prop.property, prop.getter);
     });
-    overrideDefineArrayProp(prototype, prototype.getProp_frames, 'frames');
+    overrideDefineArrayProp(prototype, prototype.getFrames, 'frames');
 }
 
 function overrideProperty_EventTimeline () {
     const prototype = spine.EventTimeline.prototype as any;
-    overrideDefineArrayProp(prototype, prototype.getProp_frames, 'frames');
-    overrideDefineArrayProp(prototype, prototype.getProp_events, 'events');
+    overrideDefineArrayProp(prototype, prototype.getFrames, 'frames');
+    overrideDefineArrayProp(prototype, prototype.getEvents, 'events');
 }
 
 function overrideProperty_DrawOrderTimeline () {
     const prototype = spine.DrawOrderTimeline.prototype as any;
-    overrideDefineArrayProp(prototype, prototype.getProp_frames, 'frames');
+    overrideDefineArrayProp(prototype, prototype.getFrames, 'frames');
 }
 
 function overrideProperty_TrackEntry () {
@@ -1255,107 +1281,107 @@ function overrideProperty_TrackEntry () {
         {
             proto: prototype,
             property: 'animation',
-            getter: prototype.getProp_animation,
+            getter: prototype.getAnimation,
         },
         {
             proto: prototype,
             property: 'next',
-            getter: prototype.getProp_next,
+            getter: prototype.getNext,
         },
         {
             proto: prototype,
             property: 'mixingFrom',
-            getter: prototype.getProp_mixingFrom,
+            getter: prototype.getMixingFrom,
         },
         {
             proto: prototype,
             property: 'mixingTo',
-            getter: prototype.getProp_mixingTo,
+            getter: prototype.getMixingTo,
         },
         {
             proto: prototype,
             property: 'trackIndex',
-            getter: prototype.getProp_trackIndex,
+            getter: prototype.getTrackIndex,
         },
         {
             proto: prototype,
             property: 'loop',
-            getter: prototype.getProp_loop,
+            getter: prototype.getLoop,
         },
         {
             proto: prototype,
             property: 'holdPrevious',
-            getter: prototype.getProp_holdPrevious,
+            getter: prototype.getHoldPrevious,
         },
         {
             proto: prototype,
             property: 'eventThreshold',
-            getter: prototype.getProp_eventThreshold,
+            getter: prototype.getEventThreshold,
         },
         {
             proto: prototype,
             property: 'attachmentThreshold',
-            getter: prototype.getProp_attachmentThreshold,
+            getter: prototype.getAttachmentThreshold,
         },
         {
             proto: prototype,
             property: 'drawOrderThreshold',
-            getter: prototype.getProp_drawOrderThreshold,
+            getter: prototype.getDrawOrderThreshold,
         },
         {
             proto: prototype,
             property: 'animationStart',
-            getter: prototype.getProp_animationStart,
+            getter: prototype.getAnimationStart,
         },
         {
             proto: prototype,
             property: 'animationEnd',
-            getter: prototype.getProp_animationEnd,
+            getter: prototype.getAnimationEnd,
         },
         {
             proto: prototype,
             property: 'animationLast',
-            getter: prototype.getProp_animationLast,
+            getter: prototype.getAnimationLast,
         },
         {
             proto: prototype,
             property: 'delay',
-            getter: prototype.getProp_delay,
+            getter: prototype.getDelay,
         },
         {
             proto: prototype,
             property: 'trackTime',
-            getter: prototype.getProp_trackTime,
+            getter: prototype.getTrackTime,
         },
         {
             proto: prototype,
             property: 'trackEnd',
-            getter: prototype.getProp_trackEnd,
+            getter: prototype.getTrackEnd,
         },
         {
             proto: prototype,
             property: 'timeScale',
-            getter: prototype.getProp_timeScale,
+            getter: prototype.getTimeScale,
         },
         {
             proto: prototype,
             property: 'alpha',
-            getter: prototype.getProp_alpha,
+            getter: prototype.getAlpha,
         },
         {
             proto: prototype,
             property: 'mixTime',
-            getter: prototype.getProp_mixTime,
+            getter: prototype.getMixTime,
         },
         {
             proto: prototype,
             property: 'mixDuration',
-            getter: prototype.getProp_mixDuration,
+            getter: prototype.getMixDuration,
         },
         {
             proto: prototype,
             property: 'mixBlend',
-            getter: prototype.getProp_mixBlend,
+            getter: prototype.getMixBlend,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -1369,12 +1395,12 @@ function overrideProperty_AnimationStateData () {
         {
             proto: prototype,
             property: 'defaultMix',
-            getter: prototype.getProp_defaultMix,
+            getter: prototype.getDefaultMix,
         },
         {
             proto: prototype,
             property: 'skeletonData',
-            getter: prototype.getProp_skeletonData,
+            getter: prototype.getSkeletonData,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -1388,19 +1414,19 @@ function overrideProperty_AnimationState () {
         {
             proto: prototype,
             property: 'data',
-            getter: prototype.getProp_data,
+            getter: prototype.getData,
         },
         {
             proto: prototype,
             property: 'timeScale',
-            getter: prototype.getProp_timeScale,
+            getter: prototype.getTimeScale,
         },
     ];
     propertyPolyfills.forEach((prop) => {
         js.getset(prop.proto, prop.property, prop.getter);
     });
 
-    overrideDefineArrayProp(prototype, prototype.getProp_tracks, 'tracks');
+    overrideDefineArrayProp(prototype, prototype.getTracks, 'tracks');
 }
 
 function overrideProperty_Animation () {
@@ -1409,7 +1435,7 @@ function overrideProperty_Animation () {
         {
             proto: prototype,
             property: 'name',
-            getter: prototype.getProp_name,
+            getter: prototype.getName,
         },
         // {
         //     proto: prototype,
@@ -1419,7 +1445,7 @@ function overrideProperty_Animation () {
         {
             proto: prototype,
             property: 'duration',
-            getter: prototype.getProp_duration,
+            getter: prototype.getDuration,
         },
     ];
     propertyPolyfills.forEach((prop) => {
@@ -1433,59 +1459,59 @@ function overrideProperty_Skeleton () {
         {
             proto: prototype,
             property: 'data',
-            getter: prototype.getProp_data,
+            getter: prototype.getData,
         },
         {
             proto: prototype,
             property: '_updateCache',
-            getter: prototype.getProp__updateCache,
+            getter: prototype.getUpdateCache,
         },
         {
             proto: prototype,
             property: 'skin',
-            getter: prototype.getProp_skin,
+            getter: prototype.getSkin,
         },
         {
             proto: prototype,
             property: 'color',
-            getter: prototype.getProp_color,
+            getter: prototype.getColor,
         },
         {
             proto: prototype,
             property: 'time',
-            getter: prototype.getProp_time,
+            getter: prototype.getTime,
         },
         {
             proto: prototype,
             property: 'scaleX',
-            getter: prototype.getProp_scaleX,
+            getter: prototype.getScaleX,
         },
         {
             proto: prototype,
             property: 'scaleY',
-            getter: prototype.getProp_scaleY,
+            getter: prototype.getScaleY,
         },
         {
             proto: prototype,
             property: 'x',
-            getter: prototype.getProp_x,
+            getter: prototype.getX,
         },
         {
             proto: prototype,
             property: 'y',
-            getter: prototype.getProp_y,
+            getter: prototype.getY,
         },
     ];
     propertyPolyfills.forEach((prop) => {
         js.getset(prop.proto, prop.property, prop.getter);
     });
 
-    overrideDefineArrayProp(prototype, prototype.getProp_bones, 'bones');
-    overrideDefineArrayProp(prototype, prototype.getProp_slots, 'slots');
-    overrideDefineArrayProp(prototype, prototype.getProp_drawOrder, 'drawOrder');
-    overrideDefineArrayProp(prototype, prototype.getProp_ikConstraints, 'ikConstraints');
-    overrideDefineArrayProp(prototype, prototype.getProp_transformConstraints, 'transformConstraints');
-    overrideDefineArrayProp(prototype, prototype.getProp_pathConstraints, 'pathConstraints');
+    overrideDefineArrayProp(prototype, prototype.getBones, 'bones');
+    overrideDefineArrayProp(prototype, prototype.getSlots, 'slots');
+    overrideDefineArrayProp(prototype, prototype.getDrawOrder, 'drawOrder');
+    overrideDefineArrayProp(prototype, prototype.getIkConstraints, 'ikConstraints');
+    overrideDefineArrayProp(prototype, prototype.getTransformConstraints, 'transformConstraints');
+    overrideDefineArrayProp(prototype, prototype.getPathConstraints, 'pathConstraints');
 }
 
 export function overrideSpineDefine (wasm) {

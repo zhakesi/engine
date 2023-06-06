@@ -228,7 +228,10 @@ export class Skeleton extends UIRenderer {
     // Skeleton cache
     protected _skeletonCache: SkeletonCache | null = null;
     protected _animCache: AnimationCache | null = null;
-    protected _curFrame: AnimationFrame | null = null;
+    /**
+     * @internal
+     */
+    public _curFrame: AnimationFrame | null = null;
     // Is need update skeltonData
     protected _needUpdateSkeltonData = true;
     protected _listener: TrackEntryListeners | null = null;
@@ -519,6 +522,23 @@ export class Skeleton extends UIRenderer {
     }
     get socketNodes () { return this._socketNodes; }
 
+    /**
+     * @en The name of current playing animation.
+     * @zh 当前播放的动画名称。
+     * @property {String} animation
+     */
+
+    get animation (): string {
+        return this._animationName;
+    }
+    set animation (value: string) {
+        if (value) {
+            this.setAnimation(0, value, this.loop);
+        } else {
+            this.clearAnimation();
+        }
+    }
+
     public __preload () {
         super.__preload();
     }
@@ -552,23 +572,6 @@ export class Skeleton extends UIRenderer {
             spine.wasmUtil.destroySpineInstance(this._instance);
         }
         super.onDestroy();
-    }
-
-    /**
-     * @en The name of current playing animation.
-     * @zh 当前播放的动画名称。
-     * @property {String} animation
-     */
-
-    get animation (): string {
-        return this._animationName;
-    }
-    set animation (value: string) {
-        if (value) {
-            this.setAnimation(0, value, this.loop);
-        } else {
-            this.clearAnimation();
-        }
     }
     /**
      * @en Clear animation and set to setup pose.
@@ -1176,7 +1179,11 @@ export class Skeleton extends UIRenderer {
     protected _updateUseTint () {
         this._cleanMaterialCache();
         this.destroyRenderData();
-        this._instance.setUseTint(this._useTint);
+        if (this.isAnimationCached()) {
+            this._useTint = true;
+        } else {
+            this._instance.setUseTint(this._useTint);
+        }
         if (this._assembler && this._skeleton) {
             this._renderData = this._assembler.createData(this);
             this.markForUpdateRenderData();
