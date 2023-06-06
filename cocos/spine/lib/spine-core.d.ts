@@ -1288,7 +1288,8 @@ declare namespace spine {
         setJitterEffect(jitter: spine.VertexEffect);
         setSwirlEffect(swirl: spine.VertexEffect);
         updateRenderData();
-        setStartListener(listener: any);
+        setStartListener();
+        static getCurrentEvent(): Event;
     }
 
     class wasmUtil {
@@ -1299,6 +1300,10 @@ declare namespace spine {
         static registerSpineSkeletonDataWithUUID(data: SkeletonData, uuid: string);
         static destroySpineSkeletonDataWithUUID(uuid: string);
         static destroySpineInstance(instance: SkeletonInstance);
+        static getCurrentInstance(): SkeletonInstance;
+        static getCurrentEventType(): EventType;
+        static getCurrentTrackEntry(): TrackEntry;
+        static getCurrentEvent(): Event;
         static HEAPU8: Uint8Array;
     }
 }
