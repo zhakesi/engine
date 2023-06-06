@@ -11,17 +11,8 @@ extern "C" {
 }
 using namespace spine;
 
-static void s_listenerFeedbackToJS(TrackEntry *entry) {
-    spineListenerCallBackFromJS();
-}
-
 static void animationCallback(AnimationState *state, EventType type, TrackEntry *entry, Event *event) {
     SpineSkeletonInstance *instance = (SpineSkeletonInstance *)state->getRendererObject();
-    SpineWasmUtil::s_currentInstance = instance;
-    SpineWasmUtil::s_currentType = type;
-    SpineWasmUtil::s_currentEntry = entry;
-    SpineWasmUtil::s_currentEvent = event;
-
     instance->onAnimationStateEvent(entry, type, event);
 }
 
@@ -380,9 +371,27 @@ void SpineSkeletonInstance::setMix(const std::string& from, const std::string& t
     _animStateData->setMix(from.c_str(), to.c_str(), duration);
 }
 
-void SpineSkeletonInstance::setStartListener() {
-    LogUtil::PrintToJs("XXX- setStartListener");
-    _startListener = s_listenerFeedbackToJS;
+void SpineSkeletonInstance::setListener(uint32_t listenerID, uint32_t type) {
+        switch (type) {
+        case EventType_Start:
+            _startListenerID = listenerID;
+            break;
+        case EventType_Interrupt:
+            _interruptListenerID = listenerID;
+            break;
+        case EventType_End:
+            _endListenerID = listenerID;
+            break;
+        case EventType_Dispose:
+            _disposeListenerID = listenerID;
+            break;
+        case EventType_Complete:
+            _completeListenerID = listenerID;
+            break;
+        case EventType_Event:
+            _eventListenerID = listenerID;
+            break;
+    }
 }
 
 void SpineSkeletonInstance::setUseTint(bool useTint) {
@@ -390,30 +399,45 @@ void SpineSkeletonInstance::setUseTint(bool useTint) {
 }
 
 void SpineSkeletonInstance::onAnimationStateEvent(TrackEntry *entry, EventType type, Event *event) {
+    SpineWasmUtil::s_currentType = type;
+    SpineWasmUtil::s_currentEntry = entry;
+    SpineWasmUtil::s_currentEvent = event;
     switch (type) {
         case EventType_Start:
-            LogUtil::PrintToJs("XXX- EventType_Start");
-            if (_startListener) _startListener(entry);
+            if (_startListenerID != 0) {
+                SpineWasmUtil::s_listenerID = _startListenerID;
+                spineListenerCallBackFromJS();
+            }
             break;
         case EventType_Interrupt:
-            LogUtil::PrintToJs("XXX- EventType_Interrupt");
-            if (_interruptListener) _interruptListener(entry);
+            if (_interruptListenerID != 0) {
+                SpineWasmUtil::s_listenerID = _interruptListenerID;
+                spineListenerCallBackFromJS();
+            }
             break;
         case EventType_End:
-            LogUtil::PrintToJs("XXX- EventType_End");
-            if (_endListener) _endListener(entry);
+            if (_endListenerID != 0) {
+                SpineWasmUtil::s_listenerID = _endListenerID;
+                spineListenerCallBackFromJS();
+            }
             break;
         case EventType_Dispose:
-            LogUtil::PrintToJs("XXX- EventType_Dispose");
-            if (_disposeListener) _disposeListener(entry);
+            if (_disposeListenerID != 0) {
+                SpineWasmUtil::s_listenerID = _disposeListenerID;
+                spineListenerCallBackFromJS();
+            }
             break;
         case EventType_Complete:
-            LogUtil::PrintToJs("XXX- EventType_Complete");
-            if (_completeListener) _completeListener(entry);
+            if (_completeListenerID != 0) {
+                SpineWasmUtil::s_listenerID = _completeListenerID;
+                spineListenerCallBackFromJS();
+            }
             break;
         case EventType_Event:
-            LogUtil::PrintToJs("XXX- EventType_Event");
-            if (_eventListener) _eventListener(entry, event);
+            if (_eventListenerID != 0) {
+                SpineWasmUtil::s_listenerID = _eventListenerID;
+                spineListenerCallBackFromJS();
+            }
             break;
     }
 }

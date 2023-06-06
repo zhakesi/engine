@@ -17,12 +17,12 @@ public:
     static void            destroySpineSkeletonDataWithUUID(const std::string& uuid);
     static void            destroySpineInstance(SpineSkeletonInstance* instance);
 
-    static SpineSkeletonInstance* getCurrentInstance();
+    static uint32_t getCurrentListenerID();
     static EventType getCurrentEventType();
     static TrackEntry* getCurrentTrackEntry();
     static Event* getCurrentEvent();
 
-    static SpineSkeletonInstance* s_currentInstance;
+    static uint32_t s_listenerID;
     static EventType s_currentType;
     static TrackEntry* s_currentEntry;
     static Event* s_currentEvent;

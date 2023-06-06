@@ -1064,7 +1064,7 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("clearEffect", &SpineSkeletonInstance::clearEffect)
         .function("getAnimationState", &SpineSkeletonInstance::getAnimationState, allow_raw_pointer<AnimationState>())
         .function("setMix", &SpineSkeletonInstance::setMix)
-        .function("setStartListener", &SpineSkeletonInstance::setStartListener);
+        .function("setListener", &SpineSkeletonInstance::setListener);
 }
 
 EMSCRIPTEN_BINDINGS(cocos_spine) {
@@ -1076,7 +1076,7 @@ EMSCRIPTEN_BINDINGS(cocos_spine) {
     .class_function("registerSpineSkeletonDataWithUUID", &SpineWasmUtil::registerSpineSkeletonDataWithUUID, allow_raw_pointers())
     .class_function("destroySpineSkeletonDataWithUUID", &SpineWasmUtil::destroySpineSkeletonDataWithUUID)
     .class_function("destroySpineInstance", &SpineWasmUtil::destroySpineInstance, allow_raw_pointers())
-    .class_function("getCurrentInstance", &SpineWasmUtil::getCurrentInstance, allow_raw_pointers())
+    .class_function("getCurrentListenerID", &SpineWasmUtil::getCurrentListenerID)
     .class_function("getCurrentEventType", &SpineWasmUtil::getCurrentEventType)
     .class_function("getCurrentTrackEntry", &SpineWasmUtil::getCurrentTrackEntry, allow_raw_pointers())
     .class_function("getCurrentEvent", &SpineWasmUtil::getCurrentEvent, allow_raw_pointers());

@@ -7,7 +7,7 @@
 
 std::map<std::string, SkeletonData*> skeletonDataMap {};
 
-SpineSkeletonInstance* SpineWasmUtil::s_currentInstance = nullptr;
+uint32_t SpineWasmUtil::s_listenerID = 0;
 EventType SpineWasmUtil::s_currentType = EventType_Event;
 TrackEntry* SpineWasmUtil::s_currentEntry = nullptr;
 Event* SpineWasmUtil::s_currentEvent = nullptr;
@@ -76,8 +76,8 @@ void SpineWasmUtil::destroySpineInstance(SpineSkeletonInstance* instance) {
     }
 }
 
-SpineSkeletonInstance* SpineWasmUtil::getCurrentInstance() {
-    return s_currentInstance;
+uint32_t SpineWasmUtil::getCurrentListenerID() {
+    return s_listenerID;
 }
 
 EventType SpineWasmUtil::getCurrentEventType() {
