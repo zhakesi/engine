@@ -7,6 +7,11 @@
 
 std::map<std::string, SkeletonData*> skeletonDataMap {};
 
+SpineSkeletonInstance* SpineWasmUtil::s_currentInstance = nullptr;
+EventType SpineWasmUtil::s_currentType = EventType_Event;
+TrackEntry* SpineWasmUtil::s_currentEntry = nullptr;
+Event* SpineWasmUtil::s_currentEvent = nullptr;
+
 void SpineWasmUtil::spineWasmInit() {
     LogUtil::Initialize();
     spine::SpineExtension* tension = new WasmSpineExtension();
@@ -69,4 +74,20 @@ void SpineWasmUtil::destroySpineInstance(SpineSkeletonInstance* instance) {
         delete instance;
         instance = nullptr;
     }
+}
+
+SpineSkeletonInstance* SpineWasmUtil::getCurrentInstance() {
+    return s_currentInstance;
+}
+
+EventType SpineWasmUtil::getCurrentEventType() {
+    return s_currentType;
+}
+
+TrackEntry* SpineWasmUtil::getCurrentTrackEntry() {
+    return s_currentEntry;
+}
+
+Event* SpineWasmUtil::getCurrentEvent() {
+    return s_currentEvent;
 }

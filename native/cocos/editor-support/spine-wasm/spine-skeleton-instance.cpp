@@ -4,8 +4,27 @@
 #include "AtlasAttachmentLoaderExtension.h"
 #include "util-function.h"
 #include "spine-mesh-data.h"
+#include "spine-wasm.h"
 
+extern "C" {
+    extern void spineListenerCallBackFromJS();
+}
 using namespace spine;
+
+static void s_listenerFeedbackToJS(TrackEntry *entry) {
+    spineListenerCallBackFromJS();
+}
+
+static void animationCallback(AnimationState *state, EventType type, TrackEntry *entry, Event *event) {
+    SpineSkeletonInstance *instance = (SpineSkeletonInstance *)state->getRendererObject();
+    SpineWasmUtil::s_currentInstance = instance;
+    SpineWasmUtil::s_currentType = type;
+    SpineWasmUtil::s_currentEntry = entry;
+    SpineWasmUtil::s_currentEvent = event;
+
+    instance->onAnimationStateEvent(entry, type, event);
+}
+
 SpineSkeletonInstance::SpineSkeletonInstance()
 {
     _model = new SpineModel();
@@ -26,7 +45,6 @@ Skeleton *SpineSkeletonInstance::initSkeleton(SkeletonData* data) {
     if (_animState) delete _animState;
     if (_animStateData) delete _animStateData;
     if (_skeleton) delete _skeleton;
-    if (_model) delete _model;
     
     _skeletonData = data;
     _skeleton = new Skeleton(_skeletonData);
@@ -36,6 +54,10 @@ Skeleton *SpineSkeletonInstance::initSkeleton(SkeletonData* data) {
     _skeleton->setToSetupPose();
     _skeleton->updateWorldTransform();
     LogUtil::PrintToJs("initSkeleton ok.");
+
+
+    _animState->setRendererObject(this);
+    _animState->setListener(animationCallback);
     return _skeleton;
 }
 
@@ -358,11 +380,40 @@ void SpineSkeletonInstance::setMix(const std::string& from, const std::string& t
     _animStateData->setMix(from.c_str(), to.c_str(), duration);
 }
 
-void SpineSkeletonInstance::setStartListener(const StartListener &listener) {
+void SpineSkeletonInstance::setStartListener() {
     LogUtil::PrintToJs("XXX- setStartListener");
-    listener();
+    _startListener = s_listenerFeedbackToJS;
 }
 
 void SpineSkeletonInstance::setUseTint(bool useTint) {
     _userData.useTint = useTint;
+}
+
+void SpineSkeletonInstance::onAnimationStateEvent(TrackEntry *entry, EventType type, Event *event) {
+    switch (type) {
+        case EventType_Start:
+            LogUtil::PrintToJs("XXX- EventType_Start");
+            if (_startListener) _startListener(entry);
+            break;
+        case EventType_Interrupt:
+            LogUtil::PrintToJs("XXX- EventType_Interrupt");
+            if (_interruptListener) _interruptListener(entry);
+            break;
+        case EventType_End:
+            LogUtil::PrintToJs("XXX- EventType_End");
+            if (_endListener) _endListener(entry);
+            break;
+        case EventType_Dispose:
+            LogUtil::PrintToJs("XXX- EventType_Dispose");
+            if (_disposeListener) _disposeListener(entry);
+            break;
+        case EventType_Complete:
+            LogUtil::PrintToJs("XXX- EventType_Complete");
+            if (_completeListener) _completeListener(entry);
+            break;
+        case EventType_Event:
+            LogUtil::PrintToJs("XXX- EventType_Event");
+            if (_eventListener) _eventListener(entry, event);
+            break;
+    }
 }

@@ -7,7 +7,14 @@
 #include <memory>
 #include <functional>
 using namespace spine;
-typedef std::function<void()> StartListener;
+
+typedef std::function<void(TrackEntry *entry)> StartListener;
+typedef std::function<void(TrackEntry *entry)> InterruptListener;
+typedef std::function<void(TrackEntry *entry)> EndListener;
+typedef std::function<void(TrackEntry *entry)> DisposeListener;
+typedef std::function<void(TrackEntry *entry)> CompleteListener;
+typedef std::function<void(TrackEntry *entry, Event *event)> EventListener;
+
 class SpineSkeletonInstance {
     struct UserData {
         bool useTint = false;
@@ -31,7 +38,8 @@ public:
     void clearEffect();
     AnimationState* getAnimationState();
     void setMix(const std::string& from, const std::string& to, float duration);
-    void setStartListener(const StartListener &listener);
+    void setStartListener();
+    virtual void onAnimationStateEvent(TrackEntry *entry, EventType type, Event *event);
 
 private:
     void collectMeshData();
@@ -43,6 +51,13 @@ private:
     SkeletonClipping* _clipper = nullptr;
     VertexEffect *_effect = nullptr;
     SpineModel* _model = nullptr;
+    StartListener _startListener = nullptr;
+    InterruptListener _interruptListener = nullptr;
+    EndListener _endListener = nullptr;
+    DisposeListener _disposeListener = nullptr;
+    CompleteListener _completeListener = nullptr;
+    EventListener _eventListener = nullptr;
+    
     UserData _userData;
 };
 

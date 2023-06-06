@@ -4,6 +4,7 @@
 #include <emscripten/bind.h>
 #include <memory>
 #include <vector>
+#include <functional>
 
 using namespace emscripten;
 using namespace spine;
@@ -1074,5 +1075,9 @@ EMSCRIPTEN_BINDINGS(cocos_spine) {
     .class_function("createSpineSkeletonDataWithJson", &SpineWasmUtil::createSpineSkeletonDataWithJson, allow_raw_pointers())
     .class_function("registerSpineSkeletonDataWithUUID", &SpineWasmUtil::registerSpineSkeletonDataWithUUID, allow_raw_pointers())
     .class_function("destroySpineSkeletonDataWithUUID", &SpineWasmUtil::destroySpineSkeletonDataWithUUID)
-    .class_function("destroySpineInstance", &SpineWasmUtil::destroySpineInstance, allow_raw_pointers());
+    .class_function("destroySpineInstance", &SpineWasmUtil::destroySpineInstance, allow_raw_pointers())
+    .class_function("getCurrentInstance", &SpineWasmUtil::getCurrentInstance, allow_raw_pointers())
+    .class_function("getCurrentEventType", &SpineWasmUtil::getCurrentEventType)
+    .class_function("getCurrentTrackEntry", &SpineWasmUtil::getCurrentTrackEntry, allow_raw_pointers())
+    .class_function("getCurrentEvent", &SpineWasmUtil::getCurrentEvent, allow_raw_pointers());
 }

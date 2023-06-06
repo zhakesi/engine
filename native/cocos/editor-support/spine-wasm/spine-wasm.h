@@ -16,6 +16,16 @@ public:
     static void            registerSpineSkeletonDataWithUUID(SkeletonData* data, const std::string& uuid);
     static void            destroySpineSkeletonDataWithUUID(const std::string& uuid);
     static void            destroySpineInstance(SpineSkeletonInstance* instance);
+
+    static SpineSkeletonInstance* getCurrentInstance();
+    static EventType getCurrentEventType();
+    static TrackEntry* getCurrentTrackEntry();
+    static Event* getCurrentEvent();
+
+    static SpineSkeletonInstance* s_currentInstance;
+    static EventType s_currentType;
+    static TrackEntry* s_currentEntry;
+    static Event* s_currentEvent;
 };
 
 #endif
