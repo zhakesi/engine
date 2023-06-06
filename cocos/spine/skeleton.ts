@@ -43,9 +43,13 @@ import { SPINE_WASM } from './lib/instantiated';
 import spine from './lib/spine-core.js';
 import { VertexEffectDelegate } from './vertex-effect-delegate';
 import SkeletonCache, { AnimationCache, AnimationFrame } from './skeleton-cache';
+import { TrackEntryListeners } from './track-entry-listeners';
 
 const spineTag = SPINE_WASM;
 const CachedFrameTime = 1 / 60;
+
+type TrackListener = (x: spine.TrackEntry) => void;
+type TrackListener2 = (x: spine.TrackEntry, ev: spine.Event | number) => void;
 /**
  * @en
  * Animation playback rate.
@@ -227,6 +231,7 @@ export class Skeleton extends UIRenderer {
     protected _curFrame: AnimationFrame | null = null;
     // Is need update skeltonData
     protected _needUpdateSkeltonData = true;
+    protected _listener: TrackEntryListeners | null = null;
 
     constructor () {
         super();
@@ -516,7 +521,6 @@ export class Skeleton extends UIRenderer {
 
     public __preload () {
         super.__preload();
-        this._updateSkeletonData();
     }
 
     public onRestore () {
@@ -528,6 +532,7 @@ export class Skeleton extends UIRenderer {
      */
     public onEnable () {
         super.onEnable();
+        this._updateSkeletonData();
         this._flushAssembler();
         SkeletonSystem.getInstance().add(this);
     }
@@ -1305,16 +1310,23 @@ export class Skeleton extends UIRenderer {
         }
     }
 
+    protected _ensureListener () {
+        if (!this._listener) {
+            this._listener = (new TrackEntryListeners()) as any;
+        }
+    }
+
     /**
      * @en Sets the start event listener.
      * @zh 用来设置开始播放动画的事件监听。
      * @method setStartListener
      * @param {function} listener
      */
-    public setStartListener (listener: any) {
-        // this._ensureListener();
-        this._instance.setStartListener(listener);
-        // this._listener!.start = listener;
+    public setStartListener (listener: TrackListener) {
+        this._ensureListener();
+        const listenerID = TrackEntryListeners.addListener(listener);
+        this._instance.setListener(listenerID, spine.EventType.start);
+        this._listener!.start = listener;
     }
 
     /**
@@ -1323,9 +1335,11 @@ export class Skeleton extends UIRenderer {
      * @method setInterruptListener
      * @param {function} listener
      */
-    public setInterruptListener (listener: any) {
-        //this._ensureListener();
-        //this._listener!.interrupt = listener;
+    public setInterruptListener (listener: TrackListener) {
+        this._ensureListener();
+        const listenerID = TrackEntryListeners.addListener(listener);
+        this._instance.setListener(listenerID, spine.EventType.interrupt);
+        this._listener!.interrupt = listener;
     }
 
     /**
@@ -1335,8 +1349,10 @@ export class Skeleton extends UIRenderer {
      * @param {function} listener
      */
     public setEndListener (listener: any) {
-        // this._ensureListener();
-        // this._listener!.end = listener;
+        this._ensureListener();
+        const listenerID = TrackEntryListeners.addListener(listener);
+        this._instance.setListener(listenerID, spine.EventType.end);
+        this._listener!.end = listener;
     }
 
     /**
@@ -1346,8 +1362,10 @@ export class Skeleton extends UIRenderer {
      * @param {function} listener
      */
     public setDisposeListener (listener: any) {
-        // this._ensureListener();
-        // this._listener!.dispose = listener;
+        this._ensureListener();
+        const listenerID = TrackEntryListeners.addListener(listener);
+        this._instance.setListener(listenerID, spine.EventType.dispose);
+        this._listener!.dispose = listener;
     }
 
     /**
@@ -1357,8 +1375,10 @@ export class Skeleton extends UIRenderer {
      * @param {function} listener
      */
     public setCompleteListener (listener: any) {
-        // this._ensureListener();
-        // this._listener!.complete = listener;
+        this._ensureListener();
+        const listenerID = TrackEntryListeners.addListener(listener);
+        this._instance.setListener(listenerID, spine.EventType.complete);
+        this._listener!.complete = listener;
     }
 
     /**
@@ -1368,8 +1388,10 @@ export class Skeleton extends UIRenderer {
      * @param {function} listener
      */
     public setEventListener (listener: any) {
-        // this._ensureListener();
-        // this._listener!.event = listener;
+        this._ensureListener();
+        const listenerID = TrackEntryListeners.addListener(listener);
+        this._instance.setListener(listenerID, spine.EventType.event);
+        this._listener!.event = listener;
     }
 
     /**
@@ -1380,7 +1402,7 @@ export class Skeleton extends UIRenderer {
      * @param {function} listener
      */
     public setTrackStartListener (entry: any, listener: any) {
-        // TrackEntryListeners.getListeners(entry).start = listener;
+        TrackEntryListeners.getListeners(entry).start = listener;
     }
 
     /**
@@ -1391,7 +1413,7 @@ export class Skeleton extends UIRenderer {
      * @param {function} listener
      */
     public setTrackInterruptListener (entry: any, listener: any) {
-        //TrackEntryListeners.getListeners(entry).interrupt = listener;
+        TrackEntryListeners.getListeners(entry).interrupt = listener;
     }
 
     /**
@@ -1402,7 +1424,7 @@ export class Skeleton extends UIRenderer {
      * @param {function} listener
      */
     public setTrackEndListener (entry: any, listener: any) {
-        //TrackEntryListeners.getListeners(entry).end = listener;
+        TrackEntryListeners.getListeners(entry).end = listener;
     }
 
     /**
@@ -1413,7 +1435,7 @@ export class Skeleton extends UIRenderer {
      * @param {function} listener
      */
     public setTrackDisposeListener (entry: any, listener: any) {
-        //TrackEntryListeners.getListeners(entry).dispose = listener;
+        TrackEntryListeners.getListeners(entry).dispose = listener;
     }
 
     /**
@@ -1426,10 +1448,10 @@ export class Skeleton extends UIRenderer {
      * @param {Number} listener.loopCount
      */
     public setTrackCompleteListener (entry: any, listener: any) {
-        // TrackEntryListeners.getListeners(entry).complete = function (trackEntry) {
-        //     const loopCount = Math.floor(trackEntry.trackTime / trackEntry.animationEnd);
-        //     listener(trackEntry, loopCount);
-        // };
+        TrackEntryListeners.getListeners(entry).complete = function (trackEntry) {
+            const loopCount = Math.floor(trackEntry.trackTime / trackEntry.animationEnd);
+            listener(trackEntry, loopCount);
+        };
     }
 
     /**
@@ -1440,7 +1462,7 @@ export class Skeleton extends UIRenderer {
      * @param {function} listener
      */
     public setTrackEventListener (entry: any, listener: any) {
-        //TrackEntryListeners.getListeners(entry).event = listener;
+        TrackEntryListeners.getListeners(entry).event = listener;
     }
 }
 

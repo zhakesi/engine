@@ -1288,7 +1288,7 @@ declare namespace spine {
         setJitterEffect(jitter: spine.VertexEffect);
         setSwirlEffect(swirl: spine.VertexEffect);
         updateRenderData();
-        setStartListener();
+        setListener(id: number, type: number);
         static getCurrentEvent(): Event;
     }
 
@@ -1300,7 +1300,7 @@ declare namespace spine {
         static registerSpineSkeletonDataWithUUID(data: SkeletonData, uuid: string);
         static destroySpineSkeletonDataWithUUID(uuid: string);
         static destroySpineInstance(instance: SkeletonInstance);
-        static getCurrentInstance(): SkeletonInstance;
+        static getCurrentListenerID(): number;
         static getCurrentEventType(): EventType;
         static getCurrentTrackEntry(): TrackEntry;
         static getCurrentEvent(): Event;
