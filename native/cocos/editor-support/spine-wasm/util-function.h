@@ -12,12 +12,12 @@ public:
     static void ReleaseBuffer();
 };
 
-class StoreMemory {
-public:
-    static uint8_t* getStoreMemory();
-    static void     freeStoreMemory();
-    static uint32_t storeMemorySize();
-};
+// class StoreMemory {
+// public:
+//     static uint8_t* getStoreMemory();
+//     static void     freeStoreMemory();
+//     static uint32_t storeMemorySize();
+// };
 
 
 #endif

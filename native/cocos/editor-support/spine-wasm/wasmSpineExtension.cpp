@@ -23,7 +23,7 @@ char *WasmSpineExtension::_readFile(const String &path, int *length)
     // uint8_t *data = new uint8_t[resultSize];
     // memcpy(data, shareBuffer, resultSize);
 	// return (char*)data;
-	LogUtil::PrintToJs("Error WasmSpineExtension::_readFile");
+	//LogUtil::PrintToJs("Error WasmSpineExtension::_readFile");
 	return nullptr;
 }
 

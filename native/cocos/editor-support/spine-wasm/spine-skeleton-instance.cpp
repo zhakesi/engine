@@ -44,7 +44,7 @@ Skeleton *SpineSkeletonInstance::initSkeleton(SkeletonData* data) {
     _clipper = new SkeletonClipping();
     _skeleton->setToSetupPose();
     _skeleton->updateWorldTransform();
-    LogUtil::PrintToJs("initSkeleton ok.");
+    //LogUtil::PrintToJs("initSkeleton ok.");
 
 
     _animState->setRendererObject(this);
@@ -56,7 +56,7 @@ void SpineSkeletonInstance::setAnimation(float trackIndex, const std::string& na
     if (!_skeleton) return;
     spine::Animation *animation = _skeleton->getData()->findAnimation(name.c_str());
     if (!animation) {
-        LogUtil::PrintToJs("Spine: Animation not found:!!!");
+        //LogUtil::PrintToJs("Spine: Animation not found:!!!");
         _animState->clearTracks();
         _skeleton->setToSetupPose();
         return;
@@ -70,7 +70,7 @@ void SpineSkeletonInstance::setSkin(const std::string& name) {
     if (!_skeleton) return;
     _skeleton->setSkin(name.c_str());
     _skeleton->setSlotsToSetupPose();
-    LogUtil::PrintToJs(name.c_str());
+    //LogUtil::PrintToJs(name.c_str());
 }
 
 void SpineSkeletonInstance::updateAnimation(float dltTime) {
