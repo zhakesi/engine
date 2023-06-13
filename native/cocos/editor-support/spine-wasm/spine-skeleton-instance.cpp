@@ -82,6 +82,9 @@ void SpineSkeletonInstance::updateAnimation(float dltTime) {
 }
 
 SpineModel* SpineSkeletonInstance::updateRenderData() {
+    if (_userData.debugDraw) {
+        _debugShapes.clear();
+    }
     _skeleton->updateWorldTransform();
     SpineMeshData::reset();
     _model->clearMeshes();
@@ -105,6 +108,7 @@ void SpineSkeletonInstance::collectMeshData() {
     Color4F color;
     auto &slotArray = _skeleton->getDrawOrder();
     uint32_t slotCount = slotArray.size();
+    DEBUG_SHAPE_TYPE debugShapeType = DEBUG_SHAPE_TYPE::DEBUG_REGION;
 
     SlotMesh currMesh;
     if (_effect) {
@@ -125,6 +129,7 @@ void SpineSkeletonInstance::collectMeshData() {
         color.b = _userData.color.b;
         color.a = _userData.color.a;
         if (slot->getAttachment()->getRTTI().isExactly(spine::RegionAttachment::rtti)) {
+            debugShapeType = DEBUG_SHAPE_TYPE::DEBUG_REGION;
             auto *attachment = dynamic_cast<spine::RegionAttachment *>(slot->getAttachment());
             auto *attachmentVertices = reinterpret_cast<AttachmentVertices *>(attachment->getRendererObject());
 
@@ -157,6 +162,7 @@ void SpineSkeletonInstance::collectMeshData() {
             color.b *= attachment->getColor().b;
             color.a *= attachment->getColor().a;
         } else if (slot->getAttachment()->getRTTI().isExactly(spine::MeshAttachment::rtti)) {
+            debugShapeType = DEBUG_SHAPE_TYPE::DEBUG_MESH;
             auto *attachment = dynamic_cast<spine::MeshAttachment *>(slot->getAttachment());
             auto *attachmentVertices = static_cast<AttachmentVertices *>(attachment->getRendererObject());
    
@@ -331,7 +337,17 @@ void SpineSkeletonInstance::collectMeshData() {
         auto stride = _userData.useTint ? byteStrideTwoColor : byteStrideOneColor;
         SpineMeshData::moveVB(currMesh.vCount * stride);
         SpineMeshData::moveIB(currMesh.iCount);
-        
+        // record debug shape info        
+        if (_userData.debugDraw) {
+            SpineDebugShape debugShap;
+            debugShap.type = debugShapeType;
+            debugShap.vOffset = _model->vCount;
+            debugShap.vCount = currMesh.vCount;
+            debugShap.iOffset = _model->iCount;
+            debugShap.iCount = currMesh.iCount;
+            _debugShapes.push_back(debugShap);
+        }
+
         _model->addSlotMesh(currMesh);
 
         _clipper->clipEnd(*slot);
@@ -398,6 +414,10 @@ void SpineSkeletonInstance::setUseTint(bool useTint) {
     _userData.useTint = useTint;
 }
 
+void SpineSkeletonInstance::setDebugDraw(bool debugDraw) {
+    _userData.debugDraw = debugDraw;
+}
+
 void SpineSkeletonInstance::onAnimationStateEvent(TrackEntry *entry, EventType type, Event *event) {
     SpineWasmUtil::s_currentType = type;
     SpineWasmUtil::s_currentEntry = entry;
@@ -440,4 +460,8 @@ void SpineSkeletonInstance::onAnimationStateEvent(TrackEntry *entry, EventType t
             }
             break;
     }
+}
+
+std::vector<SpineDebugShape>& SpineSkeletonInstance::getDebugShapes() {
+    return this->_debugShapes;
 }

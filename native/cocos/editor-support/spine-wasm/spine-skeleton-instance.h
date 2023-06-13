@@ -15,10 +15,26 @@ typedef std::function<void(TrackEntry *entry)> DisposeListener;
 typedef std::function<void(TrackEntry *entry)> CompleteListener;
 typedef std::function<void(TrackEntry *entry, Event *event)> EventListener;
 
+enum DEBUG_SHAPE_TYPE {
+    DEBUG_REGION = 0,
+    DEBUG_MESH = 1
+};
+class SpineDebugShape {
+public:
+    SpineDebugShape(){}
+    ~SpineDebugShape(){}
+    DEBUG_SHAPE_TYPE type = DEBUG_REGION;
+    uint32_t        vOffset = 0;
+    uint32_t        vCount = 0;
+    uint32_t        iOffset = 0;
+    uint32_t        iCount = 0; 
+};
+
 class SpineSkeletonInstance {
     struct UserData {
         bool useTint = false;
         bool premultipliedAlpha = false;
+        bool debugDraw = true;
         Color4F color = Color4F(1.0F, 1.0F, 1.0F, 1.0F);
     };
 
@@ -32,6 +48,7 @@ public:
     SpineModel* updateRenderData();
     void setPremultipliedAlpha(bool val);
     void setUseTint(bool useTint);
+    void setDebugDraw(bool debugDraw);
     void setColor(float r, float g, float b, float a);
     void setJitterEffect(JitterVertexEffect *effect);
     void setSwirlEffect(SwirlVertexEffect *effect);
@@ -39,9 +56,8 @@ public:
     AnimationState* getAnimationState();
     void setMix(const std::string& from, const std::string& to, float duration);
     void setListener(uint32_t listenerID, uint32_t type);
-
-
-    virtual void onAnimationStateEvent(TrackEntry *entry, EventType type, Event *event);
+    void onAnimationStateEvent(TrackEntry *entry, EventType type, Event *event);
+    std::vector<SpineDebugShape>& getDebugShapes();
 
 private:
     void collectMeshData();
@@ -60,6 +76,7 @@ private:
     uint32_t _completeListenerID = 0;
     uint32_t _eventListenerID = 0;
     UserData _userData;
+    std::vector<SpineDebugShape> _debugShapes{};
 };
 
 #endif

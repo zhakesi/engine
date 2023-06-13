@@ -143,6 +143,10 @@ EMSCRIPTEN_BINDINGS(spine) {
         .value("Path", AttachmentType_Path)
         .value("Point", AttachmentType_Point)
         .value("Clipping", AttachmentType_Clipping);
+    
+    enum_<DEBUG_SHAPE_TYPE>("DEBUG_SHAPE_TYPE")
+        .value("DEBUG_REGION", DEBUG_REGION)
+        .value("DEBUG_MESH", DEBUG_MESH);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // class_<Vector>("Vector")
@@ -1042,7 +1046,7 @@ EMSCRIPTEN_BINDINGS(spine) {
         .property("iCount", &SlotMesh::iCount)
         .property("blendMode", &SlotMesh::blendMode);
 
-    register_vector<SlotMesh>("vector<SlotMesh>");
+    register_vector<SlotMesh>("VectorSlotMesh");
     class_<SpineModel>("SpineModel")
         .property("vCount", &SpineModel::vCount)
         .property("iCount", &SpineModel::iCount)
@@ -1050,7 +1054,14 @@ EMSCRIPTEN_BINDINGS(spine) {
         .property("iPtr", &SpineModel::iPtr)
         .function("getMeshes", &SpineModel::getMeshes);
 
+    class_<SpineDebugShape>("SpineDebugShape")
+        .property("type", &SpineDebugShape::type)
+        .property("vOffset", &SpineDebugShape::vOffset)
+        .property("vCount", &SpineDebugShape::vCount)
+        .property("iOffset", &SpineDebugShape::iOffset)
+        .property("iCount", &SpineDebugShape::iCount);
 
+    register_vector<SpineDebugShape>("VectorDebugShape");
     class_<SpineSkeletonInstance>("SkeletonInstance")
         .constructor<>()
         .function("initSkeleton", &SpineSkeletonInstance::initSkeleton, allow_raw_pointers())
@@ -1066,7 +1077,8 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("clearEffect", &SpineSkeletonInstance::clearEffect)
         .function("getAnimationState", &SpineSkeletonInstance::getAnimationState, allow_raw_pointer<AnimationState>())
         .function("setMix", &SpineSkeletonInstance::setMix)
-        .function("setListener", &SpineSkeletonInstance::setListener);
+        .function("setListener", &SpineSkeletonInstance::setListener)
+        .function("getDebugShapes", &SpineSkeletonInstance::getDebugShapes);
 }
 
 EMSCRIPTEN_BINDINGS(cocos_spine) {
