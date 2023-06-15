@@ -35,7 +35,7 @@ const PAGESIZE = 65536; // 64KiB
 
 // How many pages of the wasm memory
 // TODO: let this can be canfiguable by user.
-const PAGECOUNT = 64 * 16;
+const PAGECOUNT = 24 * 16;
 
 // How mush memory size of the wasm memory
 const MEMORYSIZE = PAGESIZE * PAGECOUNT; // 64 MiB
@@ -63,8 +63,10 @@ function initWasm (wasmUrl) {
 
 function initAsm (resolve) {
     console.log('[Spine]: Using asmjs libs.');
-    const wasmMemory: any = {};
-    wasmMemory.buffer = new ArrayBuffer(MEMORYSIZE);
+    const wasmMemory = new WebAssembly.Memory({
+        initial: MEMORYSIZE / 65536,
+        maximum: 2147483648 / 65536,
+    });
     const module = {
         wasmMemory,
     };

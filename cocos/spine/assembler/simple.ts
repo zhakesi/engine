@@ -154,14 +154,14 @@ function realTimeTraverse (comp: Skeleton) {
     const vPtr = model.vPtr;
     const vLength = vc * Float32Array.BYTES_PER_ELEMENT * floatStride;
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    const vData = spine.wasmUtil.HEAPU8.subarray(vPtr, vPtr + vLength);
+    const vData = spine.wasmUtil.wasm.HEAPU8.subarray(vPtr, vPtr + vLength);
     vUint8Buf.set(vData);
 
     const iPtr = model.iPtr;
     const ibuf = rd.indices;
     const iLength = Uint16Array.BYTES_PER_ELEMENT * ic;
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    const iData = spine.wasmUtil.HEAPU8.subarray(iPtr, iPtr + iLength);
+    const iData = spine.wasmUtil.wasm.HEAPU8.subarray(iPtr, iPtr + iLength);
     const iUint8Buf = new Uint8Array(ibuf.buffer);
     iUint8Buf.set(iData);
     const chunkOffset = rd.chunk.vertexOffset;
