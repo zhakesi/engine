@@ -34,7 +34,7 @@ import { legacyCC } from '../../core/global-exports';
 import { RenderData } from '../../2d/renderer/render-data';
 import { director } from '../../game';
 import spine from '../lib/spine-core.js';
-import { Color } from '../../core';
+import { Color, Vec3 } from '../../core';
 
 const _slotColor = new Color(0, 0, 255, 255);
 const _boneColor = new Color(255, 0, 0, 255);
@@ -181,6 +181,22 @@ function realTimeTraverse (comp: Skeleton) {
         indexOffset += indexCount;
     }
 
+    if (comp.enableBatch) {
+        const worldMat = comp.node.worldMatrix;
+        let index = 0;
+        const tempVecPos = new Vec3(0, 0, 0);
+        for (let i = 0; i < vc; i++) {
+            index = i * floatStride;
+            tempVecPos.x = vbuf[index];
+            tempVecPos.y = vbuf[index + 1];
+            tempVecPos.z = 0;
+            tempVecPos.transformMat4(worldMat);
+            vbuf[index] = tempVecPos.x;
+            vbuf[index + 1] = tempVecPos.y;
+            vbuf[index + 2] = tempVecPos.z;
+        }
+    }
+
     // debug renderer
     const graphics = comp._debugRenderer;
     const locSkeleton = comp._skeleton;
@@ -303,6 +319,23 @@ function cacheTraverse (comp: Skeleton) {
         indexCount = mesh.iCount;
         comp.requestDrawData(material, indexOffset, indexCount);
         indexOffset += indexCount;
+    }
+
+    const floatStride = _byteStrideTwoColor / Float32Array.BYTES_PER_ELEMENT;
+    if (comp.enableBatch) {
+        const worldMat = comp.node.worldMatrix;
+        let index = 0;
+        const tempVecPos = new Vec3(0, 0, 0);
+        for (let i = 0; i < vc; i++) {
+            index = i * floatStride;
+            tempVecPos.x = vbuf[index];
+            tempVecPos.y = vbuf[index + 1];
+            tempVecPos.z = 0;
+            tempVecPos.transformMat4(worldMat);
+            vbuf[index] = tempVecPos.x;
+            vbuf[index + 1] = tempVecPos.y;
+            vbuf[index + 2] = tempVecPos.z;
+        }
     }
 }
 
