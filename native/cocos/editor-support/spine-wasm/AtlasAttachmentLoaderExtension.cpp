@@ -52,8 +52,8 @@ AtlasAttachmentLoaderExtension::~AtlasAttachmentLoaderExtension() = default;
 
 void AtlasAttachmentLoaderExtension::configureAttachment(Attachment *attachment) {
     if (attachment->getRTTI().isExactly(RegionAttachment::rtti)) {
-        setAttachmentVertices(dynamic_cast<RegionAttachment *>(attachment));
+        setAttachmentVertices(static_cast<RegionAttachment *>(attachment));
     } else if (attachment->getRTTI().isExactly(MeshAttachment::rtti)) {
-        setAttachmentVertices(dynamic_cast<MeshAttachment *>(attachment));
+        setAttachmentVertices(static_cast<MeshAttachment *>(attachment));
     }
 }
