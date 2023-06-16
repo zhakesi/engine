@@ -31,16 +31,7 @@ import { sys } from '../../core';
 import { WebAssemblySupportMode } from '../../misc/webassembly-support';
 import { overrideSpineDefine } from './spine-define';
 
-const PAGESIZE = 65536; // 64KiB
-
-// How many pages of the wasm memory
-// TODO: let this can be canfiguable by user.
-const PAGECOUNT = 24 * 16;
-
-// How mush memory size of the wasm memory
-const MEMORYSIZE = PAGESIZE * PAGECOUNT; // 64 MiB
-
-const wasmInstance: SpineWasm.instance = {} as any;
+let wasmInstance: SpineWasm.instance = null!;
 const registerList: any[] = [];
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 function initWasm (wasmUrl) {
@@ -54,7 +45,7 @@ function initWasm (wasmUrl) {
             });
         },
     }).then((Instance: any) => {
-        Object.assign(wasmInstance, Instance);
+        wasmInstance = Instance;
         registerList.forEach((cb) => {
             cb(wasmInstance);
         });
@@ -63,15 +54,9 @@ function initWasm (wasmUrl) {
 
 function initAsm (resolve) {
     console.log('[Spine]: Using asmjs libs.');
-    const wasmMemory = new WebAssembly.Memory({
-        initial: MEMORYSIZE / 65536,
-        maximum: 2147483648 / 65536,
-    });
-    const module = {
-        wasmMemory,
-    };
+    const module = {};
     return asmFactory(module).then((instance: any) => {
-        Object.assign(wasmInstance, instance);
+        wasmInstance = instance;
         registerList.forEach((cb) => {
             cb(wasmInstance);
         });
