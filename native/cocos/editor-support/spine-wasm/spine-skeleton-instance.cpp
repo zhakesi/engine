@@ -82,7 +82,7 @@ void SpineSkeletonInstance::updateAnimation(float dltTime) {
 }
 
 SpineModel* SpineSkeletonInstance::updateRenderData() {
-    if (_userData.debugDraw) {
+    if (_userData.debugMode) {
         _debugShapes.clear();
     }
     _skeleton->updateWorldTransform();
@@ -338,14 +338,14 @@ void SpineSkeletonInstance::collectMeshData() {
         SpineMeshData::moveVB(currMesh.vCount * stride);
         SpineMeshData::moveIB(currMesh.iCount);
         // record debug shape info        
-        if (_userData.debugDraw) {
-            SpineDebugShape debugShap;
-            debugShap.type = debugShapeType;
-            debugShap.vOffset = _model->vCount;
-            debugShap.vCount = currMesh.vCount;
-            debugShap.iOffset = _model->iCount;
-            debugShap.iCount = currMesh.iCount;
-            _debugShapes.push_back(debugShap);
+        if (_userData.debugMode) {
+            SpineDebugShape debugShape;
+            debugShape.type = debugShapeType;
+            debugShape.vOffset = _model->vCount;
+            debugShape.vCount = currMesh.vCount;
+            debugShape.iOffset = _model->iCount;
+            debugShape.iCount = currMesh.iCount;
+            _debugShapes.push_back(debugShape);
         }
 
         _model->addSlotMesh(currMesh);
@@ -414,8 +414,8 @@ void SpineSkeletonInstance::setUseTint(bool useTint) {
     _userData.useTint = useTint;
 }
 
-void SpineSkeletonInstance::setDebugDraw(bool debugDraw) {
-    _userData.debugDraw = debugDraw;
+void SpineSkeletonInstance::setDebugMode(bool debug) {
+    _userData.debugMode = debug;
 }
 
 void SpineSkeletonInstance::onAnimationStateEvent(TrackEntry *entry, EventType type, Event *event) {

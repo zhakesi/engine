@@ -34,7 +34,7 @@ class SpineSkeletonInstance {
     struct UserData {
         bool useTint = false;
         bool premultipliedAlpha = false;
-        bool debugDraw = true;
+        bool debugMode = false;
         Color4F color = Color4F(1.0F, 1.0F, 1.0F, 1.0F);
     };
 
@@ -48,7 +48,7 @@ public:
     SpineModel* updateRenderData();
     void setPremultipliedAlpha(bool val);
     void setUseTint(bool useTint);
-    void setDebugDraw(bool debugDraw);
+    void setDebugMode(bool debug);
     void setColor(float r, float g, float b, float a);
     void setJitterEffect(JitterVertexEffect *effect);
     void setSwirlEffect(SwirlVertexEffect *effect);

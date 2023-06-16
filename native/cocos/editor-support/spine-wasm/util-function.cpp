@@ -7,7 +7,7 @@ static char* logBuffer = nullptr;
 const int LOG_LENGTH = 1024;
 
 void LogUtil::Initialize() {
-    logBuffer = new char[LOG_LENGTH];
+    //logBuffer = new char[LOG_LENGTH];
 }
 
 void LogUtil::PrintToJs(std::string &message) {
@@ -43,7 +43,7 @@ void LogUtil::PrintIntValue(int value, const char* message)
 }
 
 void LogUtil::ReleaseBuffer() {
-    delete[] logBuffer;
+    //delete[] logBuffer;
 }
 
 // const uint32_t MEMORY_SIZE = 8 * 1024 * 1024; 

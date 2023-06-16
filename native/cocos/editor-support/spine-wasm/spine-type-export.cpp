@@ -1078,6 +1078,7 @@ EMSCRIPTEN_BINDINGS(spine) {
         .function("getAnimationState", &SpineSkeletonInstance::getAnimationState, allow_raw_pointer<AnimationState>())
         .function("setMix", &SpineSkeletonInstance::setMix)
         .function("setListener", &SpineSkeletonInstance::setListener)
+        .function("setDebugMode", &SpineSkeletonInstance::setDebugMode)
         .function("getDebugShapes", &SpineSkeletonInstance::getDebugShapes);
 }
 
