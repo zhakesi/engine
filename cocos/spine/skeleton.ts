@@ -803,7 +803,7 @@ export class Skeleton extends UIRenderer {
                 const dc = this._drawList.data[i];
                 if (this._texture) {
                     batcher.commitMiddleware(this, meshBuffer, origin + dc.indexOffset,
-                        dc.indexCount, this._texture, dc.material!, false);
+                        dc.indexCount, this._texture, dc.material!, this._enableBatch);
                 }
                 indicesCount += dc.indexCount;
             }

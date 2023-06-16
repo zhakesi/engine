@@ -34,7 +34,7 @@ import { legacyCC } from '../../core/global-exports';
 import { RenderData } from '../../2d/renderer/render-data';
 import { director } from '../../game';
 import spine from '../lib/spine-core.js';
-import { Color } from '../../core';
+import { Color, Vec3 } from '../../core';
 
 const _slotColor = new Color(0, 0, 255, 255);
 const _boneColor = new Color(255, 0, 0, 255);
@@ -154,14 +154,14 @@ function realTimeTraverse (comp: Skeleton) {
     const vPtr = model.vPtr;
     const vLength = vc * Float32Array.BYTES_PER_ELEMENT * floatStride;
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    const vData = spine.wasmUtil.HEAPU8.subarray(vPtr, vPtr + vLength);
+    const vData = spine.wasmUtil.wasm.HEAPU8.subarray(vPtr, vPtr + vLength);
     vUint8Buf.set(vData);
 
     const iPtr = model.iPtr;
     const ibuf = rd.indices;
     const iLength = Uint16Array.BYTES_PER_ELEMENT * ic;
     // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-    const iData = spine.wasmUtil.HEAPU8.subarray(iPtr, iPtr + iLength);
+    const iData = spine.wasmUtil.wasm.HEAPU8.subarray(iPtr, iPtr + iLength);
     const iUint8Buf = new Uint8Array(ibuf.buffer);
     iUint8Buf.set(iData);
     const chunkOffset = rd.chunk.vertexOffset;
@@ -179,6 +179,22 @@ function realTimeTraverse (comp: Skeleton) {
         indexCount = mesh.iCount;
         comp.requestDrawData(material, indexOffset, indexCount);
         indexOffset += indexCount;
+    }
+    // if enableBatch apply worldMatrix
+    if (comp.enableBatch) {
+        const worldMat = comp.node.worldMatrix;
+        let index = 0;
+        const tempVecPos = new Vec3(0, 0, 0);
+        for (let i = 0; i < vc; i++) {
+            index = i * floatStride;
+            tempVecPos.x = vbuf[index];
+            tempVecPos.y = vbuf[index + 1];
+            tempVecPos.z = 0;
+            tempVecPos.transformMat4(worldMat);
+            vbuf[index] = tempVecPos.x;
+            vbuf[index + 1] = tempVecPos.y;
+            vbuf[index + 2] = tempVecPos.z;
+        }
     }
 
     // debug renderer
@@ -303,6 +319,23 @@ function cacheTraverse (comp: Skeleton) {
         indexCount = mesh.iCount;
         comp.requestDrawData(material, indexOffset, indexCount);
         indexOffset += indexCount;
+    }
+
+    const floatStride = _byteStrideTwoColor / Float32Array.BYTES_PER_ELEMENT;
+    if (comp.enableBatch) {
+        const worldMat = comp.node.worldMatrix;
+        let index = 0;
+        const tempVecPos = new Vec3(0, 0, 0);
+        for (let i = 0; i < vc; i++) {
+            index = i * floatStride;
+            tempVecPos.x = vbuf[index];
+            tempVecPos.y = vbuf[index + 1];
+            tempVecPos.z = 0;
+            tempVecPos.transformMat4(worldMat);
+            vbuf[index] = tempVecPos.x;
+            vbuf[index + 1] = tempVecPos.y;
+            vbuf[index + 2] = tempVecPos.z;
+        }
     }
 }
 

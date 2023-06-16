@@ -1307,7 +1307,7 @@ declare namespace spine {
         static getCurrentEventType(): EventType;
         static getCurrentTrackEntry(): TrackEntry;
         static getCurrentEvent(): Event;
-        static HEAPU8: Uint8Array;
+        static wasm: any;
     }
 }
 
