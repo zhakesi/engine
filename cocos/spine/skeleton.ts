@@ -249,7 +249,7 @@ export class Skeleton extends UIRenderer {
     protected _skeletonCache: SkeletonCache | null = null;
     protected _animCache: AnimationCache | null = null;
     /**
-     * @internal
+     * @engineInternal
      */
     public _curFrame: AnimationFrame | null = null;
     // Is need update skeltonData
@@ -257,7 +257,7 @@ export class Skeleton extends UIRenderer {
     protected _listener: TrackEntryListeners | null = null;
 
     /**
-     * @internal
+     * @engineInternal
      */
     public _debugRenderer: Graphics | null = null;
 
@@ -813,7 +813,7 @@ export class Skeleton extends UIRenderer {
     }
 
     /**
-     * @internal
+     * @engineInternal
      */
     public requestDrawData (material: Material, indexOffset: number, indexCount: number) {
         const draw = this._drawList.add();
