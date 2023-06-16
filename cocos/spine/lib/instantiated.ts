@@ -24,8 +24,8 @@
 import { instantiateWasm, fetchBuffer } from 'pal/wasm';
 import { JSB, WASM_SUPPORT_MODE } from 'internal:constants';
 import asmFactory from 'external:emscripten/spine/spine.asm.js';
-import asmJsMemUrl from 'external:emscripten/spine/spine.asm.js.mem';
-import wasmFactory from 'external:emscripten/spine/spine.js';
+import asmJsMemUrl from 'external:emscripten/spine/spine.js.mem';
+import wasmFactory from 'external:emscripten/spine/spine.wasm.js';
 import spineWasmUrl from 'external:emscripten/spine/spine.wasm';
 import { game } from '../../game';
 import { sys } from '../../core';
