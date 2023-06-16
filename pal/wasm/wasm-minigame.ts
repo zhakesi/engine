@@ -32,7 +32,7 @@ export function instantiateWasm (wasmUrl: string, importObject: WebAssembly.Impo
 
 export function fetchBuffer (binaryUrl: string): Promise<ArrayBuffer> {
     return new Promise<ArrayBuffer>((resolve, reject) => {
-        fsUtils.readArrayBuffer(binaryUrl, (err, arrayBuffer) => {
+        fsUtils.readArrayBuffer(`cocos-js/${binaryUrl}`, (err, arrayBuffer) => {
             if (err) {
                 reject(err);
                 return;
