@@ -130,7 +130,7 @@ void SpineSkeletonInstance::collectMeshData() {
         color.a = _userData.color.a;
         if (slot->getAttachment()->getRTTI().isExactly(spine::RegionAttachment::rtti)) {
             debugShapeType = DEBUG_SHAPE_TYPE::DEBUG_REGION;
-            auto *attachment = dynamic_cast<spine::RegionAttachment *>(slot->getAttachment());
+            auto *attachment = static_cast<spine::RegionAttachment *>(slot->getAttachment());
             auto *attachmentVertices = reinterpret_cast<AttachmentVertices *>(attachment->getRendererObject());
 
             auto vertCount = attachmentVertices->_triangles->vertCount;
@@ -163,7 +163,7 @@ void SpineSkeletonInstance::collectMeshData() {
             color.a *= attachment->getColor().a;
         } else if (slot->getAttachment()->getRTTI().isExactly(spine::MeshAttachment::rtti)) {
             debugShapeType = DEBUG_SHAPE_TYPE::DEBUG_MESH;
-            auto *attachment = dynamic_cast<spine::MeshAttachment *>(slot->getAttachment());
+            auto *attachment = static_cast<spine::MeshAttachment *>(slot->getAttachment());
             auto *attachmentVertices = static_cast<AttachmentVertices *>(attachment->getRendererObject());
    
             auto vertCount = attachmentVertices->_triangles->vertCount;
@@ -194,7 +194,7 @@ void SpineSkeletonInstance::collectMeshData() {
             color.b *= attachment->getColor().b;
             color.a *= attachment->getColor().a;
         } else if (slot->getAttachment()->getRTTI().isExactly(spine::ClippingAttachment::rtti)) {
-            auto *clip = dynamic_cast<spine::ClippingAttachment *>(slot->getAttachment());
+            auto *clip = static_cast<spine::ClippingAttachment *>(slot->getAttachment());
             _clipper->clipStart(*slot, clip);
             continue;
         } else {
